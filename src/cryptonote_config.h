@@ -154,21 +154,21 @@ namespace config
   boost::uuids::uuid const NETWORK_ID = { {
       0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x42, 0x44, 0x42, 0x41
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "";
+  std::string const GENESIS_TX = "011401ff00018d90fff29d01029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101796c90f36c11574074dc42b1cd46d9a4f7fe9893bd0e14f5813074fbbd022842";
   uint32_t const GENESIS_NONCE = 10000;
 
   namespace testnet
   {
-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x37751a; // Suto
-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x34f51a; // Suti
-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x1d351a; // Susu
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0xe1f54 // cash;
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x1b19a; // Suba
     //uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_SUBADDRESS_BASE58_PREFIX = 0x17b51a; // Susi
     uint16_t const P2P_DEFAULT_PORT = 29743;
     uint16_t const RPC_DEFAULT_PORT = 29744;
     boost::uuids::uuid const NETWORK_ID = { {
         0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x42, 0x44, 0x3e
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "";
+    std::string const GENESIS_TX = "011401ff00018d90fff29d01029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121012f58267555f0d4472123e3b814a5cf43220b7cdb563df6efbc13560b874c80fa";
     uint32_t const GENESIS_NONCE = 10001;
   }
 }
