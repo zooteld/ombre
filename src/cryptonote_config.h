@@ -56,7 +56,7 @@
 #define MONEY_SUPPLY                                    ((uint64_t)88888888000000000)
 #define EMISSION_SPEED_FACTOR                           21
 #define FINAL_SUBSIDY                                   ((uint64_t)1000000000) // 1 * pow(10, 9)
-#define GENESIS_BLOCK_REWARD                            ((uint64_t)6600000000000000) // ~7.5% dev premine
+#define GENESIS_BLOCK_REWARD                            ((uint64_t)7111111040000000) // ~8% dev premine
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE       240 * 1024    // 240kB
@@ -154,7 +154,7 @@ namespace config
   boost::uuids::uuid const NETWORK_ID = { {
       0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x42, 0x44, 0x42, 0x41
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff000180c0fdfbc8f0d00c024b6a1a3b2747a06ecd821422bd992c72b42f8b62d7c15a50b2b260bc2cffa28121015e5eb1d40b048470e9b4b21ab8e347ccae683243aef9327ac5c6e3be4a161f08";
+  std::string const GENESIS_TX = "013c01ff000180c0fdfbc8f0d00c02b5f4e2f5a8e0b25e212bf258b6887a9e8038ef125ef5471ee511b968f1c23ece21011a36263cafc446e930fd1b86a14828bc99ead82c2487ea321e7a99e280f7a759";
   uint32_t const GENESIS_NONCE = 10000;
 
   namespace testnet
