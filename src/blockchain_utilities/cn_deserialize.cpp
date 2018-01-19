@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
   if (command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
     return 1;
   }

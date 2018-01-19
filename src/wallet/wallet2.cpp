@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 // 
 // All rights reserved.
 // 
@@ -82,8 +82,8 @@ using namespace cryptonote;
 // arbitrary, used to generate different hashes from the same input
 #define CHACHA8_KEY_TAIL 0x8c
 
-#define UNSIGNED_TX_PREFIX "Sumokoin unsigned tx set\002"
-#define SIGNED_TX_PREFIX "Sumokoin signed tx set\002"
+#define UNSIGNED_TX_PREFIX "Ombre unsigned tx set\002"
+#define SIGNED_TX_PREFIX "Ombre signed tx set\002"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_ZONE  ((time_t)(1.8 * 86400)) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)

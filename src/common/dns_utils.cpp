@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -413,7 +413,7 @@ namespace dns_utils
     // for now, move on only if one address found
     if (addresses.size() > 1)
     {
-      LOG_ERROR("not yet supported: Multiple Sumokoin addresses found for given URL: " << url);
+      LOG_ERROR("not yet supported: Multiple Ombre addresses found for given URL: " << url);
       return{};
     }
     if (!cli_confirm)

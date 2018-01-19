@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -1207,7 +1207,7 @@ namespace nodetool
     }
     rsp.connections_count = m_net_server.get_config_object().get_connections_count();
     rsp.incoming_connections_count = rsp.connections_count - get_outgoing_connections_count();
-    rsp.version = SUMOKOIN_VERSION_FULL;
+    rsp.version = OMBRE_VERSION_FULL;
     rsp.os_version = tools::get_os_version_string();
     m_payload_handler.get_stat_info(rsp.payload_info);
     return 1;

@@ -1,16 +1,16 @@
 [Unit]
-Description=Sumokoin Full Node
+Description=Ombre Full Node
 After=network.target
 
 [Service]
-User=sumokoin
-Group=sumokoin
+User=ombre
+Group=ombre
 WorkingDirectory=~
 
 Type=forking
-ExecStart=/usr/bin/sumokoind --config-file /etc/sumokoind.conf --detach
+ExecStart=/usr/bin/ombred --config-file /etc/ombred.conf --detach
 
-# This is necessary because sumokoind does not yet support
+# This is necessary because ombred does not yet support
 # writing a PID file, which means systemd tries to guess the PID
 # by default, but it guesses wrong (sometimes, depending on
 # random timing of events), because the daemon forks twice.

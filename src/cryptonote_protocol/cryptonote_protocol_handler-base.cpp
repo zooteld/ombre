@@ -2,7 +2,7 @@
 /// @author rfree (current maintainer in monero.cc project)
 /// @brief This is the place to implement our handlers for protocol network actions, e.g. for ratelimit for download-requests
 
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 // 
 // All rights reserved.
 // 

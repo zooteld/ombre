@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -282,7 +282,7 @@ namespace cryptonote
       {
         LOG_PRINT_RED_L0("Found old-style blockchain.bin in " << old_files.string());
         LOG_PRINT_RED_L0("Monero now uses a new format. You can either remove blockchain.bin to start syncing");
-        LOG_PRINT_RED_L0("the blockchain anew, or use sumo-blockchain-export and sumo-blockchain-import to");
+        LOG_PRINT_RED_L0("the blockchain anew, or use ombre-blockchain-export and ombre-blockchain-import to");
         LOG_PRINT_RED_L0("convert your existing blockchain.bin to the new format. See README.md for instructions.");
         return false;
       }

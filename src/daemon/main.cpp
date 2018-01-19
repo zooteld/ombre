@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -117,16 +117,16 @@ int main(int argc, char const * argv[])
 
     if (command_line::get_arg(vm, command_line::arg_help))
     {
-      std::cout << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")" << ENDL << ENDL;
+      std::cout << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")" << ENDL << ENDL;
       std::cout << "Usage: " + std::string{argv[0]} + " [options|settings] [daemon_command...]" << std::endl << std::endl;
       std::cout << visible_options << std::endl;
       return 0;
     }
 
-    // Sumokoin Version
+    // Ombre Version
     if (command_line::get_arg(vm, command_line::arg_version))
     {
-      std::cout << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")" << ENDL;
+      std::cout << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")" << ENDL;
       return 0;
     }
 
@@ -282,7 +282,7 @@ int main(int argc, char const * argv[])
       tools::set_max_concurrency(command_line::get_arg(vm, daemon_args::arg_max_concurrency));
 
     // logging is now set up
-    LOG_PRINT_L0("Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")");
+    LOG_PRINT_L0("Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")");
 
     _note_c("dbg/main", "Moving from main() into the daemonize now.");
 

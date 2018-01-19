@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 //
 // All rights reserved.
 //
@@ -74,8 +74,8 @@ typedef cryptonote::simple_wallet sw;
 
 #define EXTENDED_LOGS_FILE "wallet_details.log"
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Sumokoin key image export\002"
-#define OUTPUT_EXPORT_FILE_MAGIC "Sumokoin output export\002"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Ombre key image export\002"
+#define OUTPUT_EXPORT_FILE_MAGIC "Ombre output export\002"
 
 #define LOCK_IDLE_SCOPE() \
   bool auto_refresh_enabled = m_auto_refresh_enabled.load(std::memory_order_relaxed); \
@@ -1315,7 +1315,7 @@ bool simple_wallet::new_wallet(const boost::program_options::variables_map& vm,
     tr("Your wallet has been generated!\n"
     "To start synchronizing with the daemon, use \"refresh\" command.\n"
     "Use \"help\" command to see the list of available commands.\n"
-    "Always use \"exit\" command when closing sumo-wallet-cli to save your\n"
+    "Always use \"exit\" command when closing ombre-wallet-cli to save your\n"
     "current session's state. Otherwise, you might need to synchronize \n"
     "your wallet again (your wallet keys are NOT at risk in any case).\n")
   ;
@@ -4139,7 +4139,7 @@ int main(int argc, char* argv[])
 
   const auto vm = wallet_args::main(
    argc, argv,
-   "sumo-wallet-cli [--wallet-file=<file>|--generate-new-wallet=<file>] [<COMMAND>]",
+   "ombre-wallet-cli [--wallet-file=<file>|--generate-new-wallet=<file>] [<COMMAND>]",
     desc_params,
     positional_options
   );

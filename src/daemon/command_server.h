@@ -9,7 +9,7 @@ Passing RPC commands:
 
 */
 
-// Copyright (c) 2016-2017, SUMOKOIN, (forked from) The Monero Project
+// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
 // 
 // All rights reserved.
 // 
