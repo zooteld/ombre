@@ -83,7 +83,7 @@ using namespace cryptonote;
 #define CHACHA8_KEY_TAIL 0x8c
 
 #define UNSIGNED_TX_PREFIX "Ombre unsigned tx set\002"
-#define SIGNED_TX_PREFIX "Ombre signed tx set\002"
+#define SIGNED_TX_PREFIX "Ombre signed tx set\004"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_ZONE  ((time_t)(1.8 * 86400)) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -109,7 +109,7 @@ struct options {
   const command_line::arg_descriptor<std::string> daemon_host = {"daemon-host", tools::wallet2::tr("Use daemon instance at host <arg> instead of localhost"), ""};
   const command_line::arg_descriptor<std::string> password = {"password", tools::wallet2::tr("Wallet password"), "", true};
   const command_line::arg_descriptor<std::string> password_file = {"password-file", tools::wallet2::tr("Wallet password file"), "", true};
-  const command_line::arg_descriptor<int> daemon_port = {"daemon-port", tools::wallet2::tr("Use daemon instance at port <arg> instead of 19733"), 0};
+  const command_line::arg_descriptor<int> daemon_port = {"daemon-port", tools::wallet2::tr("Use daemon instance at port <arg> instead of 19743"), 0};
   const command_line::arg_descriptor<bool> testnet = {"testnet", tools::wallet2::tr("For testnet. Daemon must also be launched with --testnet flag"), false};
   const command_line::arg_descriptor<bool> restricted = {"restricted-rpc", tools::wallet2::tr("Restricts to view-only commands"), false};
 };
