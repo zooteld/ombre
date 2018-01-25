@@ -1,6 +1,6 @@
 // Word list created by Monero contributor Shrikez
 // 
-// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
+// Copyright (c) 2014-2017, The Monero Project
 // 
 // All rights reserved.
 // 
