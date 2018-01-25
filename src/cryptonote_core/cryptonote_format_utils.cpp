@@ -108,6 +108,9 @@ namespace cryptonote
   }
   //---------------------------------------------------------------
   bool construct_miner_tx(size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
+
+
+    CHECK_AND_ASSERT_MES(1 <= max_outs, false, "max_out must be non-zero");
     tx.vin.clear();
     tx.vout.clear();
     tx.extra.clear();
@@ -122,6 +125,8 @@ namespace cryptonote
     in.height = height;
 
     uint64_t block_reward;
+    uint64_t dev_block_reward;
+    uint64_t miner_block_reward;
     if (!get_block_reward(median_size, current_block_size, already_generated_coins, block_reward, height))
     {
       LOG_PRINT_L0("Block is too big");
@@ -132,17 +137,18 @@ namespace cryptonote
     LOG_PRINT_L1("Creating block template: reward " << block_reward <<
       ", fee " << fee);
 #endif
-    block_reward += fee;
+
+    // TODO: Do we need to add the fee here aswell ?
+    dev_block_reward = CRYPTONOTE_PROJECT_BLOCK_REWARD * block_reward;
+    miner_block_reward = (block_reward + fee) - dev_block_reward;
 
     // from hard fork 4, we use a single "dusty" output. This makes the tx even smaller,
     // and avoids the quantization. These outputs will be added as rct outputs with identity
     // masks, to they can be used as rct inputs.
     std::vector<uint64_t> out_amounts;
-    decompose_amount_into_digits(block_reward, 0,
+    decompose_amount_into_digits(miner_block_reward, 0,
       [&out_amounts](uint64_t a_chunk) { out_amounts.push_back(a_chunk); },
       [&out_amounts](uint64_t a_dust) { out_amounts.push_back(a_dust); });
-
-    CHECK_AND_ASSERT_MES(1 <= max_outs, false, "max_out must be non-zero");
 
     while (max_outs < out_amounts.size())
     {
@@ -153,7 +159,8 @@ namespace cryptonote
     }
 
     uint64_t summary_amounts = 0;
-    for (size_t no = 0; no < out_amounts.size(); no++)
+    size_t no = 0;
+    for (; no < out_amounts.size(); no++)
     {
       crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);;
       crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
@@ -172,7 +179,27 @@ namespace cryptonote
       tx.vout.push_back(out);
     }
 
-    CHECK_AND_ASSERT_MES(summary_amounts == block_reward, false, "Failed to construct miner tx, summary_amounts = " << summary_amounts << " not equal block_reward = " << block_reward);
+    // Add the project block reward.
+    address_parse_info address_info;
+    if (get_account_address_from_str(address_info, false, CRYPTONOTE_PROJECT_BLOCK_ADDRESS)) {
+      crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);;
+      crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
+      bool r = crypto::generate_key_derivation(address_info.address.m_view_public_key, txkey.sec, derivation);
+      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << address_info.address.m_view_public_key << ", " << txkey.sec << ")");
+
+      r = crypto::derive_public_key(derivation, no, address_info.address.m_spend_public_key, out_eph_public_key);
+      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to derive_public_key(" << derivation << ", " << no << ", "<< address_info.address.m_spend_public_key << ")");
+
+      txout_to_key tk;
+      tk.key = out_eph_public_key;
+
+      tx_out out;
+      summary_amounts += out.amount = dev_block_reward;
+      out.target = tk;
+      tx.vout.push_back(out);
+    }
+
+    CHECK_AND_ASSERT_MES(summary_amounts == (miner_block_reward + dev_block_reward), false, "Failed to construct miner tx, summary_amounts = " << summary_amounts << " not equal block_reward = " << block_reward);
 
     tx.version = CURRENT_TRANSACTION_VERSION;
     //lock

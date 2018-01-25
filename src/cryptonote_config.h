@@ -58,6 +58,9 @@
 #define FINAL_SUBSIDY                                   ((uint64_t)1000000000) // 1 * pow(10, 9)
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)7111111040000000) // ~8% dev premine
 
+#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
+#define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashLnfXjoDie63ATqEzm5dHheJjxjpwjAJHU4AToKyL2kQ12L4mxbkNr7Uaoxh14fgGCB1mzUEyiP3KBBdXwDGA2goiR3t5cs"
+#define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE       240 * 1024    // 240kB
 #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
