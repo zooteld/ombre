@@ -959,6 +959,12 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
   LOG_PRINT_L3("Blockchain::" << __func__);
   //validate reward
   uint64_t money_in_use = 0;
+
+  if (b.miner_tx.vout.size() != 2) {
+    LOG_PRINT_L1("miner transaction doesn't contain 2 outs! Size is " << b.miner_tx.vout.size());
+    return false;
+  }
+
   for (auto& o: b.miner_tx.vout)
     money_in_use += o.amount;
   partial_block_reward = false;
