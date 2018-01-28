@@ -2,7 +2,7 @@
 /// @author rfree (current maintainer in monero.cc project)
 /// @brief base for connection, contains e.g. the ratelimit hooks
 
-// Copyright (c) 2018, OMBRE, (forked from) The Sumokoin project
+// Copyright (c) 2014-2017, The Monero Project
 // 
 // All rights reserved.
 // 
