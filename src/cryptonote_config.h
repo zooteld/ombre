@@ -1,3 +1,4 @@
+// Copyright (c) 2018, The OMBRE Project
 // Copyright (c) 2014-2017, The Monero Project
 //
 // All rights reserved.
@@ -60,6 +61,7 @@
 
 #define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
 #define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashLnfXjoDie63ATqEzm5dHheJjxjpwjAJHU4AToKyL2kQ12L4mxbkNr7Uaoxh14fgGCB1mzUEyiP3KBBdXwDGA2goiR3t5cs"
+#define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "52e98b6167d9f6f8611613cef475b706beebc5ddf2a2ade37cc32b9660fa9101"
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE       240 * 1024    // 240kB
