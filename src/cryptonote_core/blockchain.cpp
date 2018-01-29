@@ -1,3 +1,4 @@
+// Copyright (c) 2018, The OMBRE Project
 // Copyright (c) 2014-2017, The Monero Project
 //
 // All rights reserved.
@@ -960,13 +961,54 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
   //validate reward
   uint64_t money_in_use = 0;
 
-  if (b.miner_tx.vout.size() != 2) {
+  // The genesis block does not have the project free.
+  if (b.timestamp != 0 && b.miner_tx.vout.size() != 2) {
     LOG_PRINT_L1("miner transaction doesn't contain 2 outs! Size is " << b.miner_tx.vout.size());
     return false;
   }
 
-  for (auto& o: b.miner_tx.vout)
-    money_in_use += o.amount;
+  account_base project_account;
+
+  address_parse_info address_info;
+  if (!get_account_address_from_str(address_info, false, CRYPTONOTE_PROJECT_BLOCK_ADDRESS)) {
+    LOG_PRINT_L1("Unable to parse developer wallet address!");
+    return false;
+  }
+
+  cryptonote::blobdata viewkey_data;
+  string project_viewkey = CRYPTONOTE_PROJECT_BLOCK_VIEWKEY;
+  if(!epee::string_tools::parse_hexstr_to_binbuff(project_viewkey, viewkey_data)) {
+    LOG_PRINT_L1("Unable to parse developer wallet viewkey!");
+    return false;
+  }
+
+  crypto::secret_key viewkey = *reinterpret_cast<const crypto::secret_key*>(viewkey_data.data());
+  project_account.create_from_viewkey(address_info.address, viewkey);
+
+	std::vector<tx_extra_field> tx_extra_fields;
+  parse_tx_extra(b.miner_tx.extra, tx_extra_fields);
+
+  tx_extra_pub_key pub_key_field;
+  if (!find_tx_extra_field_by_type(tx_extra_fields, pub_key_field, 0)) {
+    LOG_PRINT_L1("Public tx key not found in transaction");
+    return false;
+  }
+
+  const cryptonote::account_keys& keys = project_account.get_keys();
+  crypto::key_derivation derivation;
+  generate_key_derivation(pub_key_field.pub_key, keys.m_view_secret_key, derivation);
+
+  bool project_out_found = false;
+  for (size_t i = 0; i < b.miner_tx.vout.size(); ++i) {
+    crypto::public_key pk;
+    derive_public_key(derivation, i, keys.m_account_address.m_spend_public_key, pk);
+    if (pk == boost::get<txout_to_key>(b.miner_tx.vout[i].target).key) {
+      LOG_PRINT_L3("Found project out in miner_tx");
+      project_out_found = true;
+    }
+    money_in_use += b.miner_tx.vout[i].amount;
+  }
+
   partial_block_reward = false;
 
   std::vector<size_t> last_blocks_sizes;
@@ -991,7 +1033,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     partial_block_reward = true;
   base_reward = money_in_use - fee;
 
-  return true;
+  return b.timestamp != 0 ? project_out_found : true;
 }
 //------------------------------------------------------------------
 // get the block sizes of the last <count> blocks, and return by reference <sz>.
