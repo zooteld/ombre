@@ -3,6 +3,7 @@
 /// @brief This is the orginal cryptonote protocol network-events handler, modified by us
 
 // Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2017, SUMOKOIN
 //
 // All rights reserved.
 //

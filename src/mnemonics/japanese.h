@@ -1,6 +1,7 @@
 // Word list originally created by dabura667
 // 
 // Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2017, SUMOKOIN
 // 
 // All rights reserved.
 // 

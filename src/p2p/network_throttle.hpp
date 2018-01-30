@@ -3,6 +3,7 @@
 /// @brief interface for throttling of connection (count and rate-limit speed etc)
 
 // Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2017, SUMOKOIN
 // 
 // All rights reserved.
 // 
