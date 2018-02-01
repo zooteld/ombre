@@ -561,7 +561,7 @@ string WalletImpl::keysFilename() const
     return m_wallet->get_keys_file();
 }
 
-void WalletImpl::init(const std::string &daemon_address, uint64_t upper_transaction_size_limit, bool enable_ssl, const char* cacerts_path))
+void WalletImpl::init(const std::string &daemon_address, uint64_t upper_transaction_size_limit, bool enable_ssl, const char* cacerts_path)
 {
     clearStatus();
     doInit(daemon_address, upper_transaction_size_limit, enable_ssl, cacerts_path);
