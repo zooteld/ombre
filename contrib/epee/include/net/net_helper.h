@@ -685,7 +685,7 @@ namespace net_utils
 		bool m_initialized;
 		bool m_connected;
     bool m_ssl;
-    const char* m_cacerts_path;
+    const char* m_cacerts_path = nullptr;
 		boost::asio::deadline_timer m_deadline;
 		volatile uint32_t m_shutdowned;
 	};
