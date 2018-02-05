@@ -41,6 +41,7 @@ using namespace epee;
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 #include "ringct/rctSigs.h"
+#include <math.h> // for use in the formula to calculate the current dev fee
 
 #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
 
@@ -140,8 +141,19 @@ namespace cryptonote
       ", fee " << fee);
 #endif
 
-    // TODO: Do we need to add the fee here aswell ?
-    dev_block_reward = CRYPTONOTE_PROJECT_BLOCK_REWARD * block_reward;
+    // following formula: f(x) = 0.06 * (1 - sqrt(x)) where x = current_supply / max_supply S.T. current_supply <= max_supply
+    float current_dev_fee;
+    if (already_generated_coins <= MONEY_SUPPLY)
+    {
+      current_dev_fee =  CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER * (1 - std::sqrt((float)already_generated_coins / (float)MONEY_SUPPLY));
+      current_dev_fee = std::round(current_dev_fee * 100000) / 100000; // 32bit float rounded to 5 decimal places for consistency (this ensures functional determinism)
+    }
+    else
+    {
+      current_dev_fee = 0; // dev fee is reducded to 0 once tail emission kicks in
+    }
+
+    dev_block_reward = current_dev_fee * block_reward;
     miner_block_reward = (block_reward + fee) - dev_block_reward;
 
     // from hard fork 4, we use a single "dusty" output. This makes the tx even smaller,

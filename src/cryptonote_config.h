@@ -61,6 +61,8 @@
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)7111111040000000) // ~8% dev premine
 
 #define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
+// Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
+#define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashLnfXjoDie63ATqEzm5dHheJjxjpwjAJHU4AToKyL2kQ12L4mxbkNr7Uaoxh14fgGCB1mzUEyiP3KBBdXwDGA2goiR3t5cs"
 #define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "52e98b6167d9f6f8611613cef475b706beebc5ddf2a2ade37cc32b9660fa9101"
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
