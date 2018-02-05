@@ -603,6 +603,15 @@ endif()
 
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
+if(HTTP_COMPRESSION)
+  find_package(ZLIB REQUIRED)
+  if ( ZLIB_FOUND )
+    add_definitions("-DHTTP_ENABLE_GZIP")
+    list(APPEND EXTRA_LIBRARIES ${ZLIB_LIBRARIES})
+  endif( ZLIB_FOUND )
+endif()
+
+
 if(ANDROID)
     set(ATOMIC libatomic.a)
 endif()
