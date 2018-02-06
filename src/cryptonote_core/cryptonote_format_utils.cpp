@@ -110,6 +110,19 @@ namespace cryptonote
     return true;
   }
   //---------------------------------------------------------------
+  // following formula: f(x) = 0.06 * (1 - sqrt(x)) where x = current_supply / max_supply S.T. current_supply <= max_supply
+  float get_project_block_reward_fee(float already_generated_coins) {
+    float current_dev_fee;
+    if (already_generated_coins <= MONEY_SUPPLY) {
+      current_dev_fee =  CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER * (1 - std::sqrt((float)already_generated_coins / (float)MONEY_SUPPLY));
+      current_dev_fee = std::round(current_dev_fee * 100000) / 100000; // 32bit float rounded to 5 decimal places for consistency (this ensures functional determinism)
+    } else {
+      current_dev_fee = 0; // dev fee is reduced to 0 once tail emission kicks in
+    }
+    return current_dev_fee;
+  }
+
+  //---------------------------------------------------------------
   bool construct_miner_tx(size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
 
 
@@ -141,17 +154,7 @@ namespace cryptonote
       ", fee " << fee);
 #endif
 
-    // following formula: f(x) = 0.06 * (1 - sqrt(x)) where x = current_supply / max_supply S.T. current_supply <= max_supply
-    float current_dev_fee;
-    if (already_generated_coins <= MONEY_SUPPLY)
-    {
-      current_dev_fee =  CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER * (1 - std::sqrt((float)already_generated_coins / (float)MONEY_SUPPLY));
-      current_dev_fee = std::round(current_dev_fee * 100000) / 100000; // 32bit float rounded to 5 decimal places for consistency (this ensures functional determinism)
-    }
-    else
-    {
-      current_dev_fee = 0; // dev fee is reducded to 0 once tail emission kicks in
-    }
+    float current_dev_fee = get_project_block_reward_fee(already_generated_coins);
 
     dev_block_reward = current_dev_fee * block_reward;
     miner_block_reward = (block_reward + fee) - dev_block_reward;
@@ -759,7 +762,7 @@ namespace cryptonote
         r = crypto::generate_key_derivation(dst_entr.addr.m_view_public_key, dst_entr.is_subaddress && need_additional_txkeys ? additional_txkey.sec : txkey.sec, derivation);
         CHECK_AND_ASSERT_MES(r, false, "at creation outs: failed to generate_key_derivation(" << dst_entr.addr.m_view_public_key << ", " << (dst_entr.is_subaddress && need_additional_txkeys ? additional_txkey.sec : txkey.sec) << ")");
       }
-      
+
       if (need_additional_txkeys)
       {
         additional_tx_public_keys.push_back(additional_txkey.pub);

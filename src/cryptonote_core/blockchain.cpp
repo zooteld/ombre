@@ -1000,11 +1000,16 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
   generate_key_derivation(pub_key_field.pub_key, keys.m_view_secret_key, derivation);
 
   bool project_out_found = false;
+  float project_dev_fee = get_project_block_reward_fee(already_generated_coins);
+  float project_dev_fee_amount = 0;
+
   for (size_t i = 0; i < b.miner_tx.vout.size(); ++i) {
     crypto::public_key pk;
     derive_public_key(derivation, i, keys.m_account_address.m_spend_public_key, pk);
     if (pk == boost::get<txout_to_key>(b.miner_tx.vout[i].target).key) {
       LOG_PRINT_L3("Found project out in miner_tx");
+      // Check if the amount is correct.
+      project_dev_fee_amount = b.miner_tx.vout[i].amount;
       project_out_found = true;
     }
     money_in_use += b.miner_tx.vout[i].amount;
@@ -1020,6 +1025,14 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     LOG_PRINT_L1("block size " << cumulative_block_size << " is bigger than allowed for this blockchain");
     return false;
   }
+
+  if (project_dev_fee > 0) {
+    if (m_db->height() != 0 && (project_dev_fee * base_reward) != project_dev_fee_amount) {
+      LOG_PRINT_L1("Project dev fee is incorrect!");
+      return false;
+    }
+  }
+
   if(base_reward + fee < money_in_use)
   {
     LOG_PRINT_L1("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
@@ -1034,7 +1047,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     partial_block_reward = true;
   base_reward = money_in_use - fee;
 
-  return b.timestamp != 0 ? project_out_found : true;
+  return m_db->height() != 0 ? project_out_found : true;
 }
 //------------------------------------------------------------------
 // get the block sizes of the last <count> blocks, and return by reference <sz>.
