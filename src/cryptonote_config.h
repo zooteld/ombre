@@ -55,10 +55,10 @@
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2            12
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY                                    ((uint64_t)88888888000000000)
+#define MONEY_SUPPLY                                    ((uint64_t)1000000000000000000) // 1 billion.
 #define EMISSION_SPEED_FACTOR                           21
 #define FINAL_SUBSIDY                                   ((uint64_t)1000000000) // 1 * pow(10, 9)
-#define GENESIS_BLOCK_REWARD                            ((uint64_t)7111111040000000) // ~8% dev premine
+#define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
 #define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
 // Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
@@ -160,9 +160,9 @@ namespace config
   uint16_t const RPC_DEFAULT_PORT = 19744;
 
   boost::uuids::uuid const NETWORK_ID = { {
-      0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x42, 0x44, 0x42, 0x41
+      0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x43, 0x44, 0x45, 0x41
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff000180c0fdfbc8f0d00c02b5f4e2f5a8e0b25e212bf258b6887a9e8038ef125ef5471ee511b968f1c23ece21011a36263cafc446e930fd1b86a14828bc99ead82c2487ea321e7a99e280f7a759";
+  std::string const GENESIS_TX = "013c01ff00018094ebdc0302f7c7fcac5d4a4829f5c49c86061f4cedf9f1ae904ce86f7eb9c2b83666a0e46d210102b03a3668c0c4354e7057ba4e0acd672aa9965be9d4f5e803f8e84b583b890c";
   uint32_t const GENESIS_NONCE = 10000;
 
   namespace testnet
@@ -174,9 +174,9 @@ namespace config
     uint16_t const P2P_DEFAULT_PORT = 29743;
     uint16_t const RPC_DEFAULT_PORT = 29744;
     boost::uuids::uuid const NETWORK_ID = { {
-        0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x42, 0x44, 0x3e
+        0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x42, 0x44, 0x45
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "011401ff00018d90fff29d01029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121012f58267555f0d4472123e3b814a5cf43220b7cdb563df6efbc13560b874c80fa";
+    std::string const GENESIS_TX = "013c01ff0001bbbad6adf00d029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101b20e782a04028cf9326ccd66e0d683f50dd1b261f4e81fac4bfa0c73d0601102";
     uint32_t const GENESIS_NONCE = 10001;
   }
 }
