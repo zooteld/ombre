@@ -63,7 +63,7 @@ sumokoin_add_library(blockchain_db
 target_link_libraries(blockchain_db
   PUBLIC
     common
-    crypto
+    cncrypto
     ${LMDB_LIBRARY}
     ${BDB_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}

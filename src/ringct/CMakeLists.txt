@@ -49,7 +49,7 @@ sumokoin_add_library(ringct
 target_link_libraries(ringct
   PUBLIC
     common
-    crypto
+    cncrypto
   PRIVATE
 ${EXTRA_LIBRARIES})
 

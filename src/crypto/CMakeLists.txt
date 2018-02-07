@@ -69,13 +69,13 @@ set(crypto_private_headers
   skein.h
   skein_port.h)
 
-sumokoin_private_headers(crypto
+sumokoin_private_headers(cncrypto
   ${crypto_private_headers})
-sumokoin_add_library(crypto
+sumokoin_add_library(cncrypto
   ${crypto_sources}
   ${crypto_headers}
   ${crypto_private_headers})
-target_link_libraries(crypto
+target_link_libraries(cncrypto
   PUBLIC
     ${Boost_SYSTEM_LIBRARY}
   PRIVATE

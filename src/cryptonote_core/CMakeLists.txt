@@ -77,7 +77,7 @@ sumokoin_add_library(cryptonote_core
 target_link_libraries(cryptonote_core
   PUBLIC
     common
-    crypto
+    cncrypto
     otshell_utils
     blockchain_db
     ringct
