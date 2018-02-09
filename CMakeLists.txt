@@ -294,6 +294,13 @@ else()
   message(STATUS "Stack trace on exception disabled")
 endif()
 
+find_package(OpenSSL REQUIRED)
+if(STATIC AND NOT IOS)
+  if(UNIX)
+    set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS}")
+  endif()
+endif()
+
 if (UNIX AND NOT APPLE)
   # Note that at the time of this writing the -Wstrict-prototypes flag added below will make this fail
   set(THREADS_PREFER_PTHREAD_FLAG ON)
