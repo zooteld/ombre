@@ -24,6 +24,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#include <sstream>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 #pragma once
 extern "C" {
@@ -35,15 +39,46 @@ namespace epee
 {
 namespace zlib_helper
 {
+
+  inline	static std::string compress(const std::string& data)
+	{
+		namespace bio = boost::iostreams;
+
+		std::stringstream compressed;
+		std::stringstream origin(data);
+
+		bio::filtering_streambuf<bio::input> out;
+		out.push(bio::gzip_compressor(bio::gzip_params(bio::gzip::best_compression)));
+		out.push(origin);
+		bio::copy(out, compressed);
+
+		return compressed.str();
+	}
+
+	inline static std::string decompress(const std::string& data)
+	{
+		namespace bio = boost::iostreams;
+
+		std::stringstream compressed(data);
+		std::stringstream decompressed;
+
+		bio::filtering_streambuf<bio::input> out;
+		out.push(bio::gzip_decompressor());
+		out.push(compressed);
+		bio::copy(out, decompressed);
+
+		return decompressed.str();
+	}
+
+
 	inline
 	bool pack(std::string& target){
 		std::string result_packed_buff;
 
 		z_stream    zstream = {0};
-		int ret = deflateInit(&zstream, Z_DEFAULT_COMPRESSION);
+		int ret = deflateInit(&zstream, Z_BEST_COMPRESSION);
 		if(target.size())
 		{
-
 
 			result_packed_buff.resize(target.size()*2, 'X');
 
@@ -57,7 +92,6 @@ namespace zlib_helper
 
 			if(result_packed_buff.size() != zstream.avail_out)
 				result_packed_buff.resize(result_packed_buff.size()-zstream.avail_out);
-
 
 			result_packed_buff.erase(0, 2);
 			target.swap(result_packed_buff);

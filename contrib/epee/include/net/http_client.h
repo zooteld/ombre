@@ -358,6 +358,9 @@ using namespace std;
 				req_buff += uri + " HTTP/1.1\r\n" +
 					"Host: "+ m_host_buff +"\r\n" +	"Content-Length: " + boost::lexical_cast<std::string>(body.size()) + "\r\n";
 
+#ifdef HTTP_ENABLE_GZIP
+        req_buff += "Accept-Encoding: gzip\r\n";
+#endif
 
 				//handle "additional_params"
 				for(fields_list::const_iterator it = additional_params.begin(); it!=additional_params.end(); it++)

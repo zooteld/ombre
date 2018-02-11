@@ -78,6 +78,7 @@ target_link_libraries(wallet
     mnemonics
     p2p
     ${Boost_CHRONO_LIBRARY}
+    ${Boost_IOSTREAMS_LIBRARY}
     ${Boost_SERIALIZATION_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
