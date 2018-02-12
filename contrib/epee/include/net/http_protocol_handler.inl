@@ -553,19 +553,24 @@ namespace net_utils
 		http_response_info response;
 		bool res = handle_request(query_info, response);
 
-    bool compress = false;
+    bool compression = false;
 
 #ifdef HTTP_ENABLE_GZIP
     STATIC_REGEXP_EXPR_1(rexp_match_gzip, "^.*?((gzip)|(deflate))", boost::regex::icase | boost::regex::normal);
     boost::smatch result;
     if(boost::regex_search(m_query_info.m_header_info.m_accept_encoding, result, rexp_match_gzip, boost::match_default) && result[0].matched) {
-      compress = true;
-     response.m_body = zlib_helper::compress(response.m_body);
+      compression = true;
+      std::string compressed_body = zlib_helper::compress(response.m_body);
+
+      if (!compressed_body.empty()){
+        response.m_body = compressed_body;
+        compression = true;
+      }
     }
 #endif
 		//CHECK_AND_ASSERT_MES(res, res, "handle_request(query_info, response) returned false" );
 
-		std::string response_data = get_response_header(response, compress);
+		std::string response_data = get_response_header(response, compression);
 
 		//LOG_PRINT_L0("HTTP_SEND: << \r\n" << response_data + response.m_body);
     LOG_PRINT_L3("HTTP_RESPONSE_HEAD: << \r\n" << response_data);

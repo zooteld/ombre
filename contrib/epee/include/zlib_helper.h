@@ -47,10 +47,14 @@ namespace zlib_helper
 		std::stringstream compressed;
 		std::stringstream origin(data);
 
-		bio::filtering_streambuf<bio::input> out;
-		out.push(bio::gzip_compressor(bio::gzip_params(bio::gzip::best_compression)));
-		out.push(origin);
-		bio::copy(out, compressed);
+    try {
+      bio::filtering_streambuf<bio::input> out;
+      out.push(bio::gzip_compressor(bio::gzip_params(bio::gzip::best_compression)));
+      out.push(origin);
+      bio::copy(out, compressed);
+    } catch (const boost::iostreams::gzip_error & exception) {
+      LOG_ERROR("Unable to compress payload (error: " << exception.error() << ")");
+    }
 
 		return compressed.str();
 	}
@@ -62,10 +66,14 @@ namespace zlib_helper
 		std::stringstream compressed(data);
 		std::stringstream decompressed;
 
-		bio::filtering_streambuf<bio::input> out;
-		out.push(bio::gzip_decompressor());
-		out.push(compressed);
-		bio::copy(out, decompressed);
+    try {
+      bio::filtering_streambuf<bio::input> out;
+      out.push(bio::gzip_decompressor());
+      out.push(compressed);
+      bio::copy(out, decompressed);
+    } catch (const boost::iostreams::gzip_error & exception) {
+      LOG_ERROR("Unable to decompress payload (error: " << exception.error() << ")");
+    }
 
 		return decompressed.str();
 	}
