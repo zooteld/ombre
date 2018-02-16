@@ -155,22 +155,31 @@ namespace cryptonote {
       return 1;
 		}
 
-		uint64_t weighted_timespans = 0;
-		uint64_t target;
+    uint64_t weighted_timespans = 0;
 
-		for (size_t i = 1; i < length; i++) {
-			uint64_t timespan;
-			if (timestamps[i - 1] >= timestamps[i]) {
-				timespan = 1;
-			} else {
-				timespan = timestamps[i] - timestamps[i - 1];
-			}
-			if (timespan > 10 * target_seconds) {
-				timespan = 10 * target_seconds;
-			}
-			weighted_timespans += i * timespan;
-		}
-		target = ((length + 1) / 2) * target_seconds;
+    uint64_t previous_max = timestamps[0];
+    for (size_t i = 1; i < length; i++) {
+      uint64_t timespan;
+      uint64_t max_timestamp;
+
+      if (timestamps[i] > previous_max) {
+        max_timestamp = timestamps[i];
+      } else {
+        max_timestamp = previous_max;
+      }
+
+      timespan = max_timestamp - previous_max;
+      if (timespan == 0) {
+        timespan = 1;
+      } else if (timespan > 10 * target_seconds) {
+        timespan = 10 * target_seconds;
+      }
+
+      weighted_timespans += i * timespan;
+      previous_max = max_timestamp;
+    }
+    // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
+    uint64_t target = 99 * (((length + 1) / 2) * target_seconds) / 100;
 
     uint64_t minimum_timespan = target_seconds * length / 2;
     if (weighted_timespans < minimum_timespan) {
