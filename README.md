@@ -36,7 +36,29 @@ The development fee will be used to pay for development, exchanges and marketing
   + 1 Ombrecent = 0.001 **OMB** (10<sup>-3</sup>)
 - **Hash algorithm**: CryptoNight (Proof-Of-Work)
 - **Emission scheme**: Ombre's block reward changes _every 6-months_ as the following "Camel" distribution* (inspired by _real-world mining production_ like of crude oil, coal etc. that is often slow at first,
-accelerated in the next few years before declined and depleted). However, the emission path of Ombre is generally not far apart from what of Bitcoin (view charts below). This great emission scheme was first introduced in Sumokoin.
+accelerated in the next few years before declined and depleted). This great emission scheme was first introduced in Sumokoin.
+
+## Roadmap 2018
+
+### Q2: Android wallet
+We will release an Android wallet which will use remote wallet nodes to scan the blockchain for transactions.
+
+One problem with existing Android wallets for cryptonote coins is that they use close to 1GB of data (Sumokoin) to scan the blockchain. we will solve this by allowing the Android wallet to send the wallet's viewkey to the remote wallet node. With this approach the transaction scanning can be done server side and this will significantly increase the performance of the wallet.
+
+All wallet connections will be SSL encrypted and official wallet nodes will be provided.
+
+### Q2. Blockchain protocol optimisations
+The blockchain network communication is not optimized and, for example, doesn't even use compression on large data exchanges. We will add compression and will look into modernizing the RPC protocols.
+
+### Q3. Security audit
+We plan on doing a full security audit of the codebase and will setup fuzzing for all exposed network logic. Additionally security enhancements are planned for the ombred daemon, the GUI wallet and the communication channel between both. 
+
+### Q3. Web wallet (under consideration)
+For this roadmap item we would like to have community feedback first: we think a web wallet would be very convenient for our users but we'll be on the lookout for feedback before starting the implementation.
+
+### Q3. Global pool balancer ((under consideration)
+We will implement a lightweight and yet protocol aware loadbalancer to spread the mining load on our network across pools evenly. We will create an incentive for pool owners and miners to join the loadbalancer. A healthy spread of the mining across multiple pools is highly beneficial for the stability of the coin.
+
 
 ## About this Project
 
