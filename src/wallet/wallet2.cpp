@@ -795,7 +795,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
             std::ref(tx_scan_info[i])));
         }
         KILL_IOSERVICE();
-        for (size_t i = 1; i < tx.vout.size(); ++i)
+        for (size_t i = 0; i < tx.vout.size(); ++i)
         {
           if (tx_scan_info[i].error)
           {
