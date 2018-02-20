@@ -475,6 +475,8 @@ namespace nodetool
         LOG_PRINT_L0("DNS seed node lookup either timed out or failed, falling back to defaults");
         full_addrs.insert("185.47.62.242:19743");
         full_addrs.insert("185.101.98.125:19743");
+		full_addrs.insert("164.132.145.151:19743");
+		full_addrs.insert("173.249.13.148:19743");
         full_addrs.insert("104.155.77.250:19743");
       }
     }
