@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>Sumokoin::PendingTransactionImpl</name>
+    <name>Ombre::PendingTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/pending_transaction.cpp" line="95"/>
         <source>daemon is busy. Please try again later.</source>
@@ -30,7 +30,7 @@
     </message>
 </context>
 <context>
-    <name>Sumokoin::WalletImpl</name>
+    <name>Ombre::WalletImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet.cpp" line="609"/>
         <source>payment id has invalid format, expected 16 or 64 character hex string: </source>
@@ -145,7 +145,7 @@
     </message>
 </context>
 <context>
-    <name>Sumokoin::WalletManagerImpl</name>
+    <name>Ombre::WalletManagerImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet_manager.cpp" line="161"/>
         <source>failed to parse txid</source>
