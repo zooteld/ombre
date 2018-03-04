@@ -88,7 +88,6 @@ target_link_libraries(daemon
     rpc
     blockchain_db
     cryptonote_core
-    crypto
     common
     otshell_utils
     p2p
