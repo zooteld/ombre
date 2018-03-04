@@ -1028,7 +1028,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
 
   if (project_dev_fee > 0) {
     if (m_db->height() != 0 && (project_dev_fee * base_reward) != project_dev_fee_amount) {
-      LOG_PRINT_L1("Project dev fee is incorrect!");
+      LOG_PRINT_L1("Project dev fee is incorrect! " << (project_dev_fee * base_reward) << " != " << project_dev_fee_amount);
       return false;
     }
   }
