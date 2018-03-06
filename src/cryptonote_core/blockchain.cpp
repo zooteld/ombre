@@ -1028,7 +1028,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
 
   if (project_dev_fee > 0) {
     if (m_db->height() != 0 && (project_dev_fee * base_reward) != project_dev_fee_amount) {
-      LOG_PRINT_L1("Project dev fee is incorrect!");
+      LOG_PRINT_L1("Project dev fee is incorrect! " << (project_dev_fee * base_reward) << " != " << project_dev_fee_amount);
       return false;
     }
   }
@@ -3038,13 +3038,18 @@ leave:
   if (m_db->height() < m_blocks_hash_check.size())
   {
     auto hash = get_block_hash(bl);
-    if (memcmp(&hash, &m_blocks_hash_check[m_db->height()], sizeof(hash)) != 0)
-    {
-      LOG_PRINT_L1("Block with id is INVALID: " << id);
-      bvc.m_verifivation_failed = true;
-      goto leave;
+    const auto &expected_hash = m_blocks_hash_check[m_db->height()];
+
+    if (expected_hash != cryptonote::null_hash) {
+      if (memcmp(&hash, &expected_hash, sizeof(hash)) != 0) {
+        LOG_PRINT_L1("Block with id is INVALID: " << id);
+        bvc.m_verifivation_failed = true;
+        goto leave;
+      }
+      fast_check = true;
+    } else {
+      LOG_PRINT_L1("No checkpoint for height " << m_db->height());
     }
-    fast_check = true;
   }
   else
 #endif

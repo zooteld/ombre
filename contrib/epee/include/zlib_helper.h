@@ -33,7 +33,6 @@
 extern "C" {
 #include "zlib.h"
 }
-#pragma comment(lib, "zlibstat.lib")
 
 namespace epee
 {

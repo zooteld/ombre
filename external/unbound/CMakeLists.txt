@@ -1,5 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
-# Copyright (c) 2017, SUMOKOIN
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -31,15 +30,6 @@ cmake_minimum_required(VERSION 2.8.7)
 
 project(unbound C)
 
-if (APPLE)
-  if (NOT OpenSSL_DIR)
-      EXECUTE_PROCESS(COMMAND brew --prefix openssl
-        OUTPUT_VARIABLE OPENSSL_ROOT_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message(STATUS "Using OpenSSL found at ${OPENSSL_ROOT_DIR}")
-  endif()
-endif()
-
 find_package(Threads)
 
 include(configure_checks.cmake)
@@ -54,10 +44,17 @@ endif ()
 
 set(RETSIGTYPE void)
 
+if(CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
+add_definitions(-D_XOPEN_SOURCE=600)
+else()
 add_definitions(-D_GNU_SOURCE)
+endif()
+add_definitions(-std=c99)
+add_definitions(-fPIC)
 
 option(USE_ECDSA "Use ECDSA algorithms" ON)
 option(USE_SHA2 "Enable SHA2 support" ON)
+option(USE_SHA1 "Enable SHA1 support" ON)
 set(ENABLE_DNSTAP 0)
 set(HAVE_SSL 1)
 if (CMAKE_USE_PTHREADS_INIT AND NOT CMAKE_USE_WIN32_THREADS_INIT)
@@ -70,6 +67,15 @@ if (CMAKE_USE_WIN32_THREADS_INIT)
 else ()
   set(HAVE_WINDOWS_THREADS 0)
 endif ()
+
+# determine if we have libressl
+check_symbol_exists(LIBRESSL_VERSION_TEXT "openssl/opensslv.h" HAVE_LIBRESSL)
+# check if we have found HAVE_DECL_REALLOCARRAY already, so we can safely undefine and redefine it with value 1
+if (HAVE_LIBRESSL AND HAVE_DECL_REALLOCARRAY)
+  unset(HAVE_DECL_REALLOCARRAY CACHE)
+  add_definitions(-DHAVE_DECL_REALLOCARRAY=1)
+endif ()
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/config.h")
@@ -95,13 +101,16 @@ set(common_src
   iterator/iter_resptype.c
   iterator/iter_scrub.c
   iterator/iter_utils.c
+  respip/respip.c
   services/listen_dnsport.c
   services/localzone.c
   services/mesh.c
   services/modstack.c
   services/outbound_list.c
   services/outside_network.c
+  services/view.c
   util/alloc.c
+  util/as112.c
   util/config_file.c
   util/configlexer.c
   util/configparser.c
@@ -122,6 +131,7 @@ set(common_src
   util/storage/slabhash.c
   util/timehist.c
   util/tube.c
+  util/ub_event.c
   util/winsock_event.c
   validator/autotrust.c
   validator/val_anchor.c
@@ -141,7 +151,7 @@ set(common_src
 
 set(compat_src)
 
-foreach (symbol IN ITEMS ctime_r gmtime_r inet_aton inet_ntop inet_pton isblank malloc memmove snprintf strlcat strlcpy strptime explicit_bzero arc4random arc4random_uniform reallocarray)
+foreach (symbol IN ITEMS ctime_r gmtime_r inet_aton inet_ntop inet_pton isblank malloc memmove snprintf strsep strlcat strlcpy strptime explicit_bzero arc4random arc4random_uniform reallocarray)
   string(TOUPPER "${symbol}" upper_sym)
   if (NOT HAVE_${upper_sym})
     list(APPEND compat_src
@@ -225,6 +235,11 @@ endif ()
 
 
 if (INSTALL_VENDORED_LIBUNBOUND)
+    if(IOS)
+        set(lib_folder lib-${ARCH})
+    else()
+        set(lib_folder lib)
+    endif()
     install(TARGETS unbound
-        ARCHIVE DESTINATION lib)
+        ARCHIVE DESTINATION ${lib_folder})
 endif()

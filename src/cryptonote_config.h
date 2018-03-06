@@ -63,8 +63,8 @@
 #define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
 // Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
 #define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
-#define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashLnfXjoDie63ATqEzm5dHheJjxjpwjAJHU4AToKyL2kQ12L4mxbkNr7Uaoxh14fgGCB1mzUEyiP3KBBdXwDGA2goiR3t5cs"
-#define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "52e98b6167d9f6f8611613cef475b706beebc5ddf2a2ade37cc32b9660fa9101"
+#define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt"
+#define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "bffa803bb4061d93a83a3613ff478c5b5e5cb0b0337a735e1a1304ca9fab1807"
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 60
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE       240 * 1024    // 240kB
@@ -160,9 +160,9 @@ namespace config
   uint16_t const RPC_DEFAULT_PORT = 19744;
 
   boost::uuids::uuid const NETWORK_ID = { {
-      0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x43, 0x44, 0x45, 0x41
+      0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x41, 0x42, 0x43, 0x41
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff00018094ebdc0302f7c7fcac5d4a4829f5c49c86061f4cedf9f1ae904ce86f7eb9c2b83666a0e46d210102b03a3668c0c4354e7057ba4e0acd672aa9965be9d4f5e803f8e84b583b890c";
+  std::string const GENESIS_TX = "013c01ff00018094ebdc0302bc7ae26c871f8f18415e0fbd4776f9d4dbd5297c126bd99e26cf218ea0d6ec4a2101450a7665ca17a5ef3c691898068994569bb033012598c43068161b1194592327";
   uint32_t const GENESIS_NONCE = 10000;
 
   namespace testnet
@@ -174,7 +174,7 @@ namespace config
     uint16_t const P2P_DEFAULT_PORT = 29743;
     uint16_t const RPC_DEFAULT_PORT = 29744;
     boost::uuids::uuid const NETWORK_ID = { {
-        0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x42, 0x44, 0x45
+        0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x44, 0x44, 0x43
       } }; // Bender's daydream
     std::string const GENESIS_TX = "013c01ff0001bbbad6adf00d029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101b20e782a04028cf9326ccd66e0d683f50dd1b261f4e81fac4bfa0c73d0601102";
     uint32_t const GENESIS_NONCE = 10001;
