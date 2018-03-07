@@ -1,11 +1,10 @@
 #!/bin/python
-
 EMISSION_SPEED_FACTOR = 21
 DIFFICULTY_TARGET = 60 # seconds
-MONEY_SUPPLY         = 1000000000000000000
-GENESIS_BLOCK_REWARD     = 0
+MONEY_SUPPLY = 1000000000000000000
+GENESIS_BLOCK_REWARD = 1000000000
 FINAL_SUBSIDY = 10000000000
-COIN_EMISSION_MONTH_INTERVAL = 6 #months
+COIN_EMISSION_MONTH_INTERVAL = 6  #months
 COIN_EMISSION_HEIGHT_INTERVAL  = int(COIN_EMISSION_MONTH_INTERVAL * 30.4375 * 24 * 3600 / DIFFICULTY_TARGET)
 HEIGHT_PER_YEAR = int((12*30.4375*24*3600)/DIFFICULTY_TARGET)
 PEAK_COIN_EMISSION_YEAR = 4
@@ -44,6 +43,9 @@ def calculate_emssion_speed(print_by_year = False):
             block_reward = GENESIS_BLOCK_REWARD
         else:
             block_reward = int(cal_block_reward) / round_factor * round_factor
+            # temporary patch to ensure exeuction terminates
+            if block_reward < 0.5:
+                break
 
         if block_reward < FINAL_SUBSIDY:
             if MONEY_SUPPLY > coins_already_generated:
