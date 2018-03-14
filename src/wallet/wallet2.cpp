@@ -392,6 +392,29 @@ std::unique_ptr<tools::wallet2> generate_from_json(const std::string& json_file,
   return nullptr;
 }
 
+bool are_wallet_permissions_strict(std::string wallet_file) {
+  boost::filesystem::perms wanted_perms = boost::filesystem::no_perms;
+  wanted_perms |= boost::filesystem::perms::owner_read;
+  wanted_perms |= boost::filesystem::perms::owner_write;
+
+  boost::filesystem::file_status s = status(
+      boost::filesystem::path(wallet_file));
+  return s.permissions() == wanted_perms;
+}
+
+void set_strict_wallet_permissions(std::string wallet_file) {
+  boost::filesystem::perms wanted_perms = boost::filesystem::no_perms;
+  wanted_perms |= boost::filesystem::perms::owner_read;
+  wanted_perms |= boost::filesystem::perms::owner_write;
+
+  try {
+    permissions(
+        boost::filesystem::path(wallet_file), wanted_perms);
+  } catch (const boost::filesystem::filesystem_error&) {
+    LOG_ERROR("Unable to set secure permissions on file: " << wallet_file);
+  }
+}
+
 } //namespace
 
 namespace tools
@@ -2480,6 +2503,11 @@ void wallet2::load(const std::string& wallet_, const std::string& password)
   bool exists = boost::filesystem::exists(m_keys_file, e);
   THROW_WALLET_EXCEPTION_IF(e || !exists, error::file_not_found, m_keys_file);
 
+  if (!are_wallet_permissions_strict(m_keys_file)) {
+    LOG_PRINT_L0("Insecure wallet key file permissions found. Fixing them now.");
+    set_strict_wallet_permissions(m_keys_file);
+  }
+
   if (!load_keys(m_keys_file, password))
   {
     THROW_WALLET_EXCEPTION_IF(true, error::file_read_error, m_keys_file);
@@ -2497,6 +2525,12 @@ void wallet2::load(const std::string& wallet_, const std::string& password)
   {
     wallet2::cache_file_data cache_file_data;
     std::string buf;
+
+    if (!are_wallet_permissions_strict(m_wallet_file)) {
+      LOG_PRINT_L0("Insecure wallet file permissions found. Fixing them now.");
+      set_strict_wallet_permissions(m_wallet_file);
+    }
+
     bool r = epee::file_io_utils::load_file_to_string(m_wallet_file, buf);
     THROW_WALLET_EXCEPTION_IF(!r, error::file_read_error, m_wallet_file);
 
@@ -2691,6 +2725,7 @@ void wallet2::store_to(const std::string &path, const std::string &password)
     const std::string address_file = m_wallet_file + ".address.txt";
     bool r = file_io_utils::save_string_to_file(address_file, m_account.get_public_address_str(m_testnet));
     THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_wallet_file);
+    set_strict_wallet_permissions(address_file);
     // remove old wallet file
     r = boost::filesystem::remove(old_file);
     if (!r) {
@@ -2711,6 +2746,9 @@ void wallet2::store_to(const std::string &path, const std::string &password)
     std::error_code e = tools::replace_file(new_file, m_wallet_file);
     THROW_WALLET_EXCEPTION_IF(e, error::file_save_error, m_wallet_file, e);
   }
+
+  set_strict_wallet_permissions(m_wallet_file);
+  set_strict_wallet_permissions(m_keys_file);
 }
 //----------------------------------------------------------------------------------------------------
 uint64_t wallet2::balance(uint32_t index_major) const
