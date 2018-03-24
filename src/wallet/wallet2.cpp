@@ -4772,7 +4772,13 @@ uint64_t wallet2::get_upper_transaction_size_limit()
   if (m_upper_transaction_size_limit > 0)
     return m_upper_transaction_size_limit;
 
-  return TRANSACTION_SIZE_LIMIT;
+  uint64_t earliest_height;
+  get_hard_fork_info(version, earliest_height); // can throw
+
+  if (version == 2) {
+    return TRANSACTION_SIZE_LIMIT;
+  }
+  return TRANSACTION_SIZE_LIMIT_V2;
 }
 //----------------------------------------------------------------------------------------------------
 std::vector<size_t> wallet2::select_available_outputs(const std::function<bool(const transfer_details &td)> &f)

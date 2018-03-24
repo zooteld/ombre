@@ -85,7 +85,8 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1482806500 },
-  { 2, 21300, 0, 1497657600 }
+  { 2, 21300, 0, 1497657600 },
+  { 3, 35000, 0, 1522597016 }
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
@@ -2698,14 +2699,20 @@ void Blockchain::check_ring_signature(const crypto::hash &tx_prefix_hash, const 
 //------------------------------------------------------------------
 uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size)
 {
-  if (median_block_size < BLOCK_SIZE_GROWTH_FAVORED_ZONE)
-    median_block_size = BLOCK_SIZE_GROWTH_FAVORED_ZONE;
+  int block_growth_zone;
+  if (get_current_hard_fork_version() > 2) {
+    block_growth_zone = BLOCK_SIZE_GROWTH_FAVORED_ZONE_V2;
+  } else {
+    block_growth_zone = BLOCK_SIZE_GROWTH_FAVORED_ZONE;
+  }
+  if (median_block_size < block_growth_zone)
+    median_block_size = block_growth_zone;
 
   // this to avoid full block fee getting too low when block reward decline, i.e. easier for "block filler" attack
   if (block_reward < DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD)
     block_reward = DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD;
 
-  uint64_t unscaled_fee_per_kb = (DYNAMIC_FEE_PER_KB_BASE_FEE * BLOCK_SIZE_GROWTH_FAVORED_ZONE / median_block_size);
+  uint64_t unscaled_fee_per_kb = (DYNAMIC_FEE_PER_KB_BASE_FEE * block_growth_zone / median_block_size);
   uint64_t hi, lo = mul128(unscaled_fee_per_kb, block_reward, &hi);
   static_assert(DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD % 1000000 == 0, "DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD must be divisible by 1000000");
   static_assert(DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD / 1000000 <= std::numeric_limits<uint32_t>::max(), "DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD is too large");
