@@ -4773,6 +4773,7 @@ uint64_t wallet2::get_upper_transaction_size_limit()
     return m_upper_transaction_size_limit;
 
   uint64_t earliest_height;
+  uint64_t version = 0;
   get_hard_fork_info(version, earliest_height); // can throw
 
   if (version == 2) {

@@ -120,10 +120,9 @@ namespace cryptonote
       return false;
     }
 
+    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
     if (version == 2) {
-      size_t tx_size_limit = TRANSACTION_SIZE_LIMIT;
-    } else {
-      size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
+      tx_size_limit = TRANSACTION_SIZE_LIMIT;
     }
 
     if (!kept_by_block && blob_size >= tx_size_limit)
@@ -687,10 +686,9 @@ namespace cryptonote
     CRITICAL_REGION_LOCAL(m_transactions_lock);
     size_t n_removed = 0;
 
+    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
     if (version == 2) {
-      size_t tx_size_limit = TRANSACTION_SIZE_LIMIT;
-    } else {
-      size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
+      tx_size_limit = TRANSACTION_SIZE_LIMIT;
     }
 
     for (auto it = m_transactions.begin(); it != m_transactions.end(); ) {

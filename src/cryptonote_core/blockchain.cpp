@@ -2700,7 +2700,7 @@ void Blockchain::check_ring_signature(const crypto::hash &tx_prefix_hash, const 
 //------------------------------------------------------------------
 uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size)
 {
-  int block_growth_zone;
+  size_t block_growth_zone;
   if (get_current_hard_fork_version() > 2) {
     block_growth_zone = BLOCK_SIZE_GROWTH_FAVORED_ZONE_V2;
   } else {
@@ -2726,7 +2726,7 @@ uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median
 }
 
 //------------------------------------------------------------------
-bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
+bool Blockchain::check_fee(size_t blob_size, uint64_t fee)
 {
   uint64_t fee_per_kb;
   uint64_t median = m_current_block_cumul_sz_limit / 2;
@@ -2752,7 +2752,7 @@ bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
 }
 
 //------------------------------------------------------------------
-uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) const
+uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks)
 {
   if (grace_blocks >= CRYPTONOTE_REWARD_BLOCKS_WINDOW)
     grace_blocks = CRYPTONOTE_REWARD_BLOCKS_WINDOW - 1;
