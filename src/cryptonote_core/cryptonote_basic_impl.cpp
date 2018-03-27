@@ -109,8 +109,8 @@ namespace cryptonote {
     base_reward = base_reward / round_factor * round_factor;
 
     //make it soft
-    if (median_size < CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE) {
-      median_size = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
+    if (median_size < CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2) {
+      median_size = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
     }
 
     if (current_block_size > 2 * median_size) {

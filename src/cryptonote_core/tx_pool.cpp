@@ -112,7 +112,7 @@ namespace cryptonote
     }
 
     uint64_t fee = tx.rct_signatures.txnFee;
-    
+
     if (!kept_by_block && !m_blockchain.check_fee(blob_size, fee))
     {
       tvc.m_verifivation_failed = true;
@@ -120,7 +120,11 @@ namespace cryptonote
       return false;
     }
 
-    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT;
+    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
+    if (version == 2) {
+      tx_size_limit = TRANSACTION_SIZE_LIMIT;
+    }
+
     if (!kept_by_block && blob_size >= tx_size_limit)
     {
       LOG_PRINT_L1("transaction is too big: " << blob_size << " bytes, maximum size: " << tx_size_limit);
@@ -128,7 +132,7 @@ namespace cryptonote
       tvc.m_too_big = true;
       return false;
     }
-    
+
     bool mixin_too_low = false;
     bool mixin_too_high = false;
     BOOST_FOREACH(const auto& in, tx.vin)
@@ -143,7 +147,7 @@ namespace cryptonote
         break;
       }
     }
-    
+
     if (!kept_by_block && mixin_too_low){
       LOG_PRINT_L1("Transaction with id= "<< id << " has too low mixin");
       tvc.m_low_mixin = true;
@@ -681,7 +685,12 @@ namespace cryptonote
   {
     CRITICAL_REGION_LOCAL(m_transactions_lock);
     size_t n_removed = 0;
-    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT;
+
+    size_t tx_size_limit = TRANSACTION_SIZE_LIMIT_V2;
+    if (version == 2) {
+      tx_size_limit = TRANSACTION_SIZE_LIMIT;
+    }
+
     for (auto it = m_transactions.begin(); it != m_transactions.end(); ) {
       if (it->second.blob_size >= tx_size_limit) {
         LOG_PRINT_L1("Transaction " << get_transaction_hash(it->second.tx) << " is too big (" << it->second.blob_size << " bytes), removing it from pool");
@@ -731,7 +740,7 @@ namespace cryptonote
     // no need to store queue of sorted transactions, as it's easy to generate.
     for (const auto& tx : m_transactions)
     {
-      // Rounding tx fee/blob_size ratio so that txs with same priority level 
+      // Rounding tx fee/blob_size ratio so that txs with same priority level
       // and the ratios not much diff would be sorted by receive_time
       uint32_t fee_per_size_ratio = (uint32_t)(tx.second.fee / (double)tx.second.blob_size);
       m_txs_by_fee_and_receive_time.emplace(std::pair<uint32_t, time_t>(fee_per_size_ratio, tx.second.receive_time), tx.first);
