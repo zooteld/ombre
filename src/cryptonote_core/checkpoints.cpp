@@ -204,8 +204,9 @@ namespace cryptonote
     // All OmbrePulse domains have DNSSEC on and valid
     static const std::vector<std::string> dns_urls =
     {
-	  "checkpoints1.ombre.io",
-	  "checkpoints2.ombre.io"
+      "checkpoints1.cryptonote.rocks",
+      "checkpoints2.cryptonote.rocks",
+      "checkpoints3.cryptonote.rocks"
     };
 
     static const std::vector<std::string> testnet_dns_urls = {
