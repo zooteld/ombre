@@ -85,7 +85,8 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1482806500 },
-  { 2, 21300, 0, 1497657600 }
+  { 2, 21300, 0, 1497657600 },
+  { 3, 51200, 0, 1523130006 } // Between 10th and 14th of April.
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
@@ -96,7 +97,8 @@ static const struct {
   time_t time;
 } testnet_hard_forks[] = {
   { 1, 1, 0, 1482806500 },
-  { 2, 5150, 0, 1497181713 }
+  { 2, 30, 0, 1497181713 },
+  { 3, 125, 0, 1522597016 }
 };
 static const uint64_t testnet_hard_fork_version_1_till = (uint64_t)-1;
 
@@ -1285,6 +1287,14 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
   if (!m_checkpoints.is_alternative_block_allowed(get_current_blockchain_height(), block_height))
   {
     LOG_PRINT_RED_L1("Block with id: " << id << std::endl << " can't be accepted for alternative chain, block height: " << block_height << std::endl << " blockchain height: " << get_current_blockchain_height());
+    bvc.m_verifivation_failed = true;
+    return false;
+  }
+
+  // this is a cheap test
+  if (!m_hardfork->check_for_height(b, block_height))
+  {
+    LOG_PRINT_L1("Block with id: " << id << std::endl << "has old version for height " << block_height);
     bvc.m_verifivation_failed = true;
     return false;
   }
@@ -2698,14 +2708,20 @@ void Blockchain::check_ring_signature(const crypto::hash &tx_prefix_hash, const 
 //------------------------------------------------------------------
 uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size)
 {
-  if (median_block_size < BLOCK_SIZE_GROWTH_FAVORED_ZONE)
-    median_block_size = BLOCK_SIZE_GROWTH_FAVORED_ZONE;
+  size_t block_growth_zone;
+  if (get_current_hard_fork_version() > 2) {
+    block_growth_zone = BLOCK_SIZE_GROWTH_FAVORED_ZONE_V2;
+  } else {
+    block_growth_zone = BLOCK_SIZE_GROWTH_FAVORED_ZONE;
+  }
+  if (median_block_size < block_growth_zone)
+    median_block_size = block_growth_zone;
 
   // this to avoid full block fee getting too low when block reward decline, i.e. easier for "block filler" attack
   if (block_reward < DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD)
     block_reward = DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD;
 
-  uint64_t unscaled_fee_per_kb = (DYNAMIC_FEE_PER_KB_BASE_FEE * BLOCK_SIZE_GROWTH_FAVORED_ZONE / median_block_size);
+  uint64_t unscaled_fee_per_kb = (DYNAMIC_FEE_PER_KB_BASE_FEE * block_growth_zone / median_block_size);
   uint64_t hi, lo = mul128(unscaled_fee_per_kb, block_reward, &hi);
   static_assert(DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD % 1000000 == 0, "DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD must be divisible by 1000000");
   static_assert(DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD / 1000000 <= std::numeric_limits<uint32_t>::max(), "DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD is too large");
@@ -2718,7 +2734,7 @@ uint64_t Blockchain::get_dynamic_per_kb_fee(uint64_t block_reward, size_t median
 }
 
 //------------------------------------------------------------------
-bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
+bool Blockchain::check_fee(size_t blob_size, uint64_t fee)
 {
   uint64_t fee_per_kb;
   uint64_t median = m_current_block_cumul_sz_limit / 2;
@@ -2744,7 +2760,7 @@ bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
 }
 
 //------------------------------------------------------------------
-uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) const
+uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks)
 {
   if (grace_blocks >= CRYPTONOTE_REWARD_BLOCKS_WINDOW)
     grace_blocks = CRYPTONOTE_REWARD_BLOCKS_WINDOW - 1;

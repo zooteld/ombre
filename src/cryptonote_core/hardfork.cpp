@@ -1,22 +1,22 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -115,6 +115,19 @@ bool HardFork::check(const cryptonote::block &block) const
   return do_check(::get_block_version(block), ::get_block_vote(block));
 }
 
+bool HardFork::do_check_for_height(uint8_t block_version, uint8_t voting_version, uint64_t height) const
+{
+  int fork_index = get_voted_fork_index(height);
+  return block_version == heights[fork_index].version
+      && voting_version >= heights[fork_index].version;
+}
+
+bool HardFork::check_for_height(const cryptonote::block &block, uint64_t height) const
+{
+  CRITICAL_REGION_LOCAL(lock);
+  return do_check_for_height(::get_block_version(block), ::get_block_vote(block), height);
+}
+
 bool HardFork::add(uint8_t block_version, uint8_t voting_version, uint64_t height)
 {
   CRITICAL_REGION_LOCAL(lock);
@@ -207,7 +220,7 @@ bool HardFork::reorganize_from_block_height(uint64_t height)
     return false;
 
   db.set_batch_transactions(true);
-  db.batch_start();
+  bool stop_batch = db.batch_start();
 
   versions.clear();
 
@@ -235,7 +248,9 @@ bool HardFork::reorganize_from_block_height(uint64_t height)
     add(db.get_block_from_height(h), h);
   }
 
-  db.batch_stop();
+  if (stop_batch) {
+    db.batch_stop();
+  }
 
   return true;
 }

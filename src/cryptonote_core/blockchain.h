@@ -524,7 +524,7 @@ namespace cryptonote
      *
      * @return the per kB fee
      */
-    static uint64_t get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size);
+    uint64_t get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size);
 
     /**
      * @brief get dynamic per kB fee estimate for the next few blocks
@@ -538,7 +538,7 @@ namespace cryptonote
      *
      * @return the per kB fee estimate
      */
-    uint64_t get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) const;
+    uint64_t get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks);
 
     /**
      * @brief validate a transaction's fee
@@ -552,7 +552,7 @@ namespace cryptonote
      *
      * @return true if the fee is enough, false otherwise
      */
-    bool check_fee(size_t blob_size, uint64_t fee) const;
+    bool check_fee(size_t blob_size, uint64_t fee);
 
     /**
      * @brief check that a transaction's outputs conform to current standards
@@ -753,7 +753,7 @@ namespace cryptonote
      * @param earliest_height the earliest height at which <version> is allowed
      * @param voting which version this node is voting for/using
      *
-     * @return whether the version queried is enabled 
+     * @return whether the version queried is enabled
      */
     bool get_hard_fork_voting_info(uint8_t version, uint32_t &window, uint32_t &votes, uint32_t &threshold, uint64_t &earliest_height, uint8_t &voting) const;
 
