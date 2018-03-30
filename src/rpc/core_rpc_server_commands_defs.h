@@ -1,22 +1,22 @@
 // Copyright (c) 2014-2017, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -26,7 +26,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
@@ -118,6 +118,38 @@ namespace cryptonote
         KV_SERIALIZE(current_height)
         KV_SERIALIZE(status)
         KV_SERIALIZE(output_indices)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+
+  struct COMMAND_RPC_GET_WALLET_BLOCKS
+  {
+    struct request
+    {
+      uint64_t      start_height;
+      std::string   wallet_address;
+      std::string   wallet_viewkey;
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(start_height)
+        KV_SERIALIZE(wallet_address)
+        KV_SERIALIZE(wallet_viewkey)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      std::list<block_complete_entry> blocks;
+      uint64_t    start_height;
+      uint64_t    current_height;
+      bool        has_more;
+      std::string status;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(blocks)
+        KV_SERIALIZE(start_height)
+        KV_SERIALIZE(current_height)
+        KV_SERIALIZE(has_more)
+        KV_SERIALIZE(status)
       END_KV_SERIALIZE_MAP()
     };
   };
@@ -538,7 +570,7 @@ namespace cryptonote
     };
   };
 
-    
+
   //-----------------------------------------------
   struct COMMAND_RPC_STOP_MINING
   {
@@ -609,7 +641,7 @@ namespace cryptonote
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   //
   struct COMMAND_RPC_GETBLOCKCOUNT
   {
@@ -674,7 +706,7 @@ namespace cryptonote
   struct COMMAND_RPC_SUBMITBLOCK
   {
     typedef std::vector<std::string> request;
-    
+
     struct response
     {
       std::string status;
@@ -684,7 +716,7 @@ namespace cryptonote
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   struct block_header_response
   {
       uint8_t major_version;
@@ -698,7 +730,7 @@ namespace cryptonote
       std::string hash;
       difficulty_type difficulty;
       uint64_t reward;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(major_version)
         KV_SERIALIZE(minor_version)
@@ -726,7 +758,7 @@ namespace cryptonote
     {
       std::string status;
       block_header_response block_header;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(block_header)
         KV_SERIALIZE(status)
@@ -734,7 +766,7 @@ namespace cryptonote
     };
 
   };
-  
+
   struct COMMAND_RPC_GET_BLOCK_HEADER_BY_HASH
   {
     struct request
@@ -750,7 +782,7 @@ namespace cryptonote
     {
       std::string status;
       block_header_response block_header;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(block_header)
         KV_SERIALIZE(status)
@@ -774,7 +806,7 @@ namespace cryptonote
     {
       std::string status;
       block_header_response block_header;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(block_header)
         KV_SERIALIZE(status)
@@ -803,7 +835,7 @@ namespace cryptonote
       std::vector<std::string> tx_hashes;
       std::string blob;
       std::string json;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(block_header)
         KV_SERIALIZE(tx_hashes)
@@ -973,7 +1005,7 @@ namespace cryptonote
     {
       std::string status;
       std::list<connection_info> connections;
-      
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
         KV_SERIALIZE(connections)
@@ -1024,7 +1056,7 @@ namespace cryptonote
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   struct COMMAND_RPC_FAST_EXIT
   {
 	struct request
@@ -1032,17 +1064,17 @@ namespace cryptonote
       BEGIN_KV_SERIALIZE_MAP()
       END_KV_SERIALIZE_MAP()
     };
-    
+
     struct response
     {
 	  std::string status;
-	  
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   struct COMMAND_RPC_OUT_PEERS
   {
 	struct request
@@ -1052,17 +1084,17 @@ namespace cryptonote
         KV_SERIALIZE(out_peers)
       END_KV_SERIALIZE_MAP()
     };
-    
+
     struct response
     {
 	  std::string status;
-	  
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
       END_KV_SERIALIZE_MAP()
     };
   };
-    
+
   struct COMMAND_RPC_START_SAVE_GRAPH
   {
 	struct request
@@ -1070,17 +1102,17 @@ namespace cryptonote
       BEGIN_KV_SERIALIZE_MAP()
       END_KV_SERIALIZE_MAP()
     };
-    
+
     struct response
     {
 	  std::string status;
-	  
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
       END_KV_SERIALIZE_MAP()
     };
   };
-  
+
   struct COMMAND_RPC_STOP_SAVE_GRAPH
   {
 	struct request
@@ -1088,11 +1120,11 @@ namespace cryptonote
       BEGIN_KV_SERIALIZE_MAP()
       END_KV_SERIALIZE_MAP()
     };
-    
+
     struct response
     {
 	  std::string status;
-	  
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)
       END_KV_SERIALIZE_MAP()

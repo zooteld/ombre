@@ -1,22 +1,22 @@
 // Copyright (c) 2014-2017, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -26,7 +26,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include <boost/foreach.hpp>
@@ -147,6 +147,99 @@ namespace cryptonote
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
+
+  bool transaction_has_out_for_account(transaction &tx, account_base *account) {
+    std::vector<tx_extra_field> tx_extra_fields;
+    parse_tx_extra(tx.extra, tx_extra_fields);
+
+    tx_extra_pub_key pub_key_field;
+    if (!find_tx_extra_field_by_type(tx_extra_fields, pub_key_field, 0)) {
+      LOG_PRINT_L1("Public tx key not found in transaction");
+      return false;
+    }
+
+    const cryptonote::account_keys& keys = account->get_keys();
+    crypto::key_derivation derivation;
+    generate_key_derivation(pub_key_field.pub_key, keys.m_view_secret_key, derivation);
+
+    for (size_t i = 0; i < tx.vout.size(); ++i) {
+      crypto::public_key pk;
+      derive_public_key(derivation, i, keys.m_account_address.m_spend_public_key, pk);
+      if (pk == boost::get<txout_to_key>(tx.vout[i].target).key) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_get_wallet_blocks(const COMMAND_RPC_GET_WALLET_BLOCKS::request& req, COMMAND_RPC_GET_WALLET_BLOCKS::response& res) {
+
+    std::list<block> blocks;
+    size_t blocks_to_fetch = 1000;
+    account_base* account = nullptr;
+
+    if (req.wallet_viewkey.empty() || req.wallet_address.empty()) {
+      res.status = "Need both wallet viewkey and address";
+      return false;
+    }
+    account = new account_base();
+    address_parse_info address_info;
+    if (!get_account_address_from_str(address_info, false, req.wallet_address)) {
+      res.status = "Unable to parse developer wallet address";
+      return false;
+    }
+
+    cryptonote::blobdata viewkey_data;
+    if(!epee::string_tools::parse_hexstr_to_binbuff(req.wallet_viewkey, viewkey_data)) {
+      res.status = "Unable to parse developer wallet viewkey";
+      return false;
+    }
+
+    crypto::secret_key viewkey = *reinterpret_cast<const crypto::secret_key*>(viewkey_data.data());
+    account->create_from_viewkey(address_info.address, viewkey);
+
+    if (!m_core.get_blocks(req.start_height, blocks_to_fetch, blocks)) {
+      res.status = "Unable to get blocks";
+      return false;
+    }
+
+    res.current_height = req.start_height;
+
+    BOOST_FOREACH(auto& b, blocks) {
+      // Check the miner transaction.
+      bool found = transaction_has_out_for_account(b.miner_tx, account);
+
+      // Check the normal transactions.
+      std::list<transaction> txs;
+      if (!b.tx_hashes.empty() && !found) {
+        std::list<transaction> missed_txs;
+        m_core.get_transactions(b.tx_hashes, txs, missed_txs);
+
+        BOOST_FOREACH(auto& t, txs) {
+          if (transaction_has_out_for_account(t, account)) {
+            found = true;
+            break;
+          }
+        }
+      }
+
+      if (found) {
+        res.blocks.resize(res.blocks.size() + 1);
+        res.blocks.back().block = block_to_blob(b);
+        BOOST_FOREACH(auto& t, txs) {
+          res.blocks.back().txs.push_back(tx_to_blob(t));
+        }
+      }
+      res.current_height++;
+    }
+
+    res.has_more = res.current_height == (req.start_height + blocks_to_fetch);
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_get_blocks(const COMMAND_RPC_GET_BLOCKS_FAST::request& req, COMMAND_RPC_GET_BLOCKS_FAST::response& res)
   {
@@ -624,7 +717,7 @@ namespace cryptonote
 
     const miner& lMiner = m_core.get_miner();
     res.active = lMiner.is_mining();
-    
+
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
@@ -855,7 +948,7 @@ namespace cryptonote
       error_resp.message = "Wrong block blob";
       return false;
     }
-    
+
     // Fixing of high orphan issue for most pools
     // Thanks Boolberry!
     block b = AUTO_VAL_INIT(b);
@@ -1366,7 +1459,7 @@ namespace cryptonote
 			m_p2p.delete_connections(count);
 		  }
 	  }
-	  
+
 	  else
 		m_p2p.m_config.m_net_config.connections_count = req.out_peers;
 		*/
