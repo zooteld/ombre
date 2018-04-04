@@ -73,19 +73,7 @@ namespace cryptonote
     };
   };
 
-  struct COMMAND_RPC_GET_BLOCKS_FAST
-  {
-
-    struct request
-    {
-      std::list<crypto::hash> block_ids; //*first 10 blocks id goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
-      uint64_t    start_height;
-      BEGIN_KV_SERIALIZE_MAP()
-        KV_SERIALIZE_CONTAINER_POD_AS_BLOB(block_ids)
-        KV_SERIALIZE(start_height)
-      END_KV_SERIALIZE_MAP()
-    };
-
+  struct COMMAND_RPC_DATA {
     struct tx_output_indices
     {
       std::vector<uint64_t> indices;
@@ -103,6 +91,20 @@ namespace cryptonote
         KV_SERIALIZE(indices)
       END_KV_SERIALIZE_MAP()
     };
+  };
+
+  struct COMMAND_RPC_GET_BLOCKS_FAST
+  {
+
+    struct request
+    {
+      std::list<crypto::hash> block_ids; //*first 10 blocks id goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
+      uint64_t    start_height;
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE_CONTAINER_POD_AS_BLOB(block_ids)
+        KV_SERIALIZE(start_height)
+      END_KV_SERIALIZE_MAP()
+    };
 
     struct response
     {
@@ -110,7 +112,7 @@ namespace cryptonote
       uint64_t    start_height;
       uint64_t    current_height;
       std::string status;
-      std::vector<block_output_indices> output_indices;
+      std::vector<COMMAND_RPC_DATA::block_output_indices> output_indices;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(blocks)
@@ -139,10 +141,12 @@ namespace cryptonote
     struct response
     {
       std::list<block_complete_entry> blocks;
+      std::list<uint64_t> block_id;
       uint64_t    start_height;
       uint64_t    current_height;
       bool        has_more;
       std::string status;
+      std::vector<COMMAND_RPC_DATA::block_output_indices> output_indices;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(blocks)
@@ -150,7 +154,9 @@ namespace cryptonote
         KV_SERIALIZE(current_height)
         KV_SERIALIZE(has_more)
         KV_SERIALIZE(status)
+        KV_SERIALIZE(output_indices)
       END_KV_SERIALIZE_MAP()
+
     };
   };
 

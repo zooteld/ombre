@@ -175,10 +175,11 @@ namespace cryptonote
 
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_get_wallet_blocks(const COMMAND_RPC_GET_WALLET_BLOCKS::request& req, COMMAND_RPC_GET_WALLET_BLOCKS::response& res) {
-
     std::list<block> blocks;
     size_t blocks_to_fetch = 1000;
     account_base* account = nullptr;
+
+    LOG_ERROR("Start height: " << req.start_height);
 
     if (req.wallet_viewkey.empty() || req.wallet_address.empty()) {
       res.status = "Need both wallet viewkey and address";
@@ -188,11 +189,13 @@ namespace cryptonote
     address_parse_info address_info;
     if (!get_account_address_from_str(address_info, false, req.wallet_address)) {
       res.status = "Unable to parse developer wallet address";
+      LOG_ERROR("AAAAAAAAAAAAAA");
       return false;
     }
 
     cryptonote::blobdata viewkey_data;
     if(!epee::string_tools::parse_hexstr_to_binbuff(req.wallet_viewkey, viewkey_data)) {
+      LOG_ERROR("BBBBBBBBBB");
       res.status = "Unable to parse developer wallet viewkey";
       return false;
     }
@@ -202,19 +205,18 @@ namespace cryptonote
 
     if (!m_core.get_blocks(req.start_height, blocks_to_fetch, blocks)) {
       res.status = "Unable to get blocks";
+      LOG_ERROR("CCCCCCCCCCC");
       return false;
     }
 
     res.current_height = req.start_height;
 
     BOOST_FOREACH(auto& b, blocks) {
-      // Check the miner transaction.
-      bool found = transaction_has_out_for_account(b.miner_tx, account);
-
       // Check the normal transactions.
-      std::list<transaction> txs;
-      if (!b.tx_hashes.empty() && !found) {
-        std::list<transaction> missed_txs;
+      bool found = false;
+      if (!b.tx_hashes.empty()) {
+        std::list<transaction> txs;
+        std::list<crypto::hash> missed_txs;
         m_core.get_transactions(b.tx_hashes, txs, missed_txs);
 
         BOOST_FOREACH(auto& t, txs) {
@@ -225,18 +227,49 @@ namespace cryptonote
         }
       }
 
-      if (found) {
-        res.blocks.resize(res.blocks.size() + 1);
-        res.blocks.back().block = block_to_blob(b);
+      if (!found && !transaction_has_out_for_account(b.miner_tx, account)) {
+        // If no transaction was found, continue to the next block.
+        res.current_height++;
+        continue;
+      }
+
+      // Add the block.
+      res.blocks.resize(res.blocks.size() + 1);
+      res.blocks.back().block = block_to_blob(b);
+
+      // Add the miner transaction.
+      res.output_indices.push_back(COMMAND_RPC_DATA::block_output_indices());
+      res.output_indices.back().indices.push_back(COMMAND_RPC_DATA::tx_output_indices());
+      bool r = m_core.get_tx_outputs_gindexs(get_transaction_hash(b.miner_tx), res.output_indices.back().indices.back().indices);
+      if (!r) {
+        res.status = "Failed";
+        return false;
+      }
+
+      // Add other transactions.
+      if (!b.tx_hashes.empty()) {
+        std::list<transaction> txs;
+        std::list<crypto::hash> missed_txs;
+        m_core.get_transactions(b.tx_hashes, txs, missed_txs);
+
+        size_t txidx = 0;
         BOOST_FOREACH(auto& t, txs) {
           res.blocks.back().txs.push_back(tx_to_blob(t));
+          res.output_indices.back().indices.push_back(COMMAND_RPC_DATA::tx_output_indices());
+          bool r = m_core.get_tx_outputs_gindexs(b.tx_hashes[txidx++], res.output_indices.back().indices.back().indices);
+          if (!r) {
+            res.status = "Failed";
+            return false;
+          }
         }
       }
-      res.current_height++;
+
+      res.block_id.push_back(res.current_height++);
     }
 
     res.has_more = res.current_height == (req.start_height + blocks_to_fetch);
     res.status = CORE_RPC_STATUS_OK;
+    LOG_ERROR("Current height: " << res.current_height);
     return true;
   }
 
@@ -256,8 +289,8 @@ namespace cryptonote
     {
       res.blocks.resize(res.blocks.size()+1);
       res.blocks.back().block = block_to_blob(b.first);
-      res.output_indices.push_back(COMMAND_RPC_GET_BLOCKS_FAST::block_output_indices());
-      res.output_indices.back().indices.push_back(COMMAND_RPC_GET_BLOCKS_FAST::tx_output_indices());
+      res.output_indices.push_back(COMMAND_RPC_DATA::block_output_indices());
+      res.output_indices.back().indices.push_back(COMMAND_RPC_DATA::tx_output_indices());
       bool r = m_core.get_tx_outputs_gindexs(get_transaction_hash(b.first.miner_tx), res.output_indices.back().indices.back().indices);
       if (!r)
       {
@@ -268,7 +301,7 @@ namespace cryptonote
       BOOST_FOREACH(auto& t, b.second)
       {
         res.blocks.back().txs.push_back(tx_to_blob(t));
-        res.output_indices.back().indices.push_back(COMMAND_RPC_GET_BLOCKS_FAST::tx_output_indices());
+        res.output_indices.back().indices.push_back(COMMAND_RPC_DATA::tx_output_indices());
         bool r = m_core.get_tx_outputs_gindexs(b.first.tx_hashes[txidx++], res.output_indices.back().indices.back().indices);
         if (!r)
         {
