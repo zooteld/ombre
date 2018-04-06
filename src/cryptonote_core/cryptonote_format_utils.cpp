@@ -238,6 +238,45 @@ namespace cryptonote
     crypto::hash_to_scalar(data, sizeof(data), m);
     return m;
   }
+  
+  //---------------------------------------------------------------
+  std::vector<crypto::public_key> get_subaddress_spend_public_keys(const cryptonote::account_keys &keys, uint32_t account, uint32_t begin, uint32_t end)
+  {
+    CHECK_AND_ASSERT_THROW_MES(begin <= end, "begin > end");
+
+    std::vector<crypto::public_key> pkeys;
+    pkeys.reserve(end - begin);
+    cryptonote::subaddress_index index = { account, begin };
+
+    ge_p3 p3;
+    ge_cached cached;
+    CHECK_AND_ASSERT_THROW_MES(ge_frombytes_vartime(&p3, (const unsigned char*)keys.m_account_address.m_spend_public_key.data) == 0,
+      "ge_frombytes_vartime failed to convert spend public key");
+    ge_p3_to_cached(&cached, &p3);
+
+    for (uint32_t idx = begin; idx < end; ++idx)
+    {
+      index.minor = idx;
+      if (index.is_zero())
+      {
+        pkeys.push_back(keys.m_account_address.m_spend_public_key);
+        continue;
+      }
+      const crypto::secret_key m = cryptonote::get_subaddress_secret_key(keys.m_view_secret_key, index);
+
+      // M = m*G
+      ge_scalarmult_base(&p3, (const unsigned char*)m.data);
+
+      // D = B + M
+      crypto::public_key D;
+      ge_p1p1 p1p1;
+      ge_add(&p1p1, &p3, &cached);
+      ge_p1p1_to_p3(&p3, &p1p1);
+      ge_p3_tobytes((unsigned char*)D.data, &p3);
+
+      pkeys.push_back(D);
+    }
+    return pkeys;
   //---------------------------------------------------------------
   bool generate_key_image_helper(const account_keys& ack, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, const crypto::public_key& out_key, const crypto::public_key& tx_public_key, const std::vector<crypto::public_key>& additional_tx_public_keys, size_t real_output_index, keypair& in_ephemeral, crypto::key_image& ki)
   {
@@ -1221,19 +1260,27 @@ namespace cryptonote
     string_tools::parse_hexstr_to_binbuff(genesis_coinbase_tx_hex, tx_bl);
     bool r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
-    bl.major_version = CURRENT_BLOCK_MAJOR_VERSION;
-    bl.minor_version = CURRENT_BLOCK_MINOR_VERSION;
+    bl.major_version = 1; // the current block major version
+    bl.minor_version = 1; // the current block minor version
     bl.timestamp = 0;
     bl.nonce = nonce;
     miner::find_nonce_for_given_block(bl, 1, 0);
     return true;
   }
   //---------------------------------------------------------------
-  bool get_block_longhash(const block& b, crypto::hash& res, uint64_t height)
+  bool get_block_longhash(const block& b, cn_pow_hash_v2 &ctx, crypto::hash& res)
   {
-    block b_local = b; //workaround to avoid const errors with do_serialize
-    blobdata bd = get_block_hashing_blob(b);
-    crypto::cn_slow_hash(bd.data(), bd.size(), res);
+	block b_local = b; //workaround to avoid const errors with do_serialize
+	blobdata bd = get_block_hashing_blob(b);
+	if(b_local.major_version < CRYPTONOTE_V2_POW_BLOCK_VERSION)
+	{
+		cn_pow_hash_v1 ctx_v1 = cn_pow_hash_v1::make_borrowed(ctx);
+		ctx_v1.hash(bd.data(), bd.size(), res.data);
+	}
+	else
+	{
+		ctx.hash(bd.data(), bd.size(), res.data);
+	}
     return true;
   }
   //---------------------------------------------------------------
@@ -1255,13 +1302,6 @@ namespace cryptonote
       res[i] -= res[i-1];
 
     return res;
-  }
-  //---------------------------------------------------------------
-  crypto::hash get_block_longhash(const block& b, uint64_t height)
-  {
-    crypto::hash p = null_hash;
-    get_block_longhash(b, p, height);
-    return p;
   }
   //---------------------------------------------------------------
   bool parse_and_validate_block_from_blob(const blobdata& b_blob, block& b)

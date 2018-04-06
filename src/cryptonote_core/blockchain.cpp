@@ -70,9 +70,8 @@
 
 using namespace cryptonote;
 using epee::string_tools::pod_to_hex;
-extern "C" void slow_hash_allocate_state();
-extern "C" void slow_hash_free_state();
 
+// someone want to drop a comment explaining what this magic number means
 DISABLE_VS_WARNINGS(4267)
 
 // used to overestimate the block reward when estimating a per kB to use
@@ -1375,7 +1374,8 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
     CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
-    get_block_longhash(bei.bl, proof_of_work, bei.height);
+    get_block_longhash(bei.bl, m_pow_ctx, proof_of_work);
+    
     if(!check_hash(proof_of_work, current_diff))
     {
       LOG_PRINT_RED_L1("Block with id: " << id << std::endl << " for alternative chain, does not have enough proof of work: " << proof_of_work << std::endl << " expected difficulty: " << current_diff);
@@ -3077,7 +3077,9 @@ leave:
       proof_of_work = it->second;
     }
     else
-      proof_of_work = get_block_longhash(bl, m_db->height());
+    {
+        get_block_longhash(bl, m_pow_ctx, proof_of_work);
+    }
 
     // validate proof_of_work versus difficulty target
     if(!check_hash(proof_of_work, current_diffic))
@@ -3442,10 +3444,9 @@ void Blockchain::set_enforce_dns_checkpoints(bool enforce_checkpoints)
 }
 
 //------------------------------------------------------------------
-void Blockchain::block_longhash_worker(const uint64_t height, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map) const
+void Blockchain::block_longhash_worker(cn_pow_hash_v2& hash_ctx, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map)
 {
   TIME_MEASURE_START(t);
-  slow_hash_allocate_state();
 
   //FIXME: height should be changing here, as get_block_longhash expects
   //       the height of the block passed to it
@@ -3454,11 +3455,21 @@ void Blockchain::block_longhash_worker(const uint64_t height, const std::vector<
     if (m_cancel)
        return;
     crypto::hash id = get_block_hash(block);
-    crypto::hash pow = get_block_longhash(block, height);
+    
+    crypto::hash pow;
+	get_block_longhash(block, hash_ctx, pow);
+    
     map.emplace(id, pow);
+    // auto map_result = map.emplace(id, pow);
+    // // this is just for debugging
+    // if (map_result)
+    // {
+    //     LOG_PRINT_L0("[WARNING] 'map.emplace(id, pow)' in \
+    //     src/cryptonote_core/blockchain.cpp failed.");
+    // }
+    
   }
 
-  slow_hash_free_state();
   TIME_MEASURE_FINISH(t);
 }
 
@@ -3615,9 +3626,15 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
     if (!blocks_exist)
     {
       m_blocks_longhash_table.clear();
+      
+      if(m_hash_ctxes_multi.size() < threads)
+      {
+        m_hash_ctxes_multi.resize(threads);
+      }
+
       for (uint64_t i = 0; i < threads; i++)
       {
-        thread_list.push_back(new boost::thread(&Blockchain::block_longhash_worker, this, height + (i * batches), std::cref(blocks[i]), std::ref(maps[i])));
+        thread_list.push_back(new boost::thread(&Blockchain::block_longhash_worker, this, std::ref(m_hash_ctxes_multi[i]), std::cref(blocks[i]), std::ref(maps[i])));
       }
 
       for (size_t j = 0; j < thread_list.size(); j++)
