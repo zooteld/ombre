@@ -313,6 +313,9 @@ struct Wallet
     std::string mainAddress() const { return address(0, 0); }
     virtual std::string path() const = 0;
 
+    // Controls whether the wallet should send the viewkey to the wallet node for refreshing.
+    virtual void setRefreshFromViewKey(bool v) = 0;
+
     /*!
      * \brief integratedAddress - returns integrated address for current wallet address and given payment_id.
      *                            if passed "payment_id" param is an empty string or not-valid payment id string
