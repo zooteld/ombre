@@ -1916,8 +1916,7 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> next_o_indices;
       bool error = false;
 
-      //pull_thread = boost::thread([&]{pull_next_blocks(start_height, next_blocks_start_height, short_chain_history, blocks, next_blocks, next_o_indices, error);});
-      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, blocks, next_o_indices);});
+      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
       blocks_fetched += added_blocks;
       pull_thread.join();
