@@ -179,8 +179,6 @@ namespace cryptonote
     size_t blocks_to_fetch = 1000;
     account_base* account = nullptr;
 
-    LOG_ERROR("Start height: " << req.start_height);
-
     if (req.wallet_viewkey.empty() || req.wallet_address.empty()) {
       res.status = "Need both wallet viewkey and address";
       return false;
@@ -189,13 +187,11 @@ namespace cryptonote
     address_parse_info address_info;
     if (!get_account_address_from_str(address_info, false, req.wallet_address)) {
       res.status = "Unable to parse developer wallet address";
-      LOG_ERROR("AAAAAAAAAAAAAA");
       return false;
     }
 
     cryptonote::blobdata viewkey_data;
     if(!epee::string_tools::parse_hexstr_to_binbuff(req.wallet_viewkey, viewkey_data)) {
-      LOG_ERROR("BBBBBBBBBB");
       res.status = "Unable to parse developer wallet viewkey";
       return false;
     }
@@ -205,7 +201,6 @@ namespace cryptonote
 
     if (!m_core.get_blocks(req.start_height, blocks_to_fetch, blocks)) {
       res.status = "Unable to get blocks";
-      LOG_ERROR("CCCCCCCCCCC");
       return false;
     }
 
@@ -269,7 +264,6 @@ namespace cryptonote
 
     res.has_more = res.current_height == (req.start_height + blocks_to_fetch);
     res.status = CORE_RPC_STATUS_OK;
-    LOG_ERROR("Current height: " << res.current_height);
     return true;
   }
 
