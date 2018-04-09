@@ -1148,10 +1148,6 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
   }
   catch (const std::exception &e) { }
 
-  if (m_trusted_daemon) {
-      m_wallet->set_refresh_with_viewkey(true);
-  }
-
   m_wallet->callback(this);
   return true;
 }
