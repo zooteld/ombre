@@ -174,6 +174,8 @@ include_directories(external/easylogging++ src contrib/epee/include external "${
 
 if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
+  include_directories(/usr/local/opt/openssl/include)
+  link_directories(/usr/local/opt/openssl/lib)
 endif()
 
 if(MSVC OR MINGW)
