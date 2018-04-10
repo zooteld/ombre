@@ -238,7 +238,7 @@ namespace cryptonote
     crypto::hash_to_scalar(data, sizeof(data), m);
     return m;
   }
-  
+
   //---------------------------------------------------------------
   std::vector<crypto::public_key> get_subaddress_spend_public_keys(const cryptonote::account_keys &keys, uint32_t account, uint32_t begin, uint32_t end)
   {
@@ -277,6 +277,7 @@ namespace cryptonote
       pkeys.push_back(D);
     }
     return pkeys;
+  }
   //---------------------------------------------------------------
   bool generate_key_image_helper(const account_keys& ack, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, const crypto::public_key& out_key, const crypto::public_key& tx_public_key, const std::vector<crypto::public_key>& additional_tx_public_keys, size_t real_output_index, keypair& in_ephemeral, crypto::key_image& ki)
   {
