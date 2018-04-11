@@ -655,6 +655,10 @@ void WalletImpl::refreshAsync()
     m_refreshCV.notify_one();
 }
 
+void WalletImpl::setRefreshFromViewKey(bool v) {
+  m_wallet->set_refresh_with_viewkey(v);
+}
+
 void WalletImpl::setAutoRefreshInterval(int millis)
 {
     if (millis > MAX_REFRESH_INTERVAL_MILLIS) {

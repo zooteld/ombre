@@ -93,6 +93,7 @@ public:
     bool synchronized() const;
     bool refresh();
     void refreshAsync();
+    void setRefreshFromViewKey(bool v);
     void setAutoRefreshInterval(int millis);
     int autoRefreshInterval() const;
     void setRefreshFromBlockHeight(uint64_t refresh_from_block_height);
