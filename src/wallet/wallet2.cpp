@@ -1369,7 +1369,6 @@ void wallet2::process_blocks(uint64_t start_height, const std::list<cryptonote::
   blocks_added = 0;
   size_t tx_o_indices_idx = 0;
 
-  LOG_ERROR("size mismatch " << blocks.size() << " " << o_indices.size());
   THROW_WALLET_EXCEPTION_IF(blocks.size() != o_indices.size(), error::wallet_internal_error, "size mismatch");
 
   int threads = tools::get_max_concurrency();
