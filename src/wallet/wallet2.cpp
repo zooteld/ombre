@@ -1783,11 +1783,11 @@ bool wallet2::delete_address_book_row(std::size_t row_id) {
 //----------------------------------------------------------------------------------------------------
 void wallet2::refresh(uint64_t start_height, uint64_t & blocks_fetched, bool& received_money)
 {
- // if (m_refresh_with_viewkey) {
+  if (m_refresh_with_viewkey) {
     refresh_with_viewkey(start_height, blocks_fetched, received_money);
- // } else {
-  //  refresh_all_blocks(start_height, blocks_fetched, received_money);
- // }
+  } else {
+    refresh_all_blocks(start_height, blocks_fetched, received_money);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
