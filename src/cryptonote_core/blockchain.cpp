@@ -84,7 +84,7 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1482806500 },
-  { 2, 21300, 0, 1497657600 },
+  { 2, 21301, 0, 1497657600 },
   { 3, 72000, 0, 1524577218 } // Roughly the 20th of April.
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
@@ -1370,7 +1370,6 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     }
 
     // Check the block's hash against the difficulty target for its alt chain
-    m_is_in_checkpoint_zone = false;
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
     CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
