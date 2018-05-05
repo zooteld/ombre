@@ -1915,6 +1915,7 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
       pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
+      m_local_bc_height = next_blocks_start_height;
       blocks_fetched += added_blocks;
       pull_thread.join();
 
@@ -4142,8 +4143,8 @@ void wallet2::transfer_selected_rct(std::vector<cryptonote::tx_destination_entry
     src.rct = td.is_rct();
     //paste mixin transaction
 
-    THROW_WALLET_EXCEPTION_IF(outs.size() < out_index + 1 ,  error::wallet_internal_error, "outs.size() < out_index + 1");
-    THROW_WALLET_EXCEPTION_IF(outs[out_index].size() < fake_outputs_count ,  error::wallet_internal_error, "fake_outputs_count > random outputts found");
+    THROW_WALLET_EXCEPTION_IF(outs.size() < out_index + 1 ,  error::wallet_internal_error, "outs.size() < out_index + 1: " + std::to_string(outs.size()) + " < " + std::to_string(out_index + 1 ));
+    THROW_WALLET_EXCEPTION_IF(outs[out_index].size() < fake_outputs_count ,  error::wallet_internal_error, "fake_outputs_count > random outputs found");
 
     typedef cryptonote::tx_source_entry::output_entry tx_output_entry;
     for (size_t n = 0; n < fake_outputs_count + 1; ++n)
