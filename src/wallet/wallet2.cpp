@@ -1299,8 +1299,8 @@ void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_s
 
   req.wallet_viewkey = string_tools::pod_to_hex(get_account().get_keys().m_view_secret_key);
   req.wallet_address = get_account().get_public_address_str(m_testnet);
-
   req.start_height = start_height;
+
   m_daemon_rpc_mutex.lock();
   bool r = net_utils::invoke_http_bin_remote_command2(m_daemon_address + "/getwalletblocks.bin", req, res, m_http_client, WALLET_RCP_CONNECTION_TIMEOUT);
   m_daemon_rpc_mutex.unlock();
@@ -1311,9 +1311,7 @@ void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_s
       "mismatched blocks (" + boost::lexical_cast<std::string>(res.blocks.size()) + ") and output_indices (" +
       boost::lexical_cast<std::string>(res.output_indices.size()) + ") sizes from daemon");
 
-  blocks_start_height = res.current_height;
-  start_height = res.current_height;
-
+  blocks_start_height = res.start_height;
   blocks = res.blocks;
   o_indices = res.output_indices;
 }
@@ -1900,7 +1898,6 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
   m_run.store(true, std::memory_order_relaxed);
 
-  start_height = 0;
   pull_blocks_with_viewkey(start_height, blocks_start_height, blocks, o_indices);
 
   while(m_run.load(std::memory_order_relaxed))
@@ -1911,7 +1908,6 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       uint64_t next_blocks_start_height = blocks_start_height;
       std::list<cryptonote::block_complete_entry> next_blocks;
       std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> next_o_indices;
-      bool error = false;
 
       pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
@@ -1927,12 +1923,6 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       blocks_start_height = next_blocks_start_height;
       blocks = next_blocks;
       o_indices = next_o_indices;
-
-      // handle error from async fetching thread
-      if (error)
-      {
-        throw std::runtime_error("proxy exception in refresh thread");
-      }
     }
     catch (const std::exception&)
     {
