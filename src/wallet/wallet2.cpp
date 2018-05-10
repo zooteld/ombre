@@ -1166,6 +1166,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 //----------------------------------------------------------------------------------------------------
 void wallet2::process_unconfirmed(const cryptonote::transaction& tx, uint64_t height)
 {
+
   if (m_unconfirmed_txs.empty())
     return;
 
@@ -1909,9 +1910,18 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       std::list<cryptonote::block_complete_entry> next_blocks;
       std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> next_o_indices;
 
+      LOG_PRINT_L4("Next pull start_height: " << start_height << " next_blocks_start_height: " << next_blocks_start_height);
       pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
+
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
       m_local_bc_height = next_blocks_start_height;
+
+      // Push null hashes for the blocks that we didn't fetch.
+      // TODO(sadbatman): Push the actual hashes of the missed blocks.
+      for (int i = added_blocks; i<999;i++) {
+        m_blockchain.push_back(null_hash);
+      }
+
       blocks_fetched += added_blocks;
       pull_thread.join();
 
