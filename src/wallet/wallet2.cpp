@@ -1899,6 +1899,11 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
   m_run.store(true, std::memory_order_relaxed);
 
+  // Refresh from where we stopped syncing previously.
+  if (start_height == 0 && m_local_bc_height) {
+    start_height = m_local_bc_height;
+  }
+
   pull_blocks_with_viewkey(start_height, blocks_start_height, blocks, o_indices);
 
   while(m_run.load(std::memory_order_relaxed))
