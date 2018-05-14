@@ -144,6 +144,7 @@ namespace cryptonote
       std::list<uint64_t> block_id;
       uint64_t    start_height;
       uint64_t    current_height;
+      uint64_t    blocks_scanned;
       bool        has_more;
       std::string status;
       std::vector<COMMAND_RPC_DATA::block_output_indices> output_indices;
@@ -152,6 +153,7 @@ namespace cryptonote
         KV_SERIALIZE(blocks)
         KV_SERIALIZE(start_height)
         KV_SERIALIZE(current_height)
+        KV_SERIALIZE(blocks_scanned)
         KV_SERIALIZE(has_more)
         KV_SERIALIZE(status)
         KV_SERIALIZE(output_indices)

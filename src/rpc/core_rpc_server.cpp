@@ -206,6 +206,7 @@ namespace cryptonote
 
     res.current_height = m_core.get_current_blockchain_height();
     res.start_height = req.start_height;
+    res.blocks_scanned = blocks.size();
 
     BOOST_FOREACH(auto& b, blocks) {
       // Check the normal transactions.

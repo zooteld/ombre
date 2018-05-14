@@ -1293,7 +1293,7 @@ void wallet2::parse_block_round(const cryptonote::blobdata &blob, cryptonote::bl
     bl_id = get_block_hash(bl);
 }
 //----------------------------------------------------------------------------------------------------
-void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_start_height, std::list<cryptonote::block_complete_entry> &blocks, std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> &o_indices)
+void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_start_height, uint64_t &blocks_scanned, std::list<cryptonote::block_complete_entry> &blocks, std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> &o_indices)
 {
   cryptonote::COMMAND_RPC_GET_WALLET_BLOCKS::request req = AUTO_VAL_INIT(req);
   cryptonote::COMMAND_RPC_GET_WALLET_BLOCKS::response res = AUTO_VAL_INIT(res);
@@ -1313,6 +1313,7 @@ void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_s
       boost::lexical_cast<std::string>(res.output_indices.size()) + ") sizes from daemon");
 
   blocks_start_height = res.start_height;
+  blocks_scanned = res.blocks_scanned;
   blocks = res.blocks;
   o_indices = res.output_indices;
 }
@@ -1900,11 +1901,14 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
   m_run.store(true, std::memory_order_relaxed);
 
   // Refresh from where we stopped syncing previously.
-  if (start_height == 0 && m_local_bc_height) {
-    start_height = m_local_bc_height;
+  if (start_height == 0 && m_local_bc_height > 1000) {
+    start_height = m_local_bc_height - 1000;
   }
 
-  pull_blocks_with_viewkey(start_height, blocks_start_height, blocks, o_indices);
+  LOG_PRINT_L4("Next pull start_height: " << start_height);
+  uint64_t blocks_scanned = 0;
+  uint64_t next_blocks_scanned = 0;
+  pull_blocks_with_viewkey(start_height, blocks_start_height, blocks_scanned, blocks, o_indices);
 
   while(m_run.load(std::memory_order_relaxed))
   {
@@ -1915,15 +1919,15 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       std::list<cryptonote::block_complete_entry> next_blocks;
       std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> next_o_indices;
 
-      LOG_PRINT_L4("Next pull start_height: " << start_height << " next_blocks_start_height: " << next_blocks_start_height);
-      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
+      LOG_PRINT_L1("Next pull start_height: " << start_height << " next_blocks_start_height: " << next_blocks_start_height);
+      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks_scanned, next_blocks, next_o_indices);});
 
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
       m_local_bc_height = next_blocks_start_height;
 
       // Push null hashes for the blocks that we didn't fetch.
       // TODO(sadbatman): Push the actual hashes of the missed blocks.
-      for (int i = added_blocks; i<999;i++) {
+      for (uint64_t i = added_blocks; i< blocks_scanned - 1;i++) {
         m_blockchain.push_back(null_hash);
       }
 
@@ -1934,7 +1938,9 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
       if (start_height == next_blocks_start_height) {
         break;
       }
+
       start_height = next_blocks_start_height;
+      blocks_scanned = next_blocks_scanned;
       blocks_start_height = next_blocks_start_height;
       blocks = next_blocks;
       o_indices = next_o_indices;
