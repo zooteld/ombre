@@ -216,7 +216,8 @@ namespace cryptonote
 
     BOOST_FOREACH(auto& b, blocks) {
       // Check the normal transactions.
-      bool found = false;
+      // Always grab the first block.
+      bool found = res.start_height == req.start_height;
       res.start_height++;
       if (!b.tx_hashes.empty()) {
         std::list<transaction> txs;
