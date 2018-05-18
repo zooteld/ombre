@@ -196,6 +196,12 @@ namespace cryptonote
       return false;
     }
 
+    if (req.start_height > m_core.get_current_blockchain_height()) {
+      LOG_ERROR("Requested start height exceeds blockchain height: " << req.start_height << " > " << m_core.get_current_blockchain_height());
+      res.status = "Unable to get blocks";
+      return false;
+    }
+
     crypto::secret_key viewkey = *reinterpret_cast<const crypto::secret_key*>(viewkey_data.data());
     account->create_from_viewkey(address_info.address, viewkey);
 
