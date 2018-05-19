@@ -196,6 +196,16 @@ namespace cryptonote
       return false;
     }
 
+    res.current_height = m_core.get_current_blockchain_height();
+    res.start_height = req.start_height;
+    res.blocks_scanned = 0;
+
+    // If the wallet is in sync; simply return now.
+    if (req.start_height == m_core.get_current_blockchain_height()) {
+      res.status = CORE_RPC_STATUS_OK;
+      return true;
+    }
+
     if (req.start_height > m_core.get_current_blockchain_height()) {
       LOG_ERROR("Requested start height exceeds blockchain height: " << req.start_height << " > " << m_core.get_current_blockchain_height());
       res.status = "Unable to get blocks";
@@ -210,8 +220,6 @@ namespace cryptonote
       return false;
     }
 
-    res.current_height = m_core.get_current_blockchain_height();
-    res.start_height = req.start_height;
     res.blocks_scanned = blocks.size();
 
     BOOST_FOREACH(auto& b, blocks) {
