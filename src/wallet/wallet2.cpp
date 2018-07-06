@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
 //
 // All rights reserved.
@@ -748,6 +748,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 
   // Don't try to extract tx public key if tx has no ouputs
   size_t pk_index = 0;
+  std::unordered_set<crypto::public_key> public_keys_seen;
   std::vector<tx_scan_info_t> tx_scan_info(tx.vout.size());
   while (!tx.vout.empty())
   {
@@ -763,6 +764,13 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         m_callback->on_skip_transaction(height, txid, tx);
       return;
     }
+
+    if (public_keys_seen.find(pub_key_field.pub_key) != public_keys_seen.end())
+    {
+      LOG_PRINT_L0("The same transaction pubkey is present more than once, ignoring extra instance");
+      continue;
+    }
+    public_keys_seen.insert(pub_key_field.pub_key);
 
     int num_vouts_received = 0;
     tx_pub_key = pub_key_field.pub_key;
@@ -1900,16 +1908,22 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
   m_run.store(true, std::memory_order_relaxed);
 
-  if (start_height == 0) {
-    start_height = m_local_bc_height;
-  }
-
   int fetched = 0;
-
-  LOG_PRINT_L2("Next pull start_height: " << start_height);
   uint64_t blocks_scanned = 0;
   uint64_t next_blocks_scanned = 0;
 
+  if (start_height == 0) {
+    start_height = m_local_bc_height;
+  } else {
+    // Always refresh from the current height - 200. We do this because
+    // block reorgs might invalidate blocks that were scanned previously.
+    if (start_height > 200) {
+      start_height = start_height - 200;
+    }
+  }
+
+
+  LOG_PRINT_L2("Next pull start_height: " << start_height);
 
   string error;
   uint64_t remote_height = get_daemon_blockchain_height(error);
@@ -1925,6 +1939,10 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
   LOG_PRINT_L3("#1 Next pull start_height: " << start_height);
   pull_blocks_with_viewkey(start_height, blocks_start_height, blocks_scanned, blocks, o_indices);
+
+  if (start_height < m_blockchain.size()) {
+    blocks_scanned -= m_blockchain.size() - start_height;
+  }
 
   while(m_run.load(std::memory_order_relaxed))
   {
