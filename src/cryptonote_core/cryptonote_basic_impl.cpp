@@ -119,7 +119,7 @@ namespace cryptonote {
     }
 
     if (current_block_size <= (median_size < BLOCK_SIZE_GROWTH_FAVORED_ZONE ? median_size * 110 / 100 : median_size)) {
-      reward = base_reward;
+      reward = base_reward / 2;
       return true;
     }
 
@@ -140,7 +140,7 @@ namespace cryptonote {
     assert(0 == reward_hi);
     assert(reward_lo < base_reward);
 
-    reward = reward_lo;
+    reward = reward_lo / 2;
     return true;
   }
   //------------------------------------------------------------------------------------
