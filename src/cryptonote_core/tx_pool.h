@@ -222,7 +222,7 @@ namespace cryptonote
      *
      * @return true
      */
-    bool fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t height);
+    bool fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t height, uint8_t version);
 
     /**
      * @brief get a list of all transactions in the pool
@@ -344,14 +344,14 @@ namespace cryptonote
       /*! if the transaction was returned to the pool from the blockchain
        *  due to a reorg, then this will be true
        */
-      bool kept_by_block;  
+      bool kept_by_block;
 
       //! the highest block the transaction referenced when last checking it failed
       /*! if verifying a transaction's inputs fails, it's possible this is due
        *  to a reorg since it was created (if it used recently created outputs
        *  as inputs).
        */
-      uint64_t last_failed_height;  
+      uint64_t last_failed_height;
 
       //! the hash of the highest block the transaction referenced when last checking it failed
       /*! if verifying a transaction's inputs fails, it's possible this is due
@@ -468,7 +468,7 @@ private:
 #endif
 
     //! container for spent key images from the transactions in the pool
-    key_images_container m_spent_key_images;  
+    key_images_container m_spent_key_images;
 
     //TODO: this time should be a named constant somewhere, not hard-coded
     //! interval on which to check for stale/"stuck" transactions
