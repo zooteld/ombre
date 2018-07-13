@@ -3264,7 +3264,12 @@ leave:
   // at MONEY_SUPPLY. already_generated_coins is only used to compute the block subsidy and MONEY_SUPPLY yields a
   // subsidy of 0 under the base formula and therefore the minimum subsidy >0 in the tail state.
   uint64_t already_generated_coins = height ? m_db->get_block_already_generated_coins(height - 1) : 0;
-  already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY;
+
+  if (m_hardfork->get_current_version() > 3) {
+    already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY_V4;
+  } else {
+    already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY;
+  }
   if (height)
     cumulative_difficulty += m_db->get_block_cumulative_difficulty(height - 1);
 
