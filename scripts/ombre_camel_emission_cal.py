@@ -2,7 +2,7 @@
 
 EMISSION_SPEED_FACTOR = 21
 DIFFICULTY_TARGET = 60 # seconds
-MONEY_SUPPLY         = 1000000000000000000
+MONEY_SUPPLY         = 500000000000000000
 GENESIS_BLOCK_REWARD     = 0
 FINAL_SUBSIDY = 10000000000
 COIN_EMISSION_MONTH_INTERVAL = 6 #months
@@ -19,7 +19,7 @@ def get_block_reward(height, coins_already_generated):
         cal_block_reward = (MONEY_SUPPLY * money_supply_pct)/(2**EMISSION_SPEED_FACTOR)
     else:
         cal_block_reward = (MONEY_SUPPLY - coins_already_generated)/(2**EMISSION_SPEED_FACTOR)
-    return cal_block_reward
+    return cal_block_reward / 2
 
 
 def calculate_emssion_speed(print_by_year = False):
