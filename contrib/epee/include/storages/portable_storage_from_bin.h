@@ -113,9 +113,9 @@ namespace epee
 
     template<class t_pod_type>
     void throwable_buffer_reader::read(t_pod_type& pod_val)
-    static_assert(std::is_pod<t_pod_type>::value, "POD type expected");
     {
       RECURSION_LIMITATION();
+      static_assert(std::is_pod<t_pod_type>::value, "POD type expected");
       read(&pod_val, sizeof(pod_val));
     }
     
@@ -279,7 +279,7 @@ namespace epee
       m_ptr+=len;
       m_count -= len;
     }
-     inline
+    inline
     void throwable_buffer_reader::read(array_entry &ae)
     {
       RECURSION_LIMITATION();
