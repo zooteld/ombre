@@ -1,7 +1,7 @@
 
 // Copyright (c) 2006-2013, Andrey N. Sabelnikov, www.sabelnikov.net
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
 // * Neither the name of the Andrey N. Sabelnikov nor the
 // names of its contributors may be used to endorse or promote products
 // derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -23,7 +23,7 @@
 // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 #pragma once
 #include "storages/serializeble_struct_helper.h"
@@ -56,6 +56,7 @@ namespace epee
         if(pri->m_response_code != 200)
         {
           LOG_PRINT_L1("Failed to invoke http request to  " << url << ", wrong response code: " << pri->m_response_code);
+          LOG_PRINT_L4("Body: " << pri->m_body);
           return false;
         }
 
@@ -68,7 +69,7 @@ namespace epee
       bool invoke_http_bin_remote_command(const std::string& url, TArg& out_struct, TResult& result_struct, TTransport& transport, unsigned int timeout = 5000, const std::string& method = "GET")
       {
         std::string req_param;
-        epee::StorageNamed::save_struct_as_storage_to_buff(out_struct, req_param); 
+        epee::StorageNamed::save_struct_as_storage_to_buff(out_struct, req_param);
 
         const http_response_info* pri = NULL;
         if(!invoke_request(url, transport, timeout, &pri, method, req_param))
@@ -86,10 +87,11 @@ namespace epee
         if(pri->m_response_code != 200)
         {
           LOG_PRINT_L1("Failed to invoke http request to  " << url << ", wrong response code: " << pri->m_response_code);
+          LOG_PRINT_L4("Body: " << pri->m_body);
           return false;
         }
 
-        return epee::StorageNamed::load_struct_from_storage_buff(result_struct, pri->m_body); 
+        return epee::StorageNamed::load_struct_from_storage_buff(result_struct, pri->m_body);
       }
 
 

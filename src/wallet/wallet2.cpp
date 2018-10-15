@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
 //
 // All rights reserved.
@@ -748,6 +748,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 
   // Don't try to extract tx public key if tx has no ouputs
   size_t pk_index = 0;
+  std::unordered_set<crypto::public_key> public_keys_seen;
   std::vector<tx_scan_info_t> tx_scan_info(tx.vout.size());
   while (!tx.vout.empty())
   {
@@ -763,6 +764,13 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         m_callback->on_skip_transaction(height, txid, tx);
       return;
     }
+
+    if (public_keys_seen.find(pub_key_field.pub_key) != public_keys_seen.end())
+    {
+      LOG_PRINT_L0("The same transaction pubkey is present more than once, ignoring extra instance");
+      continue;
+    }
+    public_keys_seen.insert(pub_key_field.pub_key);
 
     int num_vouts_received = 0;
     tx_pub_key = pub_key_field.pub_key;
@@ -1166,6 +1174,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 //----------------------------------------------------------------------------------------------------
 void wallet2::process_unconfirmed(const cryptonote::transaction& tx, uint64_t height)
 {
+
   if (m_unconfirmed_txs.empty())
     return;
 
@@ -1292,15 +1301,15 @@ void wallet2::parse_block_round(const cryptonote::blobdata &blob, cryptonote::bl
     bl_id = get_block_hash(bl);
 }
 //----------------------------------------------------------------------------------------------------
-void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_start_height, std::list<cryptonote::block_complete_entry> &blocks, std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> &o_indices)
+void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_start_height, uint64_t &blocks_scanned, std::list<cryptonote::block_complete_entry> &blocks, std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> &o_indices)
 {
   cryptonote::COMMAND_RPC_GET_WALLET_BLOCKS::request req = AUTO_VAL_INIT(req);
   cryptonote::COMMAND_RPC_GET_WALLET_BLOCKS::response res = AUTO_VAL_INIT(res);
 
   req.wallet_viewkey = string_tools::pod_to_hex(get_account().get_keys().m_view_secret_key);
   req.wallet_address = get_account().get_public_address_str(m_testnet);
-
   req.start_height = start_height;
+
   m_daemon_rpc_mutex.lock();
   bool r = net_utils::invoke_http_bin_remote_command2(m_daemon_address + "/getwalletblocks.bin", req, res, m_http_client, WALLET_RCP_CONNECTION_TIMEOUT);
   m_daemon_rpc_mutex.unlock();
@@ -1311,9 +1320,8 @@ void wallet2::pull_blocks_with_viewkey(uint64_t start_height, uint64_t &blocks_s
       "mismatched blocks (" + boost::lexical_cast<std::string>(res.blocks.size()) + ") and output_indices (" +
       boost::lexical_cast<std::string>(res.output_indices.size()) + ") sizes from daemon");
 
-  blocks_start_height = res.current_height;
-  start_height = res.current_height;
-
+  blocks_start_height = res.start_height;
+  blocks_scanned = res.blocks_scanned;
   blocks = res.blocks;
   o_indices = res.output_indices;
 }
@@ -1900,38 +1908,80 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
 
   m_run.store(true, std::memory_order_relaxed);
 
-  start_height = 0;
-  pull_blocks_with_viewkey(start_height, blocks_start_height, blocks, o_indices);
+  int fetched = 0;
+  uint64_t blocks_scanned = 0;
+  uint64_t next_blocks_scanned = 0;
+
+  if (start_height == 0) {
+    start_height = m_local_bc_height;
+  } else {
+    // Always refresh from the current height - 200. We do this because
+    // block reorgs might invalidate blocks that were scanned previously.
+    if (start_height > 200) {
+      start_height = start_height - 200;
+    }
+  }
+
+
+  LOG_PRINT_L2("Next pull start_height: " << start_height);
+
+  string error;
+  uint64_t remote_height = get_daemon_blockchain_height(error);
+
+  if (!error.empty()) {
+    LOG_ERROR("Unable to fetch remote block_height: " << error);
+    return;
+  }
+
+  if (remote_height == m_local_bc_height) {
+    return;
+  }
+
+  LOG_PRINT_L3("#1 Next pull start_height: " << start_height);
+  pull_blocks_with_viewkey(start_height, blocks_start_height, blocks_scanned, blocks, o_indices);
+
+  if (start_height < m_blockchain.size()) {
+    blocks_scanned -= m_blockchain.size() - start_height;
+  }
 
   while(m_run.load(std::memory_order_relaxed))
   {
     try
     {
       // pull the next set of blocks while we're processing the current one
-      uint64_t next_blocks_start_height = blocks_start_height;
+      uint64_t start_height = blocks_start_height;
+      uint64_t next_blocks_start_height;
       std::list<cryptonote::block_complete_entry> next_blocks;
       std::vector<cryptonote::COMMAND_RPC_DATA::block_output_indices> next_o_indices;
-      bool error = false;
 
-      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks, next_o_indices);});
+      LOG_PRINT_L3("#2 Next pull start_height: " << start_height << " fetched: " << fetched);
+      pull_thread = boost::thread([&]{pull_blocks_with_viewkey(start_height, next_blocks_start_height, next_blocks_scanned, next_blocks, next_o_indices);});
+
       process_blocks(blocks_start_height, blocks, o_indices, added_blocks);
-      blocks_fetched += added_blocks;
+
+      fetched += added_blocks;
+
+      m_local_bc_height = m_blockchain.size();
+
+      // Push null hashes for the blocks that we didn't fetch.
+      // TODO(sadbatman): Push the actual hashes of the missed blocks.
+      for (uint64_t i = added_blocks; i< blocks_scanned - 1;i++) {
+        m_blockchain.push_back(null_hash);
+      }
+
+      blocks_fetched += blocks_scanned;
       pull_thread.join();
 
       // switch to the new blocks from the daemon
-      if (start_height == next_blocks_start_height) {
+      if (next_blocks_scanned == 0 || start_height == next_blocks_start_height) {
         break;
       }
+
       start_height = next_blocks_start_height;
+      blocks_scanned = next_blocks_scanned;
       blocks_start_height = next_blocks_start_height;
       blocks = next_blocks;
       o_indices = next_o_indices;
-
-      // handle error from async fetching thread
-      if (error)
-      {
-        throw std::runtime_error("proxy exception in refresh thread");
-      }
     }
     catch (const std::exception&)
     {
@@ -1962,6 +2012,7 @@ void wallet2::refresh_with_viewkey(uint64_t start_height, uint64_t & blocks_fetc
     LOG_PRINT_L1("Failed to check pending transactions");
   }
 
+  m_local_bc_height = m_blockchain.size();
   LOG_PRINT_L1("Refresh done, blocks received: " << blocks_fetched << ", balance (all accounts): " << print_money(balance_all()) << ", unlocked: " << print_money(unlocked_balance_all()));
 }
 //----------------------------------------------------------------------------------------------------
@@ -4142,8 +4193,8 @@ void wallet2::transfer_selected_rct(std::vector<cryptonote::tx_destination_entry
     src.rct = td.is_rct();
     //paste mixin transaction
 
-    THROW_WALLET_EXCEPTION_IF(outs.size() < out_index + 1 ,  error::wallet_internal_error, "outs.size() < out_index + 1");
-    THROW_WALLET_EXCEPTION_IF(outs[out_index].size() < fake_outputs_count ,  error::wallet_internal_error, "fake_outputs_count > random outputts found");
+    THROW_WALLET_EXCEPTION_IF(outs.size() < out_index + 1 ,  error::wallet_internal_error, "outs.size() < out_index + 1: " + std::to_string(outs.size()) + " < " + std::to_string(out_index + 1 ));
+    THROW_WALLET_EXCEPTION_IF(outs[out_index].size() < fake_outputs_count ,  error::wallet_internal_error, "fake_outputs_count > random outputs found");
 
     typedef cryptonote::tx_source_entry::output_entry tx_output_entry;
     for (size_t n = 0; n < fake_outputs_count + 1; ++n)

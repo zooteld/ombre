@@ -204,11 +204,14 @@ namespace cryptonote
       return false;
     }
 
-    res.current_height = req.start_height;
+    res.current_height = m_core.get_current_blockchain_height();
+    res.start_height = req.start_height;
+    res.blocks_scanned = blocks.size();
 
     BOOST_FOREACH(auto& b, blocks) {
       // Check the normal transactions.
       bool found = false;
+      res.start_height++;
       if (!b.tx_hashes.empty()) {
         std::list<transaction> txs;
         std::list<crypto::hash> missed_txs;
@@ -224,7 +227,6 @@ namespace cryptonote
 
       if (!found && !transaction_has_out_for_account(b.miner_tx, account)) {
         // If no transaction was found, continue to the next block.
-        res.current_height++;
         continue;
       }
 

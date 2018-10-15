@@ -76,7 +76,7 @@ namespace cryptonote {
     return CRYPTONOTE_MAX_TX_SIZE;
   }
   //-----------------------------------------------------------------------------------------------
-  bool get_block_reward(size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height) {
+  bool get_block_reward(size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height, uint8_t version) {
     
     uint64_t base_reward;
     uint64_t round_factor = 10000000; // 1 * pow(10, 7)
@@ -120,6 +120,9 @@ namespace cryptonote {
 
     if (current_block_size <= (median_size < BLOCK_SIZE_GROWTH_FAVORED_ZONE ? median_size * 110 / 100 : median_size)) {
       reward = base_reward;
+      if (version > 3) {
+        reward = reward / 2;
+      }
       return true;
     }
 
@@ -140,7 +143,11 @@ namespace cryptonote {
     assert(0 == reward_hi);
     assert(reward_lo < base_reward);
 
+
     reward = reward_lo;
+    if (version > 3) {
+      reward = reward / 2;
+    }
     return true;
   }
   //------------------------------------------------------------------------------------
