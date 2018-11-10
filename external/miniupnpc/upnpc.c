@@ -1,7 +1,7 @@
 /* $Id: upnpc.c,v 1.117 2017/05/26 15:26:55 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005-2018 Thomas Bernard
+ * Copyright (c) 2005-2017 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution. */
 
@@ -594,10 +594,7 @@ int main(int argc, char ** argv)
 			if(argv[i][1] == 'u')
 				rootdescurl = argv[++i];
 			else if(argv[i][1] == 'm')
-			{
 				multicastif = argv[++i];
-				minissdpdpath = "";	/* Disable usage of minissdpd */
-			}
 			else if(argv[i][1] == 'z')
 			{
 				char junk;

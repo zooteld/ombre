@@ -1,7 +1,6 @@
 // Word list created by Monero contributor Shrikez
 // 
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -52,9 +51,7 @@ namespace Language
   class German: public Base
   {
   public:
-    German()
-    {
-      word_list = new std::vector<std::string>({
+    German(): Base("Deutsch", "German", std::vector<std::string>({
         "Abakus",
         "Abart",
         "abbilden",
@@ -1681,11 +1678,8 @@ namespace Language
         "Zündung",
         "Zweck",
         "Zyklop"
-      });
-      unique_prefix_length = 4;
-      word_map = new std::unordered_map<std::string, uint32_t>;
-      trimmed_word_map = new std::unordered_map<std::string, uint32_t>;
-      language_name = "German";
+      }), 4)
+    {
       populate_maps();
     }
   };

@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -32,7 +31,9 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 #include <boost/optional/optional.hpp>
+#include "wipeable_string.h"
 
 namespace tools
 {
@@ -49,6 +50,7 @@ namespace tools
 
     //! \return A password from stdin TTY prompt or `std::cin` pipe.
     static boost::optional<password_container> prompt(bool verify, const char *mesage = "Password");
+    static std::atomic<bool> is_prompting;
 
     password_container(const password_container&) = delete;
     password_container(password_container&& rhs) = default;
@@ -59,11 +61,10 @@ namespace tools
     password_container& operator=(const password_container&) = delete;
     password_container& operator=(password_container&&) = default;
 
-    const std::string& password() const noexcept { return m_password; }
+    const epee::wipeable_string &password() const noexcept { return m_password; }
 
   private:
-    //! TODO Custom allocator that locks to RAM?
-    std::string m_password;
+    epee::wipeable_string m_password;
   };
 
   struct login
@@ -83,7 +84,7 @@ namespace tools
        \return The username and password, or boost::none if
          `password_container::prompt` fails.
      */
-    static boost::optional<login> parse(std::string&& userpass, bool verify, const char* message = "Password");
+    static boost::optional<login> parse(std::string&& userpass, bool verify, const std::function<boost::optional<password_container>(bool)> &prompt);
 
     login(const login&) = delete;
     login(login&&) = default;

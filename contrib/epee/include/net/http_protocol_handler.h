@@ -1,6 +1,6 @@
 // Copyright (c) 2006-2013, Andrey N. Sabelnikov, www.sabelnikov.net
 // All rights reserved.
-//
+// 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
 // * Neither the name of the Andrey N. Sabelnikov nor the
 // names of its contributors may be used to endorse or promote products
 // derived from this software without specific prior written permission.
-//
+// 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,7 +22,7 @@
 // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
+// 
 
 
 
@@ -30,10 +30,15 @@
 #ifndef _HTTP_SERVER_H_
 #define _HTTP_SERVER_H_
 
+#include <boost/optional/optional.hpp>
 #include <string>
 #include "net_utils_base.h"
 #include "to_nonconst_iterator.h"
+#include "http_auth.h"
 #include "http_base.h"
+
+#undef MONERO_DEFAULT_LOG_CATEGORY
+#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {
@@ -49,7 +54,8 @@ namespace net_utils
 		struct http_server_config
 		{
 			std::string m_folder;
-			std::string m_required_user_agent;
+			std::vector<std::string> m_access_control_origins;
+			boost::optional<login> m_user;
 			critical_section m_lock;
 		};
 
@@ -99,7 +105,7 @@ namespace net_utils
 			enum body_transfer_type{
 				http_body_transfer_chunked,
 				http_body_transfer_measure,//mean "Content-Length" valid
-				http_body_transfer_chunked_instead_measure,
+				http_body_transfer_chunked_instead_measure, 
 				http_body_transfer_connection_close,
 				http_body_transfer_multipart,
 				http_body_transfer_undefined
@@ -118,9 +124,9 @@ namespace net_utils
 			bool set_ready_state();
 			bool slash_to_back_slash(std::string& str);
 			std::string get_file_mime_tipe(const std::string& path);
-			std::string get_response_header(const http_response_info& response, bool compress);
+			std::string get_response_header(const http_response_info& response);
 
-			//major function
+			//major function 
 			inline bool handle_request_and_send_response(const http::http_request_info& query_info);
 
 
@@ -136,7 +142,7 @@ namespace net_utils
 			config_type& m_config;
 			bool m_want_close;
 		protected:
-			i_service_endpoint* m_psnd_hndlr;
+			i_service_endpoint* m_psnd_hndlr; 
 		};
 
 		template<class t_connection_context>
@@ -154,6 +160,7 @@ namespace net_utils
 		struct custum_handler_config: public http_server_config
 		{
 			i_http_server_handler<t_connection_context>* m_phandler;
+			std::function<void(size_t, uint8_t*)> rng;
 		};
 
 		/************************************************************************/
@@ -165,20 +172,30 @@ namespace net_utils
 		{
 		public:
 			typedef custum_handler_config<t_connection_context> config_type;
-
+			
 			http_custom_handler(i_service_endpoint* psnd_hndlr, config_type& config, t_connection_context& conn_context)
 				: simple_http_connection_handler<t_connection_context>(psnd_hndlr, config),
 					m_config(config),
-					m_conn_context(conn_context)
+					m_conn_context(conn_context),
+					m_auth(m_config.m_user ? http_server_auth{*m_config.m_user, config.rng} : http_server_auth{})
 			{}
 			inline bool handle_request(const http_request_info& query_info, http_response_info& response)
 			{
 				CHECK_AND_ASSERT_MES(m_config.m_phandler, false, "m_config.m_phandler is NULL!!!!");
+
+				const auto auth_response = m_auth.get_response(query_info);
+				if (auth_response)
+				{
+					response = std::move(*auth_response);
+					return true;
+				}
+
 				//fill with default values
 				response.m_mime_tipe = "text/plain";
 				response.m_response_code = 200;
 				response.m_response_comment = "OK";
 				response.m_body.clear();
+
 				return m_config.m_phandler->handle_http_request(query_info, response, m_conn_context);
 			}
 
@@ -186,7 +203,7 @@ namespace net_utils
 			{
 				return m_config.m_phandler->init_server_thread();;
 			}
-
+	
 			virtual bool thread_deinit()
 			{
 				return m_config.m_phandler->deinit_server_thread();
@@ -202,6 +219,7 @@ namespace net_utils
 			//simple_http_connection_handler::config_type m_stub_config;
 			config_type& m_config;
 			t_connection_context& m_conn_context;
+			http_server_auth m_auth;
 		};
 	}
 }

@@ -1,7 +1,7 @@
-/* $Id: minihttptestserver.c,v 1.23 2018/01/15 16:20:07 nanard Exp $ */
+/* $Id: minihttptestserver.c,v 1.19 2015/11/17 09:07:17 nanard Exp $ */
 /* Project : miniUPnP
  * Author : Thomas Bernard
- * Copyright (c) 2011-2018 Thomas Bernard
+ * Copyright (c) 2011-2016 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
@@ -23,8 +23,6 @@
 #endif
 
 #define CRAP_LENGTH (2048)
-
-static int server(unsigned short port, const char * expected_file_name, int ipv6);
 
 volatile sig_atomic_t quit = 0;
 volatile sig_atomic_t child_to_wait_for = 0;
@@ -52,7 +50,7 @@ void handle_signal_int(int sig)
 /**
  * build a text/plain content of the specified length
  */
-void build_content(char * p, size_t n)
+void build_content(char * p, int n)
 {
 	char line_buffer[80];
 	int k;
@@ -81,10 +79,10 @@ void build_content(char * p, size_t n)
 /**
  * build crappy content
  */
-void build_crap(char * p, size_t n)
+void build_crap(char * p, int n)
 {
 	static const char crap[] = "_CRAP_\r\n";
-	size_t i;
+	int i;
 
 	while(n > 0) {
 		i = sizeof(crap) - 1;
@@ -100,13 +98,12 @@ void build_crap(char * p, size_t n)
  * build chunked response.
  * return a malloc'ed buffer
  */
-char * build_chunked_response(size_t content_length, size_t * response_len)
+char * build_chunked_response(int content_length, int * response_len)
 {
 	char * response_buffer;
 	char * content_buffer;
-	size_t buffer_length;
-	size_t i;
-	unsigned int n;
+	int buffer_length;
+	int i, n;
 
 	/* allocate to have some margin */
 	buffer_length = 256 + content_length + (content_length >> 4);
@@ -150,7 +147,7 @@ char * build_chunked_response(size_t content_length, size_t * response_len)
 	*response_len += 5;
 	free(content_buffer);
 
-	printf("resp_length=%lu buffer_length=%lu content_length=%lu\n",
+	printf("resp_length=%d buffer_length=%d content_length=%d\n",
 	       *response_len, buffer_length, content_length);
 	return response_buffer;
 }
@@ -161,7 +158,7 @@ char * build_chunked_response(size_t content_length, size_t * response_len)
 #else
 #define FAVICON_LENGTH (6 + 16 + 40 + 8 + 32 * 4)
 #endif
-void build_favicon_content(unsigned char * p, size_t n)
+void build_favicon_content(char * p, int n)
 {
 	int i;
 	if(n < FAVICON_LENGTH)
@@ -278,12 +275,12 @@ const struct {
 /**
  * write the response with random behaviour !
  */
-void send_response(int c, const char * buffer, size_t len)
+void send_response(int c, const char * buffer, int len)
 {
-	ssize_t n;
+	int n;
 	while(len > 0) {
 		n = (rand() % 99) + 1;
-		if((size_t)n > len)
+		if(n > len)
 			n = len;
 		n = write(c, buffer, n);
 		if(n < 0) {
@@ -295,8 +292,8 @@ void send_response(int c, const char * buffer, size_t len)
 		} else {
 			len -= n;
 			buffer += n;
-			usleep(10000); /* 10ms */
 		}
+		usleep(10000); /* 10ms */
 	}
 }
 
@@ -306,21 +303,20 @@ void send_response(int c, const char * buffer, size_t len)
 void handle_http_connection(int c)
 {
 	char request_buffer[2048];
-	size_t request_len = 0;
+	int request_len = 0;
 	int headers_found = 0;
-	ssize_t n, m;
-	size_t i;
+	int n, i;
 	char request_method[16];
 	char request_uri[256];
 	char http_version[16];
 	char * p;
 	char * response_buffer;
-	size_t response_len;
+	int response_len;
 	enum modes mode;
-	size_t content_length = 16*1024;
+	int content_length = 16*1024;
 
 	/* read the request */
-	while(request_len < sizeof(request_buffer) && !headers_found) {
+	while(request_len < (int)sizeof(request_buffer) && !headers_found) {
 		n = read(c,
 		         request_buffer + request_len,
 		         sizeof(request_buffer) - request_len);
@@ -348,10 +344,10 @@ void handle_http_connection(int c)
 		printf("no HTTP header found in the request\n");
 		return;
 	}
-	printf("headers :\n%.*s", (int)request_len, request_buffer);
+	printf("headers :\n%.*s", request_len, request_buffer);
 	/* the request have been received, now parse the request line */
 	p = request_buffer;
-	for(i = 0; i < sizeof(request_method) - 1; i++) {
+	for(i = 0; i < (int)sizeof(request_method) - 1; i++) {
 		if(*p == ' ' || *p == '\r')
 			break;
 		request_method[i] = *p;
@@ -389,15 +385,15 @@ void handle_http_connection(int c)
 		n = sizeof(response405) - 1;
 		pc = response405;
 		while(n > 0) {
-			m = write(c, pc, n);
-			if(m<0) {
+			i = write(c, pc, n);
+			if(i<0) {
 				if(errno != EINTR) {
 					perror("write");
 					return;
 				}
 			} else {
-				n -= m;
-				pc += m;
+				n -= i;
+				pc += i;
 			}
 		}
 		return;
@@ -425,7 +421,7 @@ void handle_http_connection(int c)
 		             "HTTP/1.1 200 OK\r\n"
 		             "Server: minihttptestserver\r\n"
 		             "Content-Type: text/plain\r\n"
-		             "Content-Length: %lu\r\n"
+		             "Content-Length: %d\r\n"
 		             "\r\n", content_length);
 		response_len = content_length+n+CRAP_LENGTH;
 		p = realloc(response_buffer, response_len);
@@ -449,10 +445,10 @@ void handle_http_connection(int c)
 		             "HTTP/1.1 200 OK\r\n"
 		             "Server: minihttptestserver\r\n"
 		             "Content-Type: image/vnd.microsoft.icon\r\n"
-		             "Content-Length: %lu\r\n"
+		             "Content-Length: %d\r\n"
 		             "\r\n", content_length);
 		/* image/x-icon */
-		build_favicon_content((unsigned char *)(response_buffer + n), content_length);
+		build_favicon_content(response_buffer + n, content_length);
 		response_len = content_length + n;
 		break;
 	default:
@@ -489,9 +485,17 @@ void handle_http_connection(int c)
  */
 int main(int argc, char * * argv) {
 	int ipv6 = 0;
-	int r, i;
+	int s, c, i;
 	unsigned short port = 0;
+	struct sockaddr_storage server_addr;
+	socklen_t server_addrlen;
+	struct sockaddr_storage client_addr;
+	socklen_t client_addrlen;
+	pid_t pid;
+	int child = 0;
+	int status;
 	const char * expected_file_name = NULL;
+	struct sigaction sa;
 
 	for(i = 1; i < argc; i++) {
 		if(argv[i][0] == '-') {
@@ -518,26 +522,6 @@ int main(int argc, char * * argv) {
 	}
 
 	srand(time(NULL));
-
-	r = server(port, expected_file_name, ipv6);
-	if(r != 0) {
-		printf("*** ERROR ***\n");
-	}
-	return r;
-}
-
-static int server(unsigned short port, const char * expected_file_name, int ipv6)
-{
-	int s, c;
-	int i;
-	struct sockaddr_storage server_addr;
-	socklen_t server_addrlen;
-	struct sockaddr_storage client_addr;
-	socklen_t client_addrlen;
-	pid_t pid;
-	int child = 0;
-	int status;
-	struct sigaction sa;
 
 	memset(&sa, 0, sizeof(struct sigaction));
 

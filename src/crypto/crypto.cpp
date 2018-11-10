@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -29,6 +28,7 @@
 // 
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
+#include <unistd.h>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -37,17 +37,24 @@
 #include <memory>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "common/varint.h"
 #include "warnings.h"
 #include "crypto.h"
 #include "hash.h"
 
-#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
-#include <alloca.h>
+namespace {
+  static void local_abort(const char *msg)
+  {
+    fprintf(stderr, "%s\n", msg);
+#ifdef NDEBUG
+    _exit(1);
 #else
-#include <stdlib.h>
+    abort();
 #endif
+  }
+}
 
 namespace crypto {
 
@@ -98,11 +105,11 @@ namespace crypto {
     sc_reduce32(&res);
   }
 
-  /*
-  * generate public and secret keys from a random 256-bit integer
-  * TODO: allow specifiying random value (for wallet recovery)
-  *
-  */
+  /* 
+   * generate public and secret keys from a random 256-bit integer
+   * TODO: allow specifying random value (for wallet recovery)
+   * 
+   */
   secret_key crypto_ops::generate_keys(public_key &pub, secret_key &sec, const secret_key& recovery_key, bool recover) {
     ge_p3 point;
 
@@ -311,7 +318,7 @@ namespace crypto {
     // pick random k
     ec_scalar k;
     random_scalar(k);
-
+    
     s_comm_2 buf;
     buf.msg = prefix_hash;
     buf.D = D;
@@ -330,7 +337,7 @@ namespace crypto {
       ge_scalarmult_base(&X_p3, &k);
       ge_p3_tobytes(&buf.X, &X_p3);
     }
-
+    
     // compute Y = k*A
     ge_p2 Y_p2;
     ge_scalarmult(&Y_p2, &k, &A_p3);
@@ -448,8 +455,8 @@ namespace crypto {
     ge_tobytes(&image, &point2);
   }
 
-  PUSH_WARNINGS
-    DISABLE_VS_WARNINGS(4200)
+PUSH_WARNINGS
+DISABLE_VS_WARNINGS(4200)
   struct ec_point_pair {
     ec_point a, b;
   };
@@ -457,9 +464,9 @@ namespace crypto {
     hash h;
     struct ec_point_pair ab[];
   };
-  POP_WARNINGS
+POP_WARNINGS
 
-    static inline size_t rs_comm_size(size_t pubs_count) {
+  static inline size_t rs_comm_size(size_t pubs_count) {
     return sizeof(rs_comm) + pubs_count * sizeof(ec_point_pair);
   }
 
@@ -471,7 +478,9 @@ namespace crypto {
     ge_p3 image_unp;
     ge_dsmp image_pre;
     ec_scalar sum, k, h;
-    rs_comm *const buf = reinterpret_cast<rs_comm *>(alloca(rs_comm_size(pubs_count)));
+    boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm *>(malloc(rs_comm_size(pubs_count))), free);
+    if (!buf)
+      local_abort("malloc failure");
     assert(sec_index < pubs_count);
 #if !defined(NDEBUG)
     {
@@ -490,7 +499,7 @@ namespace crypto {
     }
 #endif
     if (ge_frombytes_vartime(&image_unp, &image) != 0) {
-      abort();
+      local_abort("invalid key image");
     }
     ge_dsm_precomp(image_pre, &image_unp);
     sc_0(&sum);
@@ -505,12 +514,11 @@ namespace crypto {
         hash_to_ec(*pubs[i], tmp3);
         ge_scalarmult(&tmp2, &k, &tmp3);
         ge_tobytes(&buf->ab[i].b, &tmp2);
-      }
-      else {
+      } else {
         random_scalar(sig[i].c);
         random_scalar(sig[i].r);
         if (ge_frombytes_vartime(&tmp3, &*pubs[i]) != 0) {
-          abort();
+          local_abort("invalid pubkey");
         }
         ge_double_scalarmult_base_vartime(&tmp2, &sig[i].c, &tmp3, &sig[i].r);
         ge_tobytes(&buf->ab[i].a, &tmp2);
@@ -520,7 +528,7 @@ namespace crypto {
         sc_add(&sum, &sum, &sig[i].c);
       }
     }
-    hash_to_scalar(buf, rs_comm_size(pubs_count), h);
+    hash_to_scalar(buf.get(), rs_comm_size(pubs_count), h);
     sc_sub(&sig[sec_index].c, &h, &sum);
     sc_mulsub(&sig[sec_index].r, &sig[sec_index].c, &sec, &k);
   }
@@ -532,7 +540,9 @@ namespace crypto {
     ge_p3 image_unp;
     ge_dsmp image_pre;
     ec_scalar sum, h;
-    rs_comm *const buf = reinterpret_cast<rs_comm *>(alloca(rs_comm_size(pubs_count)));
+    boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm *>(malloc(rs_comm_size(pubs_count))), free);
+    if (!buf)
+      return false;
 #if !defined(NDEBUG)
     for (i = 0; i < pubs_count; i++) {
       assert(check_key(*pubs[i]));
@@ -560,7 +570,7 @@ namespace crypto {
       ge_tobytes(&buf->ab[i].b, &tmp2);
       sc_add(&sum, &sum, &sig[i].c);
     }
-    hash_to_scalar(buf, rs_comm_size(pubs_count), h);
+    hash_to_scalar(buf.get(), rs_comm_size(pubs_count), h);
     sc_sub(&h, &h, &sum);
     return sc_isnonzero(&h) == 0;
   }

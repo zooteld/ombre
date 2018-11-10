@@ -56,6 +56,7 @@ option(USE_ECDSA "Use ECDSA algorithms" ON)
 option(USE_SHA2 "Enable SHA2 support" ON)
 option(USE_SHA1 "Enable SHA1 support" ON)
 set(ENABLE_DNSTAP 0)
+set(ENABLE_DNSCRYPT 0)
 set(HAVE_SSL 1)
 if (CMAKE_USE_PTHREADS_INIT AND NOT CMAKE_USE_WIN32_THREADS_INIT)
   set(HAVE_PTHREAD 1)
@@ -82,8 +83,12 @@ configure_file(
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/dnstap/dnstap_config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/dnstap/dnstap_config.h")
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/dnscrypt/dnscrypt_config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/dnscrypt/dnscrypt_config.h")
 
 set(common_src
+  services/authzone.c
   services/cache/dns.c
   services/cache/infra.c
   services/cache/rrset.c
@@ -216,23 +221,6 @@ if (WIN32)
       iphlpapi
       ws2_32)
 endif ()
-
-if (MINGW)
-  # There is no variable for this (probably due to the fact that the pthread
-  # library is implicit with a link in msys).
-  find_library(win32pthread
-    NAMES libwinpthread-1.dll)
-  foreach (input IN LISTS win32pthread OPENSSL_LIBRARIES)
-    # Copy shared libraries into the build tree so that no PATH manipulation is
-    # necessary.
-    get_filename_component(name "${input}" NAME)
-    configure_file(
-      "${input}"
-      "${CMAKE_BINARY_DIR}/bin/${name}"
-      COPYONLY)
-  endforeach ()
-endif ()
-
 
 if (INSTALL_VENDORED_LIBUNBOUND)
     if(IOS)
