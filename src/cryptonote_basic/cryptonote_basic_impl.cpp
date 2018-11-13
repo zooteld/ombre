@@ -86,16 +86,24 @@ namespace cryptonote {
     return CRYPTONOTE_MAX_TX_SIZE;
   }
   //-----------------------------------------------------------------------------------------------
-  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version) {
+  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint64_t height, uint8_t version) {
     static_assert(DIFFICULTY_TARGET_V2%60==0&&DIFFICULTY_TARGET_V1%60==0,"difficulty targets must be a multiple of 60");
-    const int target = version < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
-    const int target_minutes = target / 60;
-    const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
+    uint64_t base_reward;
 
-    uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
-    if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
+    if (height > 0)
     {
-      base_reward = FINAL_SUBSIDY_PER_MINUTE*target_minutes;
+      if (height < (PEAK_COIN_EMISSION_HEIGHT + COIN_EMISSION_HEIGHT_INTERVAL)) {
+        uint64_t interval_num = height / COIN_EMISSION_HEIGHT_INTERVAL;
+        double money_supply_pct = 0.1888 + interval_num*(0.023 + interval_num*0.0032);
+        base_reward = ((uint64_t)(MONEY_SUPPLY * money_supply_pct)) >> EMISSION_SPEED_FACTOR;
+      }
+      else{
+        base_reward = (MONEY_SUPPLY - already_generated_coins) >> EMISSION_SPEED_FACTOR;
+      }
+    }
+    else
+    {
+      base_reward = GENESIS_BLOCK_REWARD;
     }
 
     uint64_t full_reward_zone = get_min_block_weight(version);
@@ -228,7 +236,7 @@ namespace cryptonote {
         info.has_payment_id = false;
       }
       else {
-        LOG_PRINT_L1("Wrong address prefix: " << prefix << ", expected " << address_prefix 
+        LOG_PRINT_L1("Wrong address prefix: " << prefix << ", expected " << address_prefix
           << " or " << integrated_address_prefix
           << " or " << subaddress_prefix);
         return false;

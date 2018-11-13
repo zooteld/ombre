@@ -53,6 +53,7 @@
 #define MONEY_SUPPLY                                    ((uint64_t)(-1))
 #define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
+#define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
@@ -73,7 +74,15 @@
 
 #define ORPHANED_BLOCKS_MAX_COUNT                       100
 
+// coin emission change interval/speed configs
+#define EMISSION_SPEED_FACTOR                           21
+#define COIN_EMISSION_MONTH_INTERVAL                    6  // months to change emission speed
+#define COIN_EMISSION_HEIGHT_INTERVAL                   ((uint64_t) (COIN_EMISSION_MONTH_INTERVAL * (30.4375 * 24 * 3600) / DIFFICULTY_TARGET)) // calculated to # of heights to change emission speed
+#define PEAK_COIN_EMISSION_YEAR                         4
+#define PEAK_COIN_EMISSION_HEIGHT                       ((uint64_t) (((12 * 30.4375 * 24 * 3600)/DIFFICULTY_TARGET) * PEAK_COIN_EMISSION_YEAR)) // = (# of heights emmitted per year) * PEAK_COIN_EMISSION_YEAR
+#define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
+#define DIFFICULTY_TARGET                               60  // seconds
 #define DIFFICULTY_TARGET_V2                            60  // seconds
 #define DIFFICULTY_TARGET_V1                            60  // seconds - before first fork
 #define DIFFICULTY_WINDOW                               720 // blocks

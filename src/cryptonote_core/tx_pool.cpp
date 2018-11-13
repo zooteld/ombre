@@ -1138,7 +1138,7 @@ namespace cryptonote
   }
   //---------------------------------------------------------------------------------
   //TODO: investigate whether boolean return is appropriate
-  bool tx_memory_pool::fill_block_template(block &bl, size_t median_weight, uint64_t already_generated_coins, size_t &total_weight, uint64_t &fee, uint64_t &expected_reward, uint8_t version)
+  bool tx_memory_pool::fill_block_template(block &bl, size_t median_weight, uint64_t already_generated_coins, size_t &total_weight, uint64_t &fee, uint64_t &expected_reward, uint64_t height, uint8_t version)
   {
     CRITICAL_REGION_LOCAL(m_transactions_lock);
     CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -1146,9 +1146,9 @@ namespace cryptonote
     uint64_t best_coinbase = 0, coinbase = 0;
     total_weight = 0;
     fee = 0;
-    
+
     //baseline empty block
-    get_block_reward(median_weight, total_weight, already_generated_coins, best_coinbase, version);
+    get_block_reward(median_weight, total_weight, already_generated_coins, best_coinbase, height, version);
 
 
     size_t max_total_weight_pre_v5 = (130 * median_weight) / 100 - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
@@ -1184,7 +1184,7 @@ namespace cryptonote
         // If we're getting lower coinbase tx,
         // stop including more tx
         uint64_t block_reward;
-        if(!get_block_reward(median_weight, total_weight + meta.weight, already_generated_coins, block_reward, version))
+        if(!get_block_reward(median_weight, total_weight + meta.weight, already_generated_coins, block_reward, height, version))
         {
           LOG_PRINT_L2("  would exceed maximum block weight");
           continue;
