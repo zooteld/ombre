@@ -51,7 +51,7 @@ All wallet connections will be SSL encrypted and official wallet nodes will be p
 The blockchain network communication is not optimized and, for example, doesn't even use compression on large data exchanges. We will add compression and will look into modernizing the RPC protocols.
 
 ### Q3. Security audit
-We plan on doing a full security audit of the codebase and will setup fuzzing for all exposed network logic. Additionally security enhancements are planned for the ombred daemon, the GUI wallet and the communication channel between both. 
+We plan on doing a full security audit of the codebase and will setup fuzzing for all exposed network logic. Additionally security enhancements are planned for the ombred daemon, the GUI wallet and the communication channel between both.
 
 ### Q3. Web wallet (under consideration)
 For this roadmap item we would like to have community feedback first: we think a web wallet would be very convenient for our users but we'll be on the lookout for feedback before starting the implementation.

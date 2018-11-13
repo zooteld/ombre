@@ -27,12 +27,12 @@ To test a translation:
 
     LANG=es ./build/release/bin/ombre-wallet-cli
 
-To add new translatable strings in the source code: 
+To add new translatable strings in the source code:
 
-    Use the `tr(string)` function if possible. If the code is in a class, and this class doesn't already have a `tr()` static 
-    function, add one, which uses a context named after what `lupdate` uses for the context, usually the fully qualified class 
-    name (eg, `cryptonote::simple_wallet`).  If you need to use `tr()` in code that's not in a class, you can use the fully 
-    qualified version (eg, `simple_wallet::tr`) of the one matching the context you want. Use `QT_TRANSLATE_NOOP(string)` if you want 
+    Use the `tr(string)` function if possible. If the code is in a class, and this class doesn't already have a `tr()` static
+    function, add one, which uses a context named after what `lupdate` uses for the context, usually the fully qualified class
+    name (eg, `cryptonote::simple_wallet`).  If you need to use `tr()` in code that's not in a class, you can use the fully
+    qualified version (eg, `simple_wallet::tr`) of the one matching the context you want. Use `QT_TRANSLATE_NOOP(string)` if you want
     to specify a context manually.
 
 If you're getting messages of the form:
