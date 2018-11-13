@@ -82,6 +82,12 @@
 #define PEAK_COIN_EMISSION_HEIGHT                       ((uint64_t) (((12 * 30.4375 * 24 * 3600)/DIFFICULTY_TARGET) * PEAK_COIN_EMISSION_YEAR)) // = (# of heights emmitted per year) * PEAK_COIN_EMISSION_YEAR
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
+// Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
+#define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
+#define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt"
+#define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "bffa803bb4061d93a83a3613ff478c5b5e5cb0b0337a735e1a1304ca9fab1807"
+
+
 #define DIFFICULTY_TARGET                               60  // seconds
 #define DIFFICULTY_TARGET_V2                            60  // seconds
 #define DIFFICULTY_TARGET_V1                            60  // seconds - before first fork
