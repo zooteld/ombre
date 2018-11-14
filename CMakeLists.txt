@@ -337,7 +337,6 @@ if(SANITIZE)
 endif()
 
 # Set default blockchain storage location:
-# memory was the default in Cryptonote before Ombre implemented LMDB, it still works but is unnecessary.
 # set(DATABASE memory)
 set(DATABASE lmdb)
 
