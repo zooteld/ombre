@@ -783,13 +783,16 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
     crypto::key_derivation derivation;
     generate_key_derivation(tx_pub_key, keys.m_view_secret_key, derivation);
 
-    // additional tx pubkeys and derivations for multi-destination transfers involving one or more subaddresses
-    std::vector<crypto::public_key> additional_tx_pub_keys = get_additional_tx_pub_keys_from_extra(tx);
+    std::vector<crypto::public_key> additional_tx_pub_keys;
     std::vector<crypto::key_derivation> additional_derivations;
-    for (size_t i = 0; i < additional_tx_pub_keys.size(); ++i)
-    {
-      additional_derivations.push_back({});
-      generate_key_derivation(additional_tx_pub_keys[i], keys.m_view_secret_key, additional_derivations.back());
+    if (pk_index == 1) {
+      // additional tx pubkeys and derivations for multi-destination transfers involving one or more subaddresses
+      additional_tx_pub_keys = get_additional_tx_pub_keys_from_extra(tx);
+      for (size_t i = 0; i < additional_tx_pub_keys.size(); ++i)
+      {
+        additional_derivations.push_back({});
+        generate_key_derivation(additional_tx_pub_keys[i], keys.m_view_secret_key, additional_derivations.back());
+      }
     }
 
     if (miner_tx && m_refresh_type == RefreshNoCoinbase)
