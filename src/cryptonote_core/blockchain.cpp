@@ -1128,18 +1128,59 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
   LOG_PRINT_L3("Blockchain::" << __func__);
   //validate reward
   uint64_t money_in_use = 0;
-  for (auto& o: b.miner_tx.vout)
-    money_in_use += o.amount;
   partial_block_reward = false;
 
-  if (version == 3) {
-    for (auto &o: b.miner_tx.vout) {
-      if (!is_valid_decomposed_amount(o.amount)) {
-        MERROR_VER("miner tx output " << print_money(o.amount) << " is not a valid decomposed amount");
-        return false;
-      }
-    }
-  }
+  // The genesis block does not have the project free.
+  if (b.timestamp != 0 && b.miner_tx.vout.size() != 2) {
+    LOG_PRINT_L1("miner transaction doesn't contain 2 outs! Size is " << b.miner_tx.vout.size());
+    return false;
+ }
+ account_base project_account;
+
+ address_parse_info address_info;
+ if (!get_account_address_from_str(address_info, MAINNET, CRYPTONOTE_PROJECT_BLOCK_ADDRESS)) {
+   LOG_PRINT_L1("Unable to parse developer wallet address!");
+   return false;
+ }
+
+ cryptonote::blobdata viewkey_data;
+ std::string project_viewkey = CRYPTONOTE_PROJECT_BLOCK_VIEWKEY;
+ if(!epee::string_tools::parse_hexstr_to_binbuff(project_viewkey, viewkey_data)) {
+   LOG_PRINT_L1("Unable to parse developer wallet viewkey!");
+   return false;
+ }
+
+ crypto::secret_key viewkey = *reinterpret_cast<const crypto::secret_key*>(viewkey_data.data());
+ project_account.create_from_viewkey(address_info.address, viewkey);
+
+ std::vector<tx_extra_field> tx_extra_fields;
+ parse_tx_extra(b.miner_tx.extra, tx_extra_fields);
+
+ tx_extra_pub_key pub_key_field;
+ if (!find_tx_extra_field_by_type(tx_extra_fields, pub_key_field, 0)) {
+   LOG_PRINT_L1("Public tx key not found in transaction");
+   return false;
+ }
+
+ const cryptonote::account_keys& keys = project_account.get_keys();
+ crypto::key_derivation derivation;
+ generate_key_derivation(pub_key_field.pub_key, keys.m_view_secret_key, derivation);
+
+ bool project_out_found = false;
+ float project_dev_fee = get_project_block_reward_fee(already_generated_coins);
+ float project_dev_fee_amount = 0;
+
+ for (size_t i = 0; i < b.miner_tx.vout.size(); ++i) {
+   crypto::public_key pk;
+   derive_public_key(derivation, i, keys.m_account_address.m_spend_public_key, pk);
+   if (pk == boost::get<txout_to_key>(b.miner_tx.vout[i].target).key) {
+     LOG_PRINT_L3("Found project out in miner_tx");
+     // Check if the amount is correct.
+     project_dev_fee_amount = b.miner_tx.vout[i].amount;
+     project_out_found = true;
+   }
+   money_in_use += b.miner_tx.vout[i].amount;
+ }
 
   std::vector<size_t> last_blocks_weights;
   get_last_n_blocks_weights(last_blocks_weights, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
@@ -1148,31 +1189,23 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
     return false;
   }
+  if (project_dev_fee > 0) {
+    if (m_db->height() != 0 && (project_dev_fee * base_reward) != project_dev_fee_amount) {
+      LOG_PRINT_L1("Project dev fee is incorrect! " << (project_dev_fee * base_reward) << " != " << project_dev_fee_amount);
+      return false;
+    }
+  }
+
   if(base_reward + fee < money_in_use)
   {
     MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
     return false;
   }
-  // From hard fork 2, we allow a miner to claim less block reward than is allowed, in case a miner wants less dust
-  if (m_hardfork->get_current_version() < 2)
-  {
-    if(base_reward + fee != money_in_use)
-    {
-      MDEBUG("coinbase transaction doesn't use full amount of block reward:  spent: " << money_in_use << ",  block reward " << base_reward + fee << "(" << base_reward << "+" << fee << ")");
-      return false;
-    }
-  }
-  else
-  {
-    // from hard fork 2, since a miner can claim less than the full block reward, we update the base_reward
-    // to show the amount of coins that were actually generated, the remainder will be pushed back for later
-    // emission. This modifies the emission curve very slightly.
-    CHECK_AND_ASSERT_MES(money_in_use - fee <= base_reward, false, "base reward calculation bug");
-    if(base_reward + fee != money_in_use)
-      partial_block_reward = true;
-    base_reward = money_in_use - fee;
-  }
-  return true;
+  CHECK_AND_ASSERT_MES(money_in_use - fee <= base_reward, false, "base reward calculation bug");
+  if(base_reward + fee != money_in_use)
+    partial_block_reward = true;
+  base_reward = money_in_use - fee;
+  return m_db->height() != 0 ? project_out_found : true;
 }
 //------------------------------------------------------------------
 // get the block weights of the last <count> blocks, and return by reference <sz>.

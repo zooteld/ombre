@@ -965,7 +965,7 @@ endif()
 add_subdirectory(contrib)
 add_subdirectory(src)
 
-if(BUILD_TESTS)
+if(BUILD_TESTS STREQUAL "ON")
   add_subdirectory(tests)
 endif()
 
