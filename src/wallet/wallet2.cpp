@@ -707,6 +707,16 @@ void wallet2::check_acc_out_precomp(const tx_out &o, const crypto::key_derivatio
   tx_scan_info.error = false;
 }
 //----------------------------------------------------------------------------------------------------
+void wallet2::check_acc_out_precomp_once(const tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info, bool &already_seen) const
+{
+  tx_scan_info.received = boost::none;
+  if (already_seen)
+    return;
+  check_acc_out_precomp(o, derivation, additional_derivations, i, tx_scan_info);
+  if (tx_scan_info.received)
+    already_seen = true;
+}
+//----------------------------------------------------------------------------------------------------
 static uint64_t decodeRct(const rct::rctSig & rv, const crypto::key_derivation &derivation, unsigned int i, rct::key & mask)
 {
   crypto::secret_key scalar1;
@@ -748,7 +758,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 
   // Don't try to extract tx public key if tx has no ouputs
   size_t pk_index = 0;
-  std::unordered_set<crypto::public_key> public_keys_seen;
+  std::deque<bool> output_found(tx.vout.size(), false);
   std::vector<tx_scan_info_t> tx_scan_info(tx.vout.size());
   while (!tx.vout.empty())
   {
@@ -764,13 +774,6 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         m_callback->on_skip_transaction(height, txid, tx);
       return;
     }
-
-    if (public_keys_seen.find(pub_key_field.pub_key) != public_keys_seen.end())
-    {
-      LOG_PRINT_L0("The same transaction pubkey is present more than once, ignoring extra instance");
-      continue;
-    }
-    public_keys_seen.insert(pub_key_field.pub_key);
 
     int num_vouts_received = 0;
     tx_pub_key = pub_key_field.pub_key;
@@ -825,8 +828,8 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         // the first one was already checked
         for (size_t i = 0; i < tx.vout.size(); ++i)
         {
-          ioservice.dispatch(boost::bind(&wallet2::check_acc_out_precomp, this, std::cref(tx.vout[i]), std::cref(derivation), std::cref(additional_derivations), i,
-            std::ref(tx_scan_info[i])));
+        ioservice.dispatch(boost::bind(&wallet2::check_acc_out_precomp_once, this, std::cref(tx.vout[i]), std::cref(derivation), std::cref(additional_derivations), i,
+          std::ref(tx_scan_info[i]), std::ref(output_found[i])));
         }
         KILL_IOSERVICE();
         for (size_t i = 0; i < tx.vout.size(); ++i)
@@ -869,8 +872,8 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
       std::deque<bool> error(tx.vout.size());
       for (size_t i = 0; i < tx.vout.size(); ++i)
       {
-        ioservice.dispatch(boost::bind(&wallet2::check_acc_out_precomp, this, std::cref(tx.vout[i]), std::cref(derivation), std::cref(additional_derivations), i,
-          std::ref(tx_scan_info[i])));
+        ioservice.dispatch(boost::bind(&wallet2::check_acc_out_precomp_once, this, std::cref(tx.vout[i]), std::cref(derivation), std::cref(additional_derivations), i,
+          std::ref(tx_scan_info[i]), std::ref(output_found[i])));
       }
       KILL_IOSERVICE();
       for (size_t i = 0; i < tx.vout.size(); ++i)
@@ -904,7 +907,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
       {
         uint64_t money_transfered = 0;
         bool error = false;
-        check_acc_out_precomp(tx.vout[i], derivation, additional_derivations, i, tx_scan_info[i]);
+        check_acc_out_precomp_once(tx.vout[i], derivation, additional_derivations, i, tx_scan_info[i], output_found[i]);
         if (tx_scan_info[i].error)
         {
           r = false;
@@ -974,7 +977,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
             if (td.m_amount == 0)
             {
               td.m_mask = mask[o];
-              td.m_amount = amount[o];
+			  td.m_amount = tx_scan_info[o].amount;
               td.m_rct = true;
             }
             else if (miner_tx && tx.version == 2)
@@ -1006,7 +1009,8 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
             << " from received " << print_money(tx.vout[o].amount) << " output already exists with "
             << print_money(m_transfers[kit->second].amount()) << ", replacing with new output");
           // The new larger output replaced a previous smaller one
-          tx_money_got_in_outs[tx_scan_info[o].received->index] -= tx.vout[o].amount;
+		  
+			tx_money_got_in_outs[tx_scan_info[o].received->index] -= tx_scan_info[o].amount;
 
           if (!pool)
           {
@@ -1023,7 +1027,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
             if (td.m_amount == 0)
             {
               td.m_mask = mask[o];
-              td.m_amount = amount[o];
+			  td.m_amount = tx_scan_info[o].amount;
               td.m_rct = true;
             }
             else if (miner_tx && tx.version == 2)
