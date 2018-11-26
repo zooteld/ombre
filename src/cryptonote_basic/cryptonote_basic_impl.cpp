@@ -69,11 +69,7 @@ namespace cryptonote {
   //-----------------------------------------------------------------------------------------------
   size_t get_min_block_weight(uint8_t version)
   {
-    if (version < 2)
-      return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
-    if (version < 5)
-      return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
-    return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5;
+    return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
   }
   //-----------------------------------------------------------------------------------------------
   size_t get_max_block_size()
@@ -87,9 +83,8 @@ namespace cryptonote {
   }
   //-----------------------------------------------------------------------------------------------
   bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint64_t height, uint8_t version) {
-    static_assert(DIFFICULTY_TARGET_V2%60==0&&DIFFICULTY_TARGET_V1%60==0,"difficulty targets must be a multiple of 60");
     uint64_t base_reward;
-
+    uint64_t round_factor = 10000000; // 1 * pow(10, 7)
     if (height > 0)
     {
       if (height < (PEAK_COIN_EMISSION_HEIGHT + COIN_EMISSION_HEIGHT_INTERVAL)) {
@@ -106,21 +101,34 @@ namespace cryptonote {
       base_reward = GENESIS_BLOCK_REWARD;
     }
 
-    uint64_t full_reward_zone = get_min_block_weight(version);
+    if (base_reward < FINAL_SUBSIDY){
+      if (MONEY_SUPPLY > already_generated_coins){
+        base_reward = FINAL_SUBSIDY;
+      }
+      else{
+        base_reward = FINAL_SUBSIDY/2;
+      }
+    }
+
+    // rounding (floor) base reward
+    base_reward = base_reward / round_factor * round_factor;
 
     //make it soft
-    if (median_weight < full_reward_zone) {
-      median_weight = full_reward_zone;
+    if (median_weight < CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2) {
+      median_weight = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
     }
 
-    if (current_block_weight <= median_weight) {
-      reward = base_reward;
-      return true;
-    }
-
-    if(current_block_weight > 2 * median_weight) {
-      MERROR("Block cumulative weight is too big: " << current_block_weight << ", expected less than " << 2 * median_weight);
+    if (current_block_weight > 2 * median_weight) {
+      LOG_PRINT_L1("Block cumulative size is too big: " << current_block_weight << ", expected less than " << 2 * median_weight);
       return false;
+    }
+
+    if (current_block_weight <= (median_weight < BLOCK_SIZE_GROWTH_FAVORED_ZONE ? median_weight * 110 / 100 : median_weight)) {
+      reward = base_reward;
+      if (version > 3) {
+        reward = reward / 2;
+      }
+      return true;
     }
 
     assert(median_weight < std::numeric_limits<uint32_t>::max());
@@ -140,9 +148,14 @@ namespace cryptonote {
     assert(0 == reward_hi);
     assert(reward_lo < base_reward);
 
+
     reward = reward_lo;
+    if (version > 3) {
+      reward = reward / 2;
+    }
     return true;
   }
+
   //------------------------------------------------------------------------------------
   uint8_t get_account_address_checksum(const public_address_outer_blob& bl)
   {

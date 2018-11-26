@@ -547,36 +547,6 @@ namespace cryptonote
     static uint64_t get_fee_quantization_mask();
 
     /**
-     * @brief get dynamic per kB or byte fee for a given block weight
-     *
-     * The dynamic fee is based on the block weight in a past window, and
-     * the current block reward. It is expressed by kB before v8, and
-     * per byte from v8.
-     *
-     * @param block_reward the current block reward
-     * @param median_block_weight the median block weight in the past window
-     * @param version hard fork version for rules and constants to use
-     *
-     * @return the fee
-     */
-    static uint64_t get_dynamic_base_fee(uint64_t block_reward, size_t median_block_weight, uint8_t version);
-
-    /**
-     * @brief get dynamic per kB or byte fee estimate for the next few blocks
-     *
-     * The dynamic fee is based on the block weight in a past window, and
-     * the current block reward. It is expressed by kB before v8, and
-     * per byte from v8.
-     * This function calculates an estimate for a dynamic fee which will be
-     * valid for the next grace_blocks
-     *
-     * @param grace_blocks number of blocks we want the fee to be valid for
-     *
-     * @return the fee estimate
-     */
-    uint64_t get_dynamic_base_fee_estimate(uint64_t grace_blocks) const;
-
-    /**
      * @brief validate a transaction's fee
      *
      * This function validates the fee is enough for the transaction.
@@ -588,7 +558,34 @@ namespace cryptonote
      *
      * @return true if the fee is enough, false otherwise
      */
-    bool check_fee(size_t tx_weight, uint64_t fee) const;
+    bool check_fee(size_t tx_weight, uint64_t fee);
+
+     /**
+     * @brief get dynamic per kB fee estimate for the next few blocks
+     *
+     * The dynamic fee is based on the block size in a past window, and
+     * the current block reward. It is expressed by kB. This function
+     * calculates an estimate for a dynamic fee which will be valid for
+     * the next grace_blocks
+     *
+     * @param grace_blocks number of blocks we want the fee to be valid for
+     *
+     * @return the per kB fee estimate
+     */
+    uint64_t get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks);
+
+     /**
+     * @brief get dynamic per kB fee for a given block size
+     *
+     * The dynamic fee is based on the block size in a past window, and
+     * the current block reward. It is expressed by kB.
+     *
+     * @param block_reward the current block reward
+     * @param median_block_size the median blob's size in the past window
+     *
+     * @return the per kB fee
+     */
+    uint64_t get_dynamic_per_kb_fee(uint64_t block_reward, size_t median_block_size);
 
     /**
      * @brief check that a transaction's outputs conform to current standards
@@ -797,7 +794,7 @@ namespace cryptonote
      * @param earliest_height the earliest height at which <version> is allowed
      * @param voting which version this node is voting for/using
      *
-     * @return whether the version queried is enabled 
+     * @return whether the version queried is enabled
      */
     bool get_hard_fork_voting_info(uint8_t version, uint32_t &window, uint32_t &votes, uint32_t &threshold, uint64_t &earliest_height, uint8_t &voting) const;
 

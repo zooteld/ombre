@@ -249,4 +249,5 @@ namespace cryptonote {
     }
     return low / weighted_timespans;
   }
+}  // namespace
 
