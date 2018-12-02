@@ -1263,7 +1263,10 @@ namespace cryptonote
     response.reward = get_block_reward(blk);
     response.block_size = response.block_weight = m_core.get_blockchain_storage().get_db().get_block_weight(height);
     response.num_txes = blk.tx_hashes.size();
-    response.pow_hash = fill_pow_hash ? string_tools::pod_to_hex(get_block_longhash(blk, height)) : "";
+    cn_pow_hash_v2 hash_ctx;
+    crypto::hash h;
+    get_block_longhash(blk, hash_ctx, h);
+    response.pow_hash = fill_pow_hash ? string_tools::pod_to_hex(h) : "";
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------

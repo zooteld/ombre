@@ -669,13 +669,16 @@ namespace cryptonote
     //genesis block
     bl = boost::value_initialized<block>();
 
+    account_public_address addr = boost::value_initialized<account_public_address>();
+    construct_miner_tx(0, 0, 0, 0, 0, addr, bl.miner_tx); // zero fee in genesis
+
     blobdata tx_bl;
     bool r = string_tools::parse_hexstr_to_binbuff(genesis_tx, tx_bl);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
     r = parse_and_validate_tx_from_blob(tx_bl, bl.miner_tx);
     CHECK_AND_ASSERT_MES(r, false, "failed to parse coinbase tx from hard coded blob");
-    bl.major_version = CURRENT_BLOCK_MAJOR_VERSION;
-    bl.minor_version = CURRENT_BLOCK_MINOR_VERSION;
+    bl.major_version = 1;
+    bl.minor_version = 1;
     bl.timestamp = 0;
     bl.nonce = nonce;
     miner::find_nonce_for_given_block(bl, 1, 0);

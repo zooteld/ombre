@@ -50,7 +50,8 @@
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY                                    ((uint64_t)500000000000000000)  // 0.5 billion.
+#define MONEY_SUPPLY                                    ((uint64_t)1000000000000000000)  // 0.5 billion.
+#define MONEY_SUPPLY_V4                                 ((uint64_t)500000000000000000)  // 0.5 billion.
 #define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
 #define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
@@ -69,7 +70,7 @@
 #define TRANSACTION_SIZE_LIMIT_V2                       ((uint64_t) ((CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 * 125 / 100) - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE))
 
 #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
-#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                12
+#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                9
 // COIN - number of smallest units in one coin
 #define COIN                                            ((uint64_t)1000000000) // pow(10, 9)
 
@@ -91,6 +92,7 @@
 #define PEAK_COIN_EMISSION_HEIGHT                       ((uint64_t) (((12 * 30.4375 * 24 * 3600)/DIFFICULTY_TARGET) * PEAK_COIN_EMISSION_YEAR)) // = (# of heights emmitted per year) * PEAK_COIN_EMISSION_YEAR
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
+#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
 // Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
 #define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt"
@@ -127,7 +129,7 @@
 #define P2P_DEFAULT_CONNECTION_TIMEOUT                  5000       //5 seconds
 #define P2P_DEFAULT_PING_CONNECTION_TIMEOUT             2000       //2 seconds
 #define P2P_DEFAULT_INVOKE_TIMEOUT                      60*2*1000  //2 minutes
-#define P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT            5000       //5 seconds
+#define P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT            10000       //5 seconds
 #define P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT       70
 #define P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT            2
 
@@ -164,6 +166,7 @@
 #define DEFAULT_TXPOOL_MAX_WEIGHT               648000000ull // 3 days at 300000, in bytes
 
 #define BULLETPROOF_MAX_OUTPUTS                 16
+#define CRYPTONOTE_V2_POW_BLOCK_VERSION         3
 
 // New constants are intended to go here
 namespace config

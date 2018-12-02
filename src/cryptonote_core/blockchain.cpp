@@ -74,8 +74,7 @@ using namespace crypto;
 
 using namespace cryptonote;
 using epee::string_tools::pod_to_hex;
-extern "C" void slow_hash_allocate_state();
-extern "C" void slow_hash_free_state();
+#define MAINNET_HARDFORK_V3_HEIGHT  ((uint64_t)(116520))
 
 DISABLE_VS_WARNINGS(4267)
 
@@ -1518,7 +1517,7 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
     CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
-    get_block_longhash(bei.bl, proof_of_work, bei.height);
+    get_block_longhash(bei.bl, m_pow_ctx, proof_of_work);
     if(!check_hash(proof_of_work, current_diff))
     {
       MERROR_VER("Block with id: " << id << std::endl << " for alternative chain, does not have enough proof of work: " << proof_of_work << std::endl << " expected difficulty: " << current_diff);
@@ -3239,20 +3238,11 @@ leave:
   if (m_db->height() < m_blocks_hash_check.size())
   {
     auto hash = get_block_hash(bl);
-    const auto &expected_hash = m_blocks_hash_check[m_db->height()];
-    if (expected_hash != crypto::null_hash)
+    if (memcmp(&hash, &m_blocks_hash_check[m_db->height()], sizeof(hash)) != 0)
     {
-      if (memcmp(&hash, &expected_hash, sizeof(hash)) != 0)
-      {
-        MERROR_VER("Block with id is INVALID: " << id);
-        bvc.m_verifivation_failed = true;
-        goto leave;
-      }
-      fast_check = true;
-    }
-    else
-    {
-      MCINFO("verify", "No pre-validated hash at height " << m_db->height() << ", verifying fully");
+      LOG_PRINT_L1("Block with id is INVALID: " << id);
+      bvc.m_verifivation_failed = true;
+      goto leave;
     }
   }
   else
@@ -3264,8 +3254,9 @@ leave:
       precomputed = true;
       proof_of_work = it->second;
     }
-    else
-      proof_of_work = get_block_longhash(bl, m_db->height());
+    else {
+      get_block_longhash(bl, m_pow_ctx, proof_of_work);
+      }
 
     // validate proof_of_work versus difficulty target
     if(!check_hash(proof_of_work, current_diffic))
@@ -3423,6 +3414,7 @@ leave:
   TIME_MEASURE_START(vmt);
   uint64_t base_reward = 0;
   uint64_t already_generated_coins = m_db->height() ? m_db->get_block_already_generated_coins(m_db->height() - 1) : 0;
+
   if(!validate_miner_transaction(bl, cumulative_block_weight, fee_summary, base_reward, already_generated_coins, bvc.m_partial_block_reward, m_hardfork->get_current_version()))
   {
     MERROR_VER("Block with id: " << id << " has incorrect miner transaction");
@@ -3442,7 +3434,12 @@ leave:
   // coins will eventually exceed MONEY_SUPPLY and overflow a uint64. To prevent overflow, cap already_generated_coins
   // at MONEY_SUPPLY. already_generated_coins is only used to compute the block subsidy and MONEY_SUPPLY yields a
   // subsidy of 0 under the base formula and therefore the minimum subsidy >0 in the tail state.
-  already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY;
+  if (m_hardfork->get_current_version() > 3) {
+    already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY_V4;
+  } else {
+    already_generated_coins = base_reward < (MONEY_SUPPLY-already_generated_coins) ? already_generated_coins + base_reward : MONEY_SUPPLY;
+  }
+
   if(m_db->height())
     cumulative_difficulty += m_db->get_block_cumulative_difficulty(m_db->height() - 1);
 
@@ -3641,21 +3638,20 @@ void Blockchain::set_enforce_dns_checkpoints(bool enforce_checkpoints)
 }
 
 //------------------------------------------------------------------
-void Blockchain::block_longhash_worker(uint64_t height, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map) const
+void Blockchain::block_longhash_worker(cn_pow_hash_v2& hash_ctx, const std::vector<block> &blocks, std::unordered_map<crypto::hash, crypto::hash> &map)
 {
   TIME_MEASURE_START(t);
-  slow_hash_allocate_state();
 
   for (const auto & block : blocks)
   {
     if (m_cancel)
        break;
     crypto::hash id = get_block_hash(block);
-    crypto::hash pow = get_block_longhash(block, height++);
+    crypto::hash pow;
+    get_block_longhash(block, hash_ctx, pow);
     map.emplace(id, pow);
   }
 
-  slow_hash_free_state();
   TIME_MEASURE_FINISH(t);
 }
 
@@ -3750,12 +3746,14 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
   // pre: A A A A B B B B C C C C D D D D
 
   // easy case: height >= hashes
-  if (height >= m_blocks_hash_of_hashes.size() * HASH_OF_HASHES_STEP)
+  if (height >= m_blocks_hash_of_hashes.size() * HASH_OF_HASHES_STEP) {
     return hashes.size();
+  }
 
   // if we're getting old blocks, we might have jettisoned the hashes already
-  if (m_blocks_hash_check.empty())
+  if (m_blocks_hash_check.empty()) {
     return hashes.size();
+  }
 
   // find hashes encompassing those block
   size_t first_index = height / HASH_OF_HASHES_STEP;
@@ -3763,8 +3761,9 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
   MDEBUG("Blocks " << height << " - " << (height + hashes.size() - 1) << " start at " << first_index << " and end at " << last_index);
 
   // case of not enough to calculate even a single hash
-  if (first_index == last_index && hashes.size() < HASH_OF_HASHES_STEP && (height + hashes.size()) % HASH_OF_HASHES_STEP)
+  if (first_index == last_index && hashes.size() < HASH_OF_HASHES_STEP && (height + hashes.size()) % HASH_OF_HASHES_STEP) {
     return hashes.size();
+  }
 
   // build hashes vector to hash hashes together
   std::vector<crypto::hash> data;
@@ -3787,6 +3786,7 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
     }
     pop = 0;
   }
+   MERROR("POP = " << pop);
 
   // push the data to check
   for (const auto &h: hashes)
@@ -3797,8 +3797,14 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
       data.push_back(h);
   }
 
+   MERROR("Data size = " << data.size());
+
   // hash and check
   uint64_t usable = first_index * HASH_OF_HASHES_STEP - height; // may start negative, but unsigned under/overflow is not UB
+
+   MERROR("Usable = " << usable);
+   MERROR("first_index = " << first_index << " last_index = " << last_index);
+   MERROR("m_blocks_hash_of_hashes = " <<m_blocks_hash_of_hashes.size());
   for (size_t n = first_index; n <= last_index; ++n)
   {
     if (n < m_blocks_hash_of_hashes.size())
@@ -3814,7 +3820,9 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
       // add to the known hashes array
       if (!valid)
       {
-        MDEBUG("invalid hash for blocks " << n * HASH_OF_HASHES_STEP << " - " << (n * HASH_OF_HASHES_STEP + HASH_OF_HASHES_STEP - 1));
+
+        //MDEBUG("invalid hash for blocks " << n * HASH_OF_HASHES_STEP << " - " << (n * HASH_OF_HASHES_STEP + HASH_OF_HASHES_STEP - 1));
+        MERROR("invalid hash for blocks " << n * HASH_OF_HASHES_STEP << " - " << (n * HASH_OF_HASHES_STEP + HASH_OF_HASHES_STEP - 1));
         break;
       }
 
@@ -3835,7 +3843,7 @@ uint64_t Blockchain::prevalidate_block_hashes(uint64_t height, const std::vector
         usable = hashes.size();
     }
   }
-  MDEBUG("usable: " << usable << " / " << hashes.size());
+  //MDEBUG("usable: " << usable << " / " << hashes.size());
   CHECK_AND_ASSERT_MES(usable < std::numeric_limits<uint64_t>::max() / 2, 0, "usable is negative");
   return usable;
 }
@@ -3971,11 +3979,15 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::vector<block_complete
     if (!blocks_exist)
     {
       m_blocks_longhash_table.clear();
+
+      if(m_hash_ctxes_multi.size() < threads)
+        m_hash_ctxes_multi.resize(threads);
+
       uint64_t thread_height = height;
       tools::threadpool::waiter waiter;
       for (uint64_t i = 0; i < threads; i++)
       {
-        tpool.submit(&waiter, boost::bind(&Blockchain::block_longhash_worker, this, thread_height, std::cref(blocks[i]), std::ref(maps[i])), true);
+        tpool.submit(&waiter, boost::bind(&Blockchain::block_longhash_worker, this, std::ref(m_hash_ctxes_multi[i]), std::cref(blocks[i]), std::ref(maps[i])), true);
         thread_height += blocks[i].size();
       }
 

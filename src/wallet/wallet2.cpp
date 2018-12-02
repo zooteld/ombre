@@ -990,6 +990,10 @@ bool wallet2::get_seed(epee::wipeable_string& electrum_words, const epee::wipeab
 //----------------------------------------------------------------------------------------------------
 bool wallet2::get_multisig_seed(epee::wipeable_string& seed, const epee::wipeable_string &passphrase, bool raw) const
 {
+
+  // TODO(Ombre-team): Fix the cn_slow_hash usage.
+  std::cout << "Multisig wallet not supported" << std::endl;
+  return false;
   bool ready;
   uint32_t threshold, total;
   if (!multisig(&ready, &threshold, &total))
@@ -1029,10 +1033,10 @@ bool wallet2::get_multisig_seed(epee::wipeable_string& seed, const epee::wipeabl
 
   if (!passphrase.empty())
   {
-    crypto::secret_key key;
-    crypto::cn_slow_hash(passphrase.data(), passphrase.size(), (crypto::hash&)key);
-    sc_reduce32((unsigned char*)key.data);
-    data = encrypt(data, key, true);
+    // crypto::secret_key key;
+    // crypto::cn_slow_hash(passphrase.data(), passphrase.size(), (crypto::hash&)key);
+    // sc_reduce32((unsigned char*)key.data);
+    // data = encrypt(data, key, true);
   }
 
   if (raw)

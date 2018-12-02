@@ -4,6 +4,11 @@
 #ifndef KECCAK_H
 #define KECCAK_H
 
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 #include <string.h>
 
@@ -37,4 +42,9 @@ void keccak1600(const uint8_t *in, size_t inlen, uint8_t *md);
 void keccak_init(KECCAK_CTX * ctx);
 void keccak_update(KECCAK_CTX * ctx, const uint8_t *in, size_t inlen);
 void keccak_finish(KECCAK_CTX * ctx, uint8_t *md);
+#ifdef __cplusplus
+}
 #endif
+#endif
+
+
