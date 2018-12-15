@@ -86,7 +86,7 @@ static const struct {
   { 1, 1, 0, 1482806500 },
   { 2, 21301, 0, 1497657600 },
   { 3, 72001, 0, 1524577218 }, // Roughly the 20th of April.
-  { 4, 208500, 0, 1531762611 } // Roughly the 23rd of July.
+  { 4, 208500, 0, 1531762611 }, // Roughly the 23rd of July.
   { 5, 426000, 0, 1531762611 } // Roughly the first week of January 2019.
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
@@ -100,7 +100,7 @@ static const struct {
   { 1, 1, 0, 1482806500 },
   { 2, 6, 0, 1497181713 },
   { 3, 7, 0, 1522597016 },
-  { 4, 8, 0, 1522597017 }
+  { 4, 8, 0, 1522597017 },
   { 5, 10, 0, 1522597018 }
 };
 static const uint64_t testnet_hard_fork_version_1_till = (uint64_t)-1;
