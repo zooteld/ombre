@@ -159,7 +159,7 @@ namespace cryptonote
       ", fee " << fee);
 #endif
 
-    float current_dev_fee = get_project_block_reward_fee(already_generated_coins, version);
+    float current_dev_fee = get_project_block_reward_fee(already_generated_coins, hard_fork_version);
 
     dev_block_reward = current_dev_fee * block_reward;
     miner_block_reward = (block_reward + fee) - dev_block_reward;
