@@ -73,6 +73,7 @@ namespace cryptonote
     }
     LOG_PRINT_L2("destinations include " << num_stdaddresses << " standard addresses and " << num_subaddresses << " subaddresses");
   }
+
   //---------------------------------------------------------------
   // following formula: f(x) = 0.06 * (1 - sqrt(x)) where x = current_supply / max_supply S.T. current_supply <= max_supply
   float get_project_block_reward_fee(float already_generated_coins) {
@@ -85,7 +86,6 @@ namespace cryptonote
     }
     return current_dev_fee;
   }
-
   //---------------------------------------------------------------
   bool construct_miner_tx(size_t height, size_t median_weight, uint64_t already_generated_coins, size_t current_block_weight, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
     tx.vin.clear();
@@ -114,7 +114,13 @@ namespace cryptonote
 #endif
     block_reward += fee;
 
-    float current_dev_fee = get_project_block_reward_fee(already_generated_coins);
+    float current_dev_fee;
+    if (hard_fork_version < 5) {
+      current_dev_fee = get_project_block_reward_fee(already_generated_coins);
+    } else {
+      current_dev_fee = CRYPTONOTE_PROJECT_BLOCK_REWARD;
+    }
+
     uint64_t dev_block_reward = current_dev_fee * block_reward;
     uint64_t miner_block_reward = (block_reward + fee) - dev_block_reward;
 

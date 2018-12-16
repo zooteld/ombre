@@ -131,12 +131,14 @@ namespace cryptonote
     {
       // not clear if we should set that, since verifivation (sic) did not fail before, since
       // the tx was accepted before timing out.
+      LOG_PRINT_L1("Transaction timed out!");
       tvc.m_verifivation_failed = true;
       return false;
     }
 
     if(!check_inputs_types_supported(tx))
     {
+      LOG_PRINT_L1("Transaction input types not supported!");
       tvc.m_verifivation_failed = true;
       tvc.m_invalid_input = true;
       return false;
@@ -150,6 +152,7 @@ namespace cryptonote
       uint64_t inputs_amount = 0;
       if(!get_inputs_money_amount(tx, inputs_amount))
       {
+        LOG_PRINT_L1("Transaction get_inputs_money_amount failed!");
         tvc.m_verifivation_failed = true;
         return false;
       }
@@ -179,6 +182,7 @@ namespace cryptonote
 
     if (!kept_by_block && !m_blockchain.check_fee(tx_weight, fee))
     {
+      LOG_PRINT_L1("Transaction fee is wrong: " << fee);
       tvc.m_verifivation_failed = true;
       tvc.m_fee_too_low = true;
       return false;
@@ -250,8 +254,10 @@ namespace cryptonote
           CRITICAL_REGION_LOCAL1(m_blockchain);
           LockedTXN lock(m_blockchain);
           m_blockchain.add_txpool_tx(tx, meta);
-          if (!insert_key_images(tx, kept_by_block))
+          if (!insert_key_images(tx, kept_by_block)) {
+            MERROR("insert_key_images failed!");
             return false;
+          }
           m_txs_by_fee_and_receive_time.emplace(std::pair<double, std::time_t>(fee / (double)tx_weight, receive_time), id);
         }
         catch (const std::exception &e)
@@ -292,8 +298,10 @@ namespace cryptonote
         LockedTXN lock(m_blockchain);
         m_blockchain.remove_txpool_tx(get_transaction_hash(tx));
         m_blockchain.add_txpool_tx(tx, meta);
-        if (!insert_key_images(tx, kept_by_block))
+        if (!insert_key_images(tx, kept_by_block)) {
+          MERROR("insert_key_images failed!");
           return false;
+        }
         m_txs_by_fee_and_receive_time.emplace(std::pair<double, std::time_t>(fee / (double)tx_weight, receive_time), id);
       }
       catch (const std::exception &e)

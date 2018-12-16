@@ -39,6 +39,7 @@
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
 #include "difficulty.h"
+#include "misc_log_ex.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
@@ -241,13 +242,12 @@ namespace cryptonote {
     uint64_t low, high;
     mul(total_work, target, low, high);
     if (high != 0) {
+      LOG_ERROR("high != 0");
       return 0;
     }
 
-    if (!low / weighted_timespans) {
-      return 1;
-    }
-    return low / weighted_timespans;
+    int next_diff = low / weighted_timespans;
+    return next_diff != 0 ? next_diff : 1;
   }
 }  // namespace
 

@@ -52,16 +52,12 @@
 // MONEY_SUPPLY - total number coins to be generated
 #define MONEY_SUPPLY                                    ((uint64_t)1000000000000000000)  // 0.5 billion.
 #define MONEY_SUPPLY_V4                                 ((uint64_t)500000000000000000)  // 0.5 billion.
-#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
-#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
 #define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
 
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE       240 * 1024    // 240KB^M
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    300 * 1024    // 300KB^M
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS      DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 
 
 #define BLOCK_SIZE_GROWTH_FAVORED_ZONE                  ((uint64_t) (CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 4))
@@ -93,7 +89,6 @@
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
 #define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
-// Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
 #define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define CRYPTONOTE_PROJECT_BLOCK_ADDRESS                "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt"
 #define CRYPTONOTE_PROJECT_BLOCK_VIEWKEY                "bffa803bb4061d93a83a3613ff478c5b5e5cb0b0337a735e1a1304ca9fab1807"
@@ -102,12 +97,15 @@
 #define DIFFICULTY_TARGET                               60  // seconds
 #define DIFFICULTY_TARGET_V1                            60  // seconds
 #define DIFFICULTY_TARGET_V6                            60  // seconds
-#define DIFFICULTY_WINDOW                               720 // blocks
+#define DIFFICULTY_WINDOW                               93 // blocks
 #define DIFFICULTY_LAG                                  15  // !!!
 #define DIFFICULTY_CUT                                  60  // timestamps to cut after sorting
-#define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW + DIFFICULTY_LAG
+#define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW
 
 #define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET_V1 //just alias; used by tests
+
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS      DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing

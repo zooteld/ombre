@@ -301,8 +301,6 @@ namespace cryptonote
     context.m_state = cryptonote_connection_context::state_synchronizing;
     context.m_remote_blockchain_height = hshd.current_height;
     //let the socket to send response to handshake, but request callback, to let send request data after response
-
-    MLOG(el::Level::Verbose, "requesting callback");
     ++context.m_callback_request_count;
     m_p2p->request_callback(context);
     return true;
@@ -959,6 +957,7 @@ skip:
     try_add_next_blocks(context);
     return 1;
   }
+
 
   template<class t_core>
   int t_cryptonote_protocol_handler<t_core>::try_add_next_blocks(cryptonote_connection_context& context)

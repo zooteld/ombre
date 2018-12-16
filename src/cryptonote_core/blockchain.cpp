@@ -90,7 +90,7 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1482806500 },
-  { 2, 21301, 0, 1497657600 },
+  { 2, 21300, 0, 1497657600 },
   { 3, 72000, 0, 1524577218 }, // Roughly the 20th of April.
   { 4, 208499, 0, 1531762611 } // Roughly the 23rd of July.
 };
@@ -763,44 +763,30 @@ bool Blockchain::get_block_by_hash(const crypto::hash &h, block &blk, bool *orph
 // last DIFFICULTY_BLOCKS_COUNT blocks and passes them to next_difficulty,
 // returning the result of that call.  Ignores the genesis block, and can use
 // less blocks than desired if there aren't enough.
+//------------------------------------------------------------------
 difficulty_type Blockchain::get_difficulty_for_next_block()
 {
-  if (m_fixed_difficulty)
-  {
-    return m_db->height() ? m_fixed_difficulty : 1;
-  }
-
   LOG_PRINT_L3("Blockchain::" << __func__);
-
-  crypto::hash top_hash = get_tail_id();
-  {
-    CRITICAL_REGION_LOCAL(m_difficulty_lock);
-    // we can call this without the blockchain lock, it might just give us
-    // something a bit out of date, but that's fine since anything which
-    // requires the blockchain lock will have acquired it in the first place,
-    // and it will be unlocked only when called from the getinfo RPC
-    if (top_hash == m_difficulty_for_next_block_top_hash)
-      return m_difficulty_for_next_block;
-  }
-
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
+  size_t difficult_block_count = DIFFICULTY_BLOCKS_COUNT;
+
   // ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
   //    then when the next block difficulty is queried, push the latest height data and
   //    pop the oldest one from the list. This only requires 1x read per height instead
   //    of doing 735 (DIFFICULTY_BLOCKS_COUNT).
-  if (m_timestamps_and_difficulties_height != 0 && ((height - m_timestamps_and_difficulties_height) == 1) && m_timestamps.size() >= DIFFICULTY_BLOCKS_COUNT)
+  if (m_timestamps_and_difficulties_height != 0 && ((height - m_timestamps_and_difficulties_height) == 1))
   {
     uint64_t index = height - 1;
     m_timestamps.push_back(m_db->get_block_timestamp(index));
     m_difficulties.push_back(m_db->get_block_cumulative_difficulty(index));
 
-    while (m_timestamps.size() > DIFFICULTY_BLOCKS_COUNT)
+    while (m_timestamps.size() > difficult_block_count)
       m_timestamps.erase(m_timestamps.begin());
-    while (m_difficulties.size() > DIFFICULTY_BLOCKS_COUNT)
+    while (m_difficulties.size() > difficult_block_count)
       m_difficulties.erase(m_difficulties.begin());
 
     m_timestamps_and_difficulties_height = height;
@@ -809,17 +795,12 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   }
   else
   {
-    size_t offset = height - std::min < size_t > (height, static_cast<size_t>(DIFFICULTY_BLOCKS_COUNT));
+    size_t offset = height - std::min < size_t >(height, static_cast<size_t>(difficult_block_count));
     if (offset == 0)
       ++offset;
 
     timestamps.clear();
     difficulties.clear();
-    if (height > offset)
-    {
-      timestamps.reserve(height - offset);
-      difficulties.reserve(height - offset);
-    }
     for (; offset < height; offset++)
     {
       timestamps.push_back(m_db->get_block_timestamp(offset));
@@ -830,15 +811,9 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_timestamps = timestamps;
     m_difficulties = difficulties;
   }
-  size_t target = get_difficulty_target();
-  difficulty_type diff = next_difficulty(timestamps, difficulties, target);
-
-  CRITICAL_REGION_LOCAL1(m_difficulty_lock);
-  m_difficulty_for_next_block_top_hash = top_hash;
-  m_difficulty_for_next_block = diff;
-  return diff;
+  size_t target = DIFFICULTY_TARGET;
+  return next_difficulty(timestamps, difficulties, target);
 }
-//------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
 // position where the blockchain switch started and then re-adds the blocks
 // that had been removed.
@@ -1123,8 +1098,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
  generate_key_derivation(pub_key_field.pub_key, keys.m_view_secret_key, derivation);
 
  bool project_out_found = false;
- float project_dev_fee = get_project_block_reward_fee(already_generated_coins);
- float project_dev_fee_amount = 0;
+ uint64_t tx_project_dev_fee = 0;
 
  for (size_t i = 0; i < b.miner_tx.vout.size(); ++i) {
    crypto::public_key pk;
@@ -1132,36 +1106,37 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
    if (pk == boost::get<txout_to_key>(b.miner_tx.vout[i].target).key) {
      LOG_PRINT_L3("Found project out in miner_tx");
      // Check if the amount is correct.
-     project_dev_fee_amount = b.miner_tx.vout[i].amount;
+     tx_project_dev_fee = b.miner_tx.vout[i].amount;
      project_out_found = true;
    }
    money_in_use += b.miner_tx.vout[i].amount;
  }
 
-  std::vector<size_t> last_blocks_weights;
-  get_last_n_blocks_weights(last_blocks_weights, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
-  if (!get_block_reward(epee::misc_utils::median(last_blocks_weights), cumulative_block_weight, already_generated_coins, base_reward, m_db->height(), version))
-  {
-    MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
-    return false;
-  }
-  if (project_dev_fee > 0) {
-    if (m_db->height() != 0 && (project_dev_fee * base_reward) != project_dev_fee_amount) {
-      LOG_PRINT_L1("Project dev fee is incorrect! " << (project_dev_fee * base_reward) << " != " << project_dev_fee_amount);
-      return false;
-    }
-  }
+ std::vector<size_t> last_blocks_weights;
+ get_last_n_blocks_weights(last_blocks_weights, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
+ if (!get_block_reward(epee::misc_utils::median(last_blocks_weights), cumulative_block_weight, already_generated_coins, base_reward, m_db->height(), version))
+ {
+   MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
+   return false;
+ }
 
-  if(base_reward + fee < money_in_use)
-  {
-    MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
-    return false;
-  }
-  CHECK_AND_ASSERT_MES(money_in_use - fee <= base_reward, false, "base reward calculation bug");
-  if(base_reward + fee != money_in_use)
-    partial_block_reward = true;
-  base_reward = money_in_use - fee;
-  return m_db->height() != 0 ? project_out_found : true;
+ // Check whether the project fee is included and at least the percentage we defined in the config.
+ if (m_db->height() && (CRYPTONOTE_PROJECT_BLOCK_REWARD * base_reward) >= tx_project_dev_fee) {
+   LOG_PRINT_L1("Project dev fee is incorrect! " << (CRYPTONOTE_PROJECT_BLOCK_REWARD * base_reward) << " >= " << tx_project_dev_fee);
+   return false;
+ }
+
+ if(base_reward + fee < money_in_use) {
+   MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is "
+       << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
+   return false;
+ }
+
+ CHECK_AND_ASSERT_MES(money_in_use - fee <= base_reward, false, "base reward calculation bug");
+ if(base_reward + fee != money_in_use)
+   partial_block_reward = true;
+ base_reward = money_in_use - fee;
+ return m_db->height() != 0 ? project_out_found : true;
 }
 //------------------------------------------------------------------
 // get the block weights of the last <count> blocks, and return by reference <sz>.
@@ -2534,7 +2509,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
     }
 
     // min/max tx version based on HF, and we accept v1 txes if having a non mixable
-    const size_t max_tx_version = (hf_version <= 3) ? 1 : 2;
+    const size_t max_tx_version = CURRENT_TRANSACTION_VERSION;
     if (tx.version > max_tx_version)
     {
       MERROR_VER("transaction version " << (unsigned)tx.version << " is higher than max accepted version " << max_tx_version);
@@ -3413,7 +3388,9 @@ leave:
 
   TIME_MEASURE_START(vmt);
   uint64_t base_reward = 0;
-  uint64_t already_generated_coins = m_db->height() ? m_db->get_block_already_generated_coins(m_db->height() - 1) : 0;
+  uint64_t height = m_db->height();
+  uint64_t cal_height = height - height % COIN_EMISSION_HEIGHT_INTERVAL;
+  uint64_t already_generated_coins = cal_height ? m_db->get_block_already_generated_coins(cal_height - 1) : 0;
 
   if(!validate_miner_transaction(bl, cumulative_block_weight, fee_summary, base_reward, already_generated_coins, bvc.m_partial_block_reward, m_hardfork->get_current_version()))
   {

@@ -689,11 +689,9 @@ namespace cryptonote
     }
     bad_semantics_txes_lock.unlock();
 
-    uint8_t version = m_blockchain_storage.get_current_hard_fork_version();
-    const size_t max_tx_version = version == 1 ? 1 : 2;
-    if (tx.version == 0 || tx.version > max_tx_version)
-    {
-      // v2 is the latest one we know
+    const size_t max_tx_version = CURRENT_TRANSACTION_VERSION;
+    if (tx.version == 0 || tx.version > max_tx_version) {
+      LOG_PRINT_L1("Transaction version is incorrect");
       tvc.m_verifivation_failed = true;
       return false;
     }
@@ -751,6 +749,7 @@ namespace cryptonote
       if (!check_tx_semantic(*tx_info[n].tx, keeped_by_block))
       {
         set_semantics_failed(tx_info[n].tx_hash);
+        LOG_PRINT_L1("Transaction semantics failed!");
         tx_info[n].tvc.m_verifivation_failed = true;
         tx_info[n].result = false;
         continue;
@@ -820,6 +819,7 @@ namespace cryptonote
         if (assumed_bad || !rct::verRctSemanticsSimple(tx_info[n].tx->rct_signatures))
         {
           set_semantics_failed(tx_info[n].tx_hash);
+          LOG_PRINT_L1("Transaction semantics failed!");
           tx_info[n].tvc.m_verifivation_failed = true;
           tx_info[n].result = false;
         }
@@ -1064,13 +1064,13 @@ namespace cryptonote
       std::vector<transaction> txs;
       std::vector<crypto::hash> missed_txs;
       uint64_t coinbase_amount = get_outs_money_amount(b.miner_tx);
-      this->get_transactions(b.tx_hashes, txs, missed_txs);      
+      this->get_transactions(b.tx_hashes, txs, missed_txs);
       uint64_t tx_fee_amount = 0;
       for(const auto& tx: txs)
       {
         tx_fee_amount += get_tx_fee(tx);
       }
-      
+
       emission_amount += coinbase_amount - tx_fee_amount;
       total_fee_amount += tx_fee_amount;
       return true;
@@ -1421,7 +1421,7 @@ namespace cryptonote
   bool core::get_pool_transaction(const crypto::hash &id, cryptonote::blobdata& tx) const
   {
     return m_mempool.get_transaction(id, tx);
-  }  
+  }
   //-----------------------------------------------------------------------------------------------
   bool core::pool_has_tx(const crypto::hash &id) const
   {
@@ -1563,7 +1563,7 @@ namespace cryptonote
     if (!tools::check_updates(software, buildtag, version, hash))
       return false;
 
-    if (tools::vercmp(version.c_str(), MONERO_VERSION) <= 0)
+    if (tools::vercmp(version.c_str(), OMBRE_VERSION) <= 0)
     {
       m_update_available = false;
       return true;
