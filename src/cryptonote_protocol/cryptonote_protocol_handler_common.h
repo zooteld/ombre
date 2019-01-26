@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -33,7 +32,7 @@
 
 #include "p2p/net_node_common.h"
 #include "cryptonote_protocol/cryptonote_protocol_defs.h"
-#include "cryptonote_core/connection_context.h"
+#include "cryptonote_basic/connection_context.h"
 namespace cryptonote
 {
   /************************************************************************/

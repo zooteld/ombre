@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -34,10 +33,13 @@
 #include <list>
 #include <string>
 #include <exception>
+#include <boost/program_options.hpp>
+#include "common/command_line.h"
 #include "crypto/hash.h"
-#include "cryptonote_core/cryptonote_basic.h"
-#include "cryptonote_core/difficulty.h"
-#include "cryptonote_core/hardfork.h"
+#include "cryptonote_basic/blobdatatype.h"
+#include "cryptonote_basic/cryptonote_basic.h"
+#include "cryptonote_basic/difficulty.h"
+#include "cryptonote_basic/hardfork.h"
 
 /** \file
  * Cryptonote Blockchain Database Interface
@@ -101,6 +103,10 @@ namespace cryptonote
 /** a pair of <transaction hash, output index>, typedef for convenience */
 typedef std::pair<crypto::hash, uint64_t> tx_out_index;
 
+extern const command_line::arg_descriptor<std::string> arg_db_type;
+extern const command_line::arg_descriptor<std::string> arg_db_sync_mode;
+extern const command_line::arg_descriptor<bool, false> arg_db_salvage;
+
 #pragma pack(push, 1)
 
 /**
@@ -123,6 +129,35 @@ struct tx_data_t
   uint64_t block_id;
 };
 #pragma pack(pop)
+
+/**
+ * @brief a struct containing txpool per transaction metadata
+ */
+struct txpool_tx_meta_t
+{
+  crypto::hash max_used_block_id;
+  crypto::hash last_failed_id;
+  uint64_t weight;
+  uint64_t fee;
+  uint64_t max_used_block_height;
+  uint64_t last_failed_height;
+  uint64_t receive_time;
+  uint64_t last_relayed_time;
+  // 112 bytes
+  uint8_t kept_by_block;
+  uint8_t relayed;
+  uint8_t do_not_relay;
+  uint8_t double_spend_seen: 1;
+  uint8_t bf_padding: 7;
+
+  uint8_t padding[76]; // till 192 bytes
+};
+
+#define DBF_SAFE       1
+#define DBF_FAST       2
+#define DBF_FASTEST    4
+#define DBF_RDONLY     8
+#define DBF_SALVAGE 0x10
 
 /***********************************
  * Exception Definitions
@@ -323,15 +358,16 @@ private:
    * subclass of DB_EXCEPTION
    *
    * @param blk the block to be added
-   * @param block_size the size of the block (transactions and all)
+   * @param block_weight the weight of the block (transactions and all)
    * @param cumulative_difficulty the accumulated difficulty after this block
    * @param coins_generated the number of coins generated total after this block
    * @param blk_hash the hash of the block
    */
   virtual void add_block( const block& blk
-                , const size_t& block_size
+                , size_t block_weight
                 , const difficulty_type& cumulative_difficulty
                 , const uint64_t& coins_generated
+                , uint64_t num_rct_outs
                 , const crypto::hash& blk_hash
                 ) = 0;
 
@@ -340,7 +376,7 @@ private:
    *
    * The subclass implementing this will remove the block data from the top
    * block in the chain.  The data to be removed is that which was added in
-   * BlockchainDB::add_block(const block& blk, const size_t& block_size, const difficulty_type& cumulative_difficulty, const uint64_t& coins_generated, const crypto::hash& blk_hash)
+   * BlockchainDB::add_block(const block& blk, size_t block_weight, const difficulty_type& cumulative_difficulty, const uint64_t& coins_generated, const crypto::hash& blk_hash)
    *
    * If any of this cannot be done, the subclass should throw the corresponding
    * subclass of DB_EXCEPTION
@@ -364,14 +400,15 @@ private:
    * @param blk_hash the hash of the block containing the transaction
    * @param tx the transaction to be added
    * @param tx_hash the hash of the transaction
+   * @param tx_prunable_hash the hash of the prunable part of the transaction
    * @return the transaction ID
    */
-  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash) = 0;
+  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash) = 0;
 
   /**
    * @brief remove data about a transaction
    *
-   * The subclass implementing this will remove the transaction data
+   * The subclass implementing this will remove the transaction data 
    * for the passed transaction.  The data to be removed was added in
    * add_transaction_data().  Additionally, current subclasses have behavior
    * which requires the transaction itself as a parameter here.  Future
@@ -492,8 +529,9 @@ protected:
    * @param blk_hash hash of the block which has the transaction
    * @param tx the transaction to add
    * @param tx_hash_ptr the hash of the transaction, if already calculated
+   * @param tx_prunable_hash_ptr the hash of the prunable part of the transaction, if already calculated
    */
-  void add_transaction(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash* tx_hash_ptr = NULL);
+  void add_transaction(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash* tx_hash_ptr = NULL, const crypto::hash* tx_prunable_hash_ptr = NULL);
 
   mutable uint64_t time_tx_exists = 0;  //!< a performance metric
   uint64_t time_commit1 = 0;  //!< a performance metric
@@ -504,9 +542,19 @@ protected:
 public:
 
   /**
+   * @brief An empty constructor.
+   */
+  BlockchainDB(): m_open(false) { }
+
+  /**
    * @brief An empty destructor.
    */
   virtual ~BlockchainDB() { };
+
+  /**
+   * @brief init command line options
+   */
+  static void init_options(boost::program_options::options_description& desc);
 
   /**
    * @brief reset profiling stats
@@ -579,6 +627,13 @@ public:
   virtual void sync() = 0;
 
   /**
+   * @brief toggle safe syncs for the DB
+   *
+   * Used to switch DBF_SAFE on or off after starting up with DBF_FAST.
+   */
+  virtual void safesyncmode(const bool onoff) = 0;
+
+  /**
    * @brief Remove everything from the BlockchainDB
    *
    * This function should completely remove all data from a BlockchainDB.
@@ -600,6 +655,20 @@ public:
    * @return a list of filenames
    */
   virtual std::vector<std::string> get_filenames() const = 0;
+
+  /**
+   * @brief remove file(s) storing the database
+   *
+   * This function is for resetting the database (for core tests, functional tests, etc).
+   * The function reset() is not usable because it needs to open the database file first
+   * which can fail if the existing database file is in an incompatible format.
+   * As such, this function needs to be called before calling open().
+   *
+   * @param folder    The path of the folder containing the database file(s) which must not end with slash '/'.
+   *
+   * @return          true if the operation is succesfull
+   */
+  virtual bool remove_data_file(const std::string& folder) const = 0;
 
   // return the name of the folder the db's file(s) should reside in
   /**
@@ -656,16 +725,17 @@ public:
    * been called.  In either case, it should end the batch and write to its
    * backing store.
    *
-   * If a batch is already in-progress, this function should throw a DB_ERROR.
-   * This exception may change in the future if it is deemed necessary to
-   * have a more granular exception type for this scenario.
+   * If a batch is already in-progress, this function must return false.
+   * If a batch was started by this call, it must return true.
    *
    * If any of this cannot be done, the subclass should throw the corresponding
    * subclass of DB_EXCEPTION
    *
    * @param batch_num_blocks number of blocks to batch together
+   *
+   * @return true if we started the batch, false if already started
    */
-  virtual bool batch_start(uint64_t batch_num_blocks=0) = 0;
+  virtual bool batch_start(uint64_t batch_num_blocks=0, uint64_t batch_bytes=0) = 0;
 
   /**
    * @brief ends a batch transaction
@@ -719,7 +789,7 @@ public:
    * subclass of DB_EXCEPTION
    *
    * @param blk the block to be added
-   * @param block_size the size of the block (transactions and all)
+   * @param block_weight the size of the block (transactions and all)
    * @param cumulative_difficulty the accumulated difficulty after this block
    * @param coins_generated the number of coins generated total after this block
    * @param txs the transactions in the block
@@ -727,7 +797,7 @@ public:
    * @return the height of the chain post-addition
    */
   virtual uint64_t add_block( const block& blk
-                            , const size_t& block_size
+                            , size_t block_weight
                             , const difficulty_type& cumulative_difficulty
                             , const uint64_t& coins_generated
                             , const std::vector<transaction>& txs
@@ -754,7 +824,20 @@ public:
    *
    * @return the block requested
    */
-  virtual block get_block(const crypto::hash& h) const = 0;
+  virtual cryptonote::blobdata get_block_blob(const crypto::hash& h) const = 0;
+
+  /**
+   * @brief fetches the block with the given hash
+   *
+   * Returns the requested block.
+   *
+   * If the block does not exist, the subclass should throw BLOCK_DNE
+   *
+   * @param h the hash to look for
+   *
+   * @return the block requested
+   */
+  virtual block get_block(const crypto::hash& h) const;
 
   /**
    * @brief gets the height of the block with a given hash
@@ -784,7 +867,7 @@ public:
   virtual block_header get_block_header(const crypto::hash& h) const = 0;
 
   /**
-   * @brief fetch a block by height
+   * @brief fetch a block blob by height
    *
    * The subclass should return the block at the given height.
    *
@@ -793,9 +876,21 @@ public:
    *
    * @param height the height to look for
    *
+   * @return the block blob
+   */
+  virtual cryptonote::blobdata get_block_blob_from_height(const uint64_t& height) const = 0;
+
+  /**
+   * @brief fetch a block by height
+   *
+   * If the block does not exist, that is to say if the blockchain is not
+   * that high, then the subclass should throw BLOCK_DNE
+   *
+   * @param height the height to look for
+   *
    * @return the block
    */
-  virtual block get_block_from_height(const uint64_t& height) const = 0;
+  virtual block get_block_from_height(const uint64_t& height) const;
 
   /**
    * @brief fetch a block's timestamp
@@ -812,6 +907,20 @@ public:
   virtual uint64_t get_block_timestamp(const uint64_t& height) const = 0;
 
   /**
+   * @brief fetch a block's cumulative number of rct outputs
+   *
+   * The subclass should return the numer of rct outputs in the blockchain
+   * up to the block with the given height (inclusive).
+   *
+   * If the block does not exist, the subclass should throw BLOCK_DNE
+   *
+   * @param height the height requested
+   *
+   * @return the cumulative number of rct outputs
+   */
+  virtual std::vector<uint64_t> get_block_cumulative_rct_outputs(const std::vector<uint64_t> &heights) const = 0;
+
+  /**
    * @brief fetch the top block's timestamp
    *
    * The subclass should return the timestamp of the most recent block.
@@ -821,18 +930,18 @@ public:
   virtual uint64_t get_top_block_timestamp() const = 0;
 
   /**
-   * @brief fetch a block's size
+   * @brief fetch a block's weight
    *
-   * The subclass should return the size of the block with the
+   * The subclass should return the weight of the block with the
    * given height.
    *
    * If the block does not exist, the subclass should throw BLOCK_DNE
    *
    * @param height the height requested
    *
-   * @return the size
+   * @return the weight
    */
-  virtual size_t get_block_size(const uint64_t& height) const = 0;
+  virtual size_t get_block_weight(const uint64_t& height) const = 0;
 
   /**
    * @brief fetch a block's cumulative difficulty
@@ -1009,16 +1118,65 @@ public:
   /**
    * @brief fetches the transaction with the given hash
    *
-   * The subclass should return the transaction stored which has the given
-   * hash.
-   *
    * If the transaction does not exist, the subclass should throw TX_DNE.
    *
    * @param h the hash to look for
    *
    * @return the transaction with the given hash
    */
-  virtual transaction get_tx(const crypto::hash& h) const = 0;
+  virtual transaction get_tx(const crypto::hash& h) const;
+
+  /**
+   * @brief fetches the transaction with the given hash
+   *
+   * If the transaction does not exist, the subclass should return false.
+   *
+   * @param h the hash to look for
+   *
+   * @return true iff the transaction was found
+   */
+  virtual bool get_tx(const crypto::hash& h, transaction &tx) const;
+
+  /**
+   * @brief fetches the transaction blob with the given hash
+   *
+   * The subclass should return the transaction stored which has the given
+   * hash.
+   *
+   * If the transaction does not exist, the subclass should return false.
+   *
+   * @param h the hash to look for
+   *
+   * @return true iff the transaction was found
+   */
+  virtual bool get_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const = 0;
+
+  /**
+   * @brief fetches the pruned transaction blob with the given hash
+   *
+   * The subclass should return the pruned transaction stored which has the given
+   * hash.
+   *
+   * If the transaction does not exist, the subclass should return false.
+   *
+   * @param h the hash to look for
+   *
+   * @return true iff the transaction was found
+   */
+  virtual bool get_pruned_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const = 0;
+
+  /**
+   * @brief fetches the prunable transaction hash
+   *
+   * The subclass should return the hash of the prunable transaction data.
+   *
+   * If the transaction hash does not exist, the subclass should return false.
+   *
+   * @param h the tx hash to look for
+   *
+   * @return true iff the transaction was found
+   */
+  virtual bool get_prunable_tx_hash(const crypto::hash& tx_hash, crypto::hash &prunable_hash) const = 0;
 
   /**
    * @brief fetches the total number of transactions ever
@@ -1104,23 +1262,6 @@ public:
   virtual output_data_t get_output_key(const uint64_t& amount, const uint64_t& index) = 0;
 
   /**
-   * @brief get some of an output's data
-   *
-   * The subclass should return the public key, unlock time, and block height
-   * for the output with the given global index, collected in a struct.
-   *
-   * If the output cannot be found, the subclass should throw OUTPUT_DNE.
-   *
-   * If any of these parts cannot be found, but some are, the subclass
-   * should throw DB_ERROR with a message stating as much.
-   *
-   * @param global_index the output's index (global)
-   *
-   * @return the requested output data
-   */
-  virtual output_data_t get_output_key(const uint64_t& global_index) const = 0;
-
-  /**
    * @brief gets an output's tx hash and index
    *
    * The subclass should return the hash of the transaction which created the
@@ -1170,8 +1311,8 @@ public:
    * @param offsets a list of amount-specific output indices
    * @param outputs return-by-reference a list of outputs' metadata
    */
-  virtual void get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs) = 0;
-
+  virtual void get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs, bool allow_partial = false) = 0;
+  
   /*
    * FIXME: Need to check with git blame and ask what this does to
    * document it
@@ -1204,6 +1345,82 @@ public:
   virtual bool has_key_image(const crypto::key_image& img) const = 0;
 
   /**
+   * @brief add a txpool transaction
+   *
+   * @param details the details of the transaction to add
+   */
+  virtual void add_txpool_tx(const transaction &tx, const txpool_tx_meta_t& details) = 0;
+
+  /**
+   * @brief update a txpool transaction's metadata
+   *
+   * @param txid the txid of the transaction to update
+   * @param details the details of the transaction to update
+   */
+  virtual void update_txpool_tx(const crypto::hash &txid, const txpool_tx_meta_t& details) = 0;
+
+  /**
+   * @brief get the number of transactions in the txpool
+   */
+  virtual uint64_t get_txpool_tx_count(bool include_unrelayed_txes = true) const = 0;
+
+  /**
+   * @brief check whether a txid is in the txpool
+   */
+  virtual bool txpool_has_tx(const crypto::hash &txid) const = 0;
+
+  /**
+   * @brief remove a txpool transaction
+   *
+   * @param txid the transaction id of the transation to remove
+   */
+  virtual void remove_txpool_tx(const crypto::hash& txid) = 0;
+
+  /**
+   * @brief get a txpool transaction's metadata
+   *
+   * @param txid the transaction id of the transation to lookup
+   * @param meta the metadata to return
+   *
+   * @return true if the tx meta was found, false otherwise
+   */
+  virtual bool get_txpool_tx_meta(const crypto::hash& txid, txpool_tx_meta_t &meta) const = 0;
+
+  /**
+   * @brief get a txpool transaction's blob
+   *
+   * @param txid the transaction id of the transation to lookup
+   * @param bd the blob to return
+   *
+   * @return true if the txid was in the txpool, false otherwise
+   */
+  virtual bool get_txpool_tx_blob(const crypto::hash& txid, cryptonote::blobdata &bd) const = 0;
+
+  /**
+   * @brief get a txpool transaction's blob
+   *
+   * @param txid the transaction id of the transation to lookup
+   *
+   * @return the blob for that transaction
+   */
+  virtual cryptonote::blobdata get_txpool_tx_blob(const crypto::hash& txid) const = 0;
+
+  /**
+   * @brief runs a function over all txpool transactions
+   *
+   * The subclass should run the passed function for each txpool tx it has
+   * stored, passing the tx id and metadata as its parameters.
+   *
+   * If any call to the function returns false, the subclass should return
+   * false.  Otherwise, the subclass returns true.
+   *
+   * @param std::function fn the function to run
+   *
+   * @return false if the function returns false for any transaction, otherwise true
+   */
+  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata*)>, bool include_blob = false, bool include_unrelayed_txes = true) const = 0;
+
+  /**
    * @brief runs a function over all key images stored
    *
    * The subclass should run the passed function for each key image it has
@@ -1219,10 +1436,10 @@ public:
   virtual bool for_all_key_images(std::function<bool(const crypto::key_image&)>) const = 0;
 
   /**
-   * @brief runs a function over all blocks stored
+   * @brief runs a function over a range of blocks
    *
-   * The subclass should run the passed function for each block it has
-   * stored, passing (block_height, block_hash, block) as its parameters.
+   * The subclass should run the passed function for each block in the
+   * specified range, passing (block_height, block_hash, block) as its parameters.
    *
    * If any call to the function returns false, the subclass should return
    * false.  Otherwise, the subclass returns true.
@@ -1230,11 +1447,13 @@ public:
    * The subclass should throw DB_ERROR if any of the expected values are
    * not found.  Current implementations simply return false.
    *
+   * @param h1 the start height
+   * @param h2 the end height
    * @param std::function fn the function to run
    *
    * @return false if the function returns false for any block, otherwise true
    */
-  virtual bool for_all_blocks(std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const = 0;
+  virtual bool for_blocks_range(const uint64_t& h1, const uint64_t& h2, std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const = 0;
 
   /**
    * @brief runs a function over all transactions stored
@@ -1249,10 +1468,11 @@ public:
    * not found.  Current implementations simply return false.
    *
    * @param std::function fn the function to run
+   * @param bool pruned whether to only get pruned tx data, or the whole
    *
    * @return false if the function returns false for any transaction, otherwise true
    */
-  virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>) const = 0;
+  virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>, bool pruned) const = 0;
 
   /**
    * @brief runs a function over all outputs stored
@@ -1271,7 +1491,9 @@ public:
    *
    * @return false if the function returns false for any output, otherwise true
    */
-  virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, size_t tx_idx)> f) const = 0;
+  virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, uint64_t height, size_t tx_idx)> f) const = 0;
+  virtual bool for_all_outputs(uint64_t amount, const std::function<bool(uint64_t height)> &f) const = 0;
+
 
 
   //
@@ -1311,10 +1533,13 @@ public:
    * @param amounts optional set of amounts to lookup
    * @param unlocked whether to restrict count to unlocked outputs
    * @param recent_cutoff timestamp to determine whether an output is recent
+   * @param min_count return only amounts with at least that many instances
    *
    * @return a set of amount/instances
    */
-  virtual std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff) const = 0;
+  virtual std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff, uint64_t min_count) const = 0;
+
+  virtual bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, std::vector<uint64_t> &distribution, uint64_t &base) const = 0;
 
   /**
    * @brief is BlockchainDB in read-only mode?
@@ -1322,6 +1547,13 @@ public:
    * @return true if in read-only mode, otherwise false
    */
   virtual bool is_read_only() const = 0;
+
+  /**
+   * @brief get disk space requirements
+   *
+   * @return the size required
+   */
+  virtual uint64_t get_database_size() const = 0;
 
   // TODO: this should perhaps be (or call) a series of functions which
   // progressively update through version updates
@@ -1345,6 +1577,7 @@ public:
 
 };  // class BlockchainDB
 
+BlockchainDB *new_db(const std::string& db_type);
 
 }  // namespace cryptonote
 

@@ -9,8 +9,7 @@ Passing RPC commands:
 
 */
 
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -40,6 +39,8 @@ Passing RPC commands:
 
 #pragma once
 
+#include <boost/optional/optional_fwd.hpp>
+#include "common/common_fwd.h"
 #include "console_handler.h"
 #include "daemon/command_parser_executor.h"
 
@@ -55,7 +56,7 @@ public:
   t_command_server(
       uint32_t ip
     , uint16_t port
-    , const std::string &user_agent
+    , const boost::optional<tools::login>& login
     , bool is_rpc = true
     , cryptonote::core_rpc_server* rpc_server = NULL
     );
@@ -72,6 +73,7 @@ private:
   bool help(const std::vector<std::string>& args);
 
   std::string get_commands_str();
+  std::string get_command_usage(const std::vector<std::string> &args);
 };
 
 } // namespace daemonize

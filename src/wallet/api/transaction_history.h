@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -29,7 +28,7 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-#include "wallet/wallet2_api.h"
+#include "wallet/api/wallet2_api.h"
 #include <boost/thread/shared_mutex.hpp>
 
 namespace Monero {
@@ -53,10 +52,6 @@ private:
     std::vector<TransactionInfo*> m_history;
     WalletImpl *m_wallet;
     mutable boost::shared_mutex   m_historyMutex;
-
-    std::set<uint32_t> m_subaddrIndex;        // always unique index for incoming transfers; can be multiple indices for outgoing transfers
-    uint32_t m_subaddrAccount;
-    std::string m_label;
 };
 
 }
