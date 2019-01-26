@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2014-2018, The Monero Project
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -30,7 +29,7 @@
 #include <atomic>
 
 #include "blockchain_db/blockchain_db.h"
-#include "cryptonote_protocol/blobdatatype.h" // for type blobdata
+#include "cryptonote_basic/blobdatatype.h" // for type blobdata
 #include "ringct/rctTypes.h"
 #include <boost/thread/tss.hpp>
 
@@ -51,10 +50,16 @@ typedef struct mdb_txn_cursors
   MDB_cursor *m_txc_output_amounts;
 
   MDB_cursor *m_txc_txs;
+  MDB_cursor *m_txc_txs_pruned;
+  MDB_cursor *m_txc_txs_prunable;
+  MDB_cursor *m_txc_txs_prunable_hash;
   MDB_cursor *m_txc_tx_indices;
   MDB_cursor *m_txc_tx_outputs;
 
   MDB_cursor *m_txc_spent_keys;
+
+  MDB_cursor *m_txc_txpool_meta;
+  MDB_cursor *m_txc_txpool_blob;
 
   MDB_cursor *m_txc_hf_versions;
 } mdb_txn_cursors;
@@ -65,9 +70,14 @@ typedef struct mdb_txn_cursors
 #define m_cur_output_txs	m_cursors->m_txc_output_txs
 #define m_cur_output_amounts	m_cursors->m_txc_output_amounts
 #define m_cur_txs	m_cursors->m_txc_txs
+#define m_cur_txs_pruned	m_cursors->m_txc_txs_pruned
+#define m_cur_txs_prunable	m_cursors->m_txc_txs_prunable
+#define m_cur_txs_prunable_hash	m_cursors->m_txc_txs_prunable_hash
 #define m_cur_tx_indices	m_cursors->m_txc_tx_indices
 #define m_cur_tx_outputs	m_cursors->m_txc_tx_outputs
 #define m_cur_spent_keys	m_cursors->m_txc_spent_keys
+#define m_cur_txpool_meta	m_cursors->m_txc_txpool_meta
+#define m_cur_txpool_blob	m_cursors->m_txc_txpool_blob
 #define m_cur_hf_versions	m_cursors->m_txc_hf_versions
 
 typedef struct mdb_rflags
@@ -79,9 +89,14 @@ typedef struct mdb_rflags
   bool m_rf_output_txs;
   bool m_rf_output_amounts;
   bool m_rf_txs;
+  bool m_rf_txs_pruned;
+  bool m_rf_txs_prunable;
+  bool m_rf_txs_prunable_hash;
   bool m_rf_tx_indices;
   bool m_rf_tx_outputs;
   bool m_rf_spent_keys;
+  bool m_rf_txpool_meta;
+  bool m_rf_txpool_blob;
   bool m_rf_hf_versions;
 } mdb_rflags;
 
@@ -106,6 +121,7 @@ struct mdb_txn_safe
   // BlockchainLMDB destructor to call mdb_txn_safe destructor, as that's too late
   // to properly abort, since mdb_env_close would have been called earlier.
   void abort();
+  void uncheck();
 
   operator MDB_txn*()
   {
@@ -159,9 +175,13 @@ public:
 
   virtual void sync();
 
+  virtual void safesyncmode(const bool onoff);
+
   virtual void reset();
 
   virtual std::vector<std::string> get_filenames() const;
+
+  virtual bool remove_data_file(const std::string& folder) const;
 
   virtual std::string get_db_name() const;
 
@@ -171,19 +191,21 @@ public:
 
   virtual bool block_exists(const crypto::hash& h, uint64_t *height = NULL) const;
 
-  virtual block get_block(const crypto::hash& h) const;
-
   virtual uint64_t get_block_height(const crypto::hash& h) const;
 
   virtual block_header get_block_header(const crypto::hash& h) const;
 
-  virtual block get_block_from_height(const uint64_t& height) const;
+  virtual cryptonote::blobdata get_block_blob(const crypto::hash& h) const;
+
+  virtual cryptonote::blobdata get_block_blob_from_height(const uint64_t& height) const;
+
+  virtual std::vector<uint64_t> get_block_cumulative_rct_outputs(const std::vector<uint64_t> &heights) const;
 
   virtual uint64_t get_block_timestamp(const uint64_t& height) const;
 
   virtual uint64_t get_top_block_timestamp() const;
 
-  virtual size_t get_block_size(const uint64_t& height) const;
+  virtual size_t get_block_weight(const uint64_t& height) const;
 
   virtual difficulty_type get_block_cumulative_difficulty(const uint64_t& height) const;
 
@@ -208,7 +230,9 @@ public:
 
   virtual uint64_t get_tx_unlock_time(const crypto::hash& h) const;
 
-  virtual transaction get_tx(const crypto::hash& h) const;
+  virtual bool get_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
+  virtual bool get_pruned_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
+  virtual bool get_prunable_tx_hash(const crypto::hash& tx_hash, crypto::hash &prunable_hash) const;
 
   virtual uint64_t get_tx_count() const;
 
@@ -219,8 +243,7 @@ public:
   virtual uint64_t get_num_outputs(const uint64_t& amount) const;
 
   virtual output_data_t get_output_key(const uint64_t& amount, const uint64_t& index);
-  virtual output_data_t get_output_key(const uint64_t& global_index) const;
-  virtual void get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs);
+  virtual void get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs, bool allow_partial = false);
 
   virtual tx_out_index get_output_tx_and_index_from_global(const uint64_t& index) const;
   virtual void get_output_tx_and_index_from_global(const std::vector<uint64_t> &global_indices,
@@ -233,20 +256,31 @@ public:
 
   virtual bool has_key_image(const crypto::key_image& img) const;
 
+  virtual void add_txpool_tx(const transaction &tx, const txpool_tx_meta_t& meta);
+  virtual void update_txpool_tx(const crypto::hash &txid, const txpool_tx_meta_t& meta);
+  virtual uint64_t get_txpool_tx_count(bool include_unrelayed_txes = true) const;
+  virtual bool txpool_has_tx(const crypto::hash &txid) const;
+  virtual void remove_txpool_tx(const crypto::hash& txid);
+  virtual bool get_txpool_tx_meta(const crypto::hash& txid, txpool_tx_meta_t &meta) const;
+  virtual bool get_txpool_tx_blob(const crypto::hash& txid, cryptonote::blobdata &bd) const;
+  virtual cryptonote::blobdata get_txpool_tx_blob(const crypto::hash& txid) const;
+  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata*)> f, bool include_blob = false, bool include_unrelayed_txes = true) const;
+
   virtual bool for_all_key_images(std::function<bool(const crypto::key_image&)>) const;
-  virtual bool for_all_blocks(std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const;
-  virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>) const;
-  virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, size_t tx_idx)> f) const;
+  virtual bool for_blocks_range(const uint64_t& h1, const uint64_t& h2, std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const;
+  virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>, bool pruned) const;
+  virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, uint64_t height, size_t tx_idx)> f) const;
+  virtual bool for_all_outputs(uint64_t amount, const std::function<bool(uint64_t height)> &f) const;
 
   virtual uint64_t add_block( const block& blk
-                            , const size_t& block_size
+                            , size_t block_weight
                             , const difficulty_type& cumulative_difficulty
                             , const uint64_t& coins_generated
                             , const std::vector<transaction>& txs
                             );
 
   virtual void set_batch_transactions(bool batch_transactions);
-  virtual bool batch_start(uint64_t batch_num_blocks=0);
+  virtual bool batch_start(uint64_t batch_num_blocks=0, uint64_t batch_bytes=0);
   virtual void batch_commit();
   virtual void batch_stop();
   virtual void batch_abort();
@@ -267,28 +301,32 @@ public:
    * @param amounts optional set of amounts to lookup
    * @param unlocked whether to restrict count to unlocked outputs
    * @param recent_cutoff timestamp to determine which outputs are recent
+   * @param min_count return only amounts with at least that many instances
    *
    * @return a set of amount/instances
    */
-  std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff) const;
+  std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> get_output_histogram(const std::vector<uint64_t> &amounts, bool unlocked, uint64_t recent_cutoff, uint64_t min_count) const;
+
+  bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, std::vector<uint64_t> &distribution, uint64_t &base) const;
 
 private:
   void do_resize(uint64_t size_increase=0);
 
   bool need_resize(uint64_t threshold_size=0) const;
-  void check_and_resize_for_batch(uint64_t batch_num_blocks);
-  uint64_t get_estimated_batch_size(uint64_t batch_num_blocks) const;
+  void check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes);
+  uint64_t get_estimated_batch_size(uint64_t batch_num_blocks, uint64_t batch_bytes) const;
 
   virtual void add_block( const block& blk
-                , const size_t& block_size
+                , size_t block_weight
                 , const difficulty_type& cumulative_difficulty
                 , const uint64_t& coins_generated
+                , uint64_t num_rct_outs
                 , const crypto::hash& block_hash
                 );
 
   virtual void remove_block();
 
-  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash);
+  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash);
 
   virtual void remove_transaction_data(const crypto::hash& tx_hash, const transaction& tx);
 
@@ -310,6 +348,8 @@ private:
   virtual void add_spent_key(const crypto::key_image& k_image);
 
   virtual void remove_spent_key(const crypto::key_image& k_image);
+
+  uint64_t num_outputs() const;
 
   // Hard fork
   virtual void set_hard_fork_version(uint64_t height, uint8_t version);
@@ -339,6 +379,8 @@ private:
 
   virtual bool is_read_only() const;
 
+  virtual uint64_t get_database_size() const;
+
   // fix up anything that may be wrong due to past bugs
   virtual void fixup();
 
@@ -348,6 +390,15 @@ private:
   // migrate from DB version 0 to 1
   void migrate_0_1();
 
+  // migrate from DB version 1 to 2
+  void migrate_1_2();
+
+  // migrate from DB version 2 to 3
+  void migrate_2_3();
+
+  void cleanup_batch();
+
+private:
   MDB_env* m_env;
 
   MDB_dbi m_blocks;
@@ -355,6 +406,9 @@ private:
   MDB_dbi m_block_info;
 
   MDB_dbi m_txs;
+  MDB_dbi m_txs_pruned;
+  MDB_dbi m_txs_prunable;
+  MDB_dbi m_txs_prunable_hash;
   MDB_dbi m_tx_indices;
   MDB_dbi m_tx_outputs;
 
@@ -363,15 +417,16 @@ private:
 
   MDB_dbi m_spent_keys;
 
+  MDB_dbi m_txpool_meta;
+  MDB_dbi m_txpool_blob;
+
   MDB_dbi m_hf_starting_heights;
   MDB_dbi m_hf_versions;
 
   MDB_dbi m_properties;
 
-  uint64_t m_num_txs;
-  uint64_t m_num_outputs;
   mutable uint64_t m_cum_size;	// used in batch size estimation
-  mutable int m_cum_count;
+  mutable unsigned int m_cum_count;
   std::string m_folder;
   mdb_txn_safe* m_write_txn; // may point to either a short-lived txn or a batch txn
   mdb_txn_safe* m_write_batch_txn; // persist batch txn outside of BlockchainLMDB
@@ -394,7 +449,7 @@ private:
 #endif
 #endif
 
-  constexpr static float RESIZE_PERCENT = 0.8f;
+  constexpr static float RESIZE_PERCENT = 0.9f;
 };
 
 }  // namespace cryptonote

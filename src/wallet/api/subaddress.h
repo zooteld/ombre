@@ -1,4 +1,4 @@
-// Copyright (c) 2017, OMBRE, (forked from) The Monero Project
+// Copyright (c) 2017-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -26,7 +26,7 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "wallet/wallet2_api.h"
+#include "wallet/api/wallet2_api.h"
 #include "wallet/wallet2.h"
 
 namespace Monero {
@@ -40,10 +40,10 @@ public:
     ~SubaddressImpl();
     
     // Fetches addresses from Wallet2
-    void refresh(uint32_t accountIndex);
-    std::vector<SubaddressRow*> getAll() const;
-    void addRow(uint32_t accountIndex, const std::string &label);
-    void setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label);
+    void refresh(uint32_t accountIndex) override;
+    std::vector<SubaddressRow*> getAll() const override;
+    void addRow(uint32_t accountIndex, const std::string &label) override;
+    void setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label) override;
 
 private:
     void clearRows();
