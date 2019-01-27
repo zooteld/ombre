@@ -76,7 +76,11 @@ We try as hard as we can to bring this coin up and not failed it, but remember t
 These words are just like the rest of our work should be mentioned loudly because we want to be honest as much as possible. 
 It does not mean wo do not take your business and your money seriously, it is fully against it because getting falsehood hopes and dreams are what we all hate!
 
-Look at big coins with serious well known full time developers and how they fail what they claim, we can point out several recent flaw in a some of them but we refrain to do that because it is non of our business and we do not want promote ourselves buy ruining others, our job is to revive this coin if we can. Unfortunately some coins are mostly shilling coins and using your emotions to get your money.
+Look at big coins with serious well known full time developers and how they fail what they claim, we can point out several recent flaws in some of them based on recent discussion and articles (not our knowledge or discovery) but we refrain to do that because it is non of our business and we do not want promote ourselves buy ruining others, our job is to revive this coin if we can. Unfortunately some coins are mostly shilling coins and using your emotions to get your money.
+
+And remember if you want to do something it could not be perfect. Perfectionism comes from doing nothing, it means when you do nothing then all things you’ve done is perfect! 
+
+Finding a bug and reporting it, is a very decent act because it will help us to know our flaws,It would be appreciated if you could help us to fix it too and your name will remain in this project as long as this project remains alive. Please refrain from complaining if you cannot help in any way.
 
 If you are here for `Lambo` or `Jambo` , non of them can be find here.
 
