@@ -14,7 +14,7 @@ https://github.com/monero-project/meta/issues/236#issuecomment-419366720
 and 
 https://twitter.com/whoisanonimal/status/1019360748491849728
 
-By the help of `SadBatman <https://github.com/SadBatman>`_ and others, `yoosofan <https://yoosofan.github.io/en/>`_ is trying to revive this coin under a new development scheme which we believe is more transparent and more community based.
+By the help of `Niels <https://github.com/SadBatman>`_ and others, `yoosofan <https://yoosofan.github.io/en/>`_ is trying to revive this coin under a new development scheme which we believe is more transparent and more community based.
 
 We may use any kind of text based tools for all our work including wiki such that all of them can be put on the git repository.
 
