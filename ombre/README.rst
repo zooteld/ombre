@@ -28,6 +28,27 @@ List of participants
 * `nnluukhtn <https://github.com/nnluukhtn>`_
 *  Helge
 
+Don't get your hopes up too much
+################################
+Apart from `Niels <https://github.com/SadBatman>`_ , which cannot unfortunately work much, the rest of us (core participants) are non developer or developer who weren't serious cryptocurrency developer.
+
+At least me `yoosofan <https://github.com/yoosofan>`_  is not cryptocurrency developer right now but have more than two decades of developing variety of projects with different programming languages and familiar of managing projects, and of course teaching programming langauges.
+
+So please be patient and help us to survive this coin as we intended.
+
+We try as hard as we can to bring this coin up and not failed it, but remember that all of us have daily job to work on too.
+
+These words are just like the rest of our work should be mentioned loudly because we want to be honest as much as possible. 
+It does not mean wo do not take your business and your money seriously, it is fully against it because getting falsehood hopes and dreams are what we all hate!
+
+Look at big coins with serious well known full time developers and how they fail what they claim, we can point out several recent flaws in some of them based on recent discussion and articles (not our knowledge or discovery) but we refrain to do that because it is non of our business and we do not want promote ourselves buy ruining others, our job is to revive this coin if we can. Unfortunately some coins are mostly shilling coins and using your emotions to get your money.
+
+And remember if you want to do something it could not be perfect. Perfectionism comes from doing nothing, it means when you do nothing then all things you’ve done is perfect! 
+
+Finding a bug and reporting it, is a very decent act because it will help us to know our flaws,It would be appreciated if you could help us to fix it too and your name will remain in this project as long as this project remains alive. Please refrain from complaining if you cannot help in any way.
+
+If you are here for `Lambo` or `Jambo` , non of them can be find here.
+
 Useful links
 ############
 Omber repository on other websites
@@ -62,27 +83,6 @@ restructuretext(rst)
 *   `FAQ <http://docutils.sourceforge.net/FAQ.html>`_
 *   `Restructured Text (reST) and Sphinx CheatSheet <http://openalea.gforge.inria.fr/doc/openalea/doc/_build/html/source/sphinx/rest_syntax.html>`_
 *   `<http://www.siafoo.net/help/reST>`_
-
-Don't get your hopes up too much
-################################
-Apart from `Niels <https://github.com/SadBatman>`_ , which cannot unfortunately work much, the rest of us (core participants) are non developer or developer who weren't serious cryptocurrency developer.
-
-At least me `yoosofan <https://github.com/yoosofan>`_  is not cryptocurrency developer right now but have more than two decades of developing variety of projects with different programming languages and familiar of managing projects, and of course teaching programming langauges.
-
-So please be patient and help us to survive this coin as we intended.
-
-We try as hard as we can to bring this coin up and not failed it, but remember that all of us have daily job to work on too.
-
-These words are just like the rest of our work should be mentioned loudly because we want to be honest as much as possible. 
-It does not mean wo do not take your business and your money seriously, it is fully against it because getting falsehood hopes and dreams are what we all hate!
-
-Look at big coins with serious well known full time developers and how they fail what they claim, we can point out several recent flaws in some of them based on recent discussion and articles (not our knowledge or discovery) but we refrain to do that because it is non of our business and we do not want promote ourselves buy ruining others, our job is to revive this coin if we can. Unfortunately some coins are mostly shilling coins and using your emotions to get your money.
-
-And remember if you want to do something it could not be perfect. Perfectionism comes from doing nothing, it means when you do nothing then all things you’ve done is perfect! 
-
-Finding a bug and reporting it, is a very decent act because it will help us to know our flaws,It would be appreciated if you could help us to fix it too and your name will remain in this project as long as this project remains alive. Please refrain from complaining if you cannot help in any way.
-
-If you are here for `Lambo` or `Jambo` , non of them can be find here.
 
 .. contents:: Table of Contents
    :depth: 3
