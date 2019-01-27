@@ -14,7 +14,7 @@ https://github.com/monero-project/meta/issues/236#issuecomment-419366720
 and 
 https://twitter.com/whoisanonimal/status/1019360748491849728
 
-By the help of `SadBatman <https://github.com/SadBatman>`_ and others, yoosofan <https://yoosofan.github.io/en/>`_ is trying to revive this coin under a new development scheme which we believe is more transparent and more community based.
+By the help of `SadBatman <https://github.com/SadBatman>`_ and others, `yoosofan <https://yoosofan.github.io/en/>`_ is trying to revive this coin under a new development scheme which we believe is more transparent and more community based.
 
 We may use any kind of text based tools for all our work including wiki such that all of them can be put on the git repository.
 
@@ -76,7 +76,7 @@ We try as hard as we can to bring this coin up and not failed it, but remember t
 These words are just like the rest of our work should be mentioned loudly because we want to be honest as much as possible. 
 It does not mean wo do not take your business and your money seriously, it is fully against it because getting falsehood hopes and dreams are what we all hate!
 
-Look at big coins with serious well known full time developer and how they fail what they claim. Unfortunately some coins are mostly shiling coins and using your emotions to get your money.
+Look at big coins with serious well known full time developers and how they fail what they claim, we can point out several recent flaw in a some of them but we refrain to do that because it is non of our business and we do not want promote ourselves buy ruining others, our job is to revive this coin if we can. Unfortunately some coins are mostly shilling coins and using your emotions to get your money.
 
 If you are here for `Lambo` or `Jambo` , non of them can be find here.
 
