@@ -3,7 +3,7 @@ Ombre Under new development scheme
 ##################################
 We believe every single contribution from every one should remains in the history.
 
-Therefore every discussion will be remain safe and untouched.
+Therefore every discussion will be remain safe and untouched. Also, enough accumulated contribution means a portion of dev fund, this why we want to come back to 6% dev fund.
 
 To contribure to this project, you need just to learn how to use `git` ,  `restructuredtext` (rst), pull request and  of course a simple text editor like `geany <https://geany.org>`_ .
 
@@ -17,6 +17,9 @@ https://twitter.com/whoisanonimal/status/1019360748491849728
 By the help of `Niels <https://github.com/SadBatman>`_ and others, `yoosofan <https://yoosofan.github.io/en/>`_ is trying to revive this coin under a new development scheme which we believe is more transparent and more community based.
 
 We may use any kind of text based tools for all our work including wiki such that all of them can be put on the git repository.
+
+We believe in open source (`GPLv3 <https://www.gnu.org/licenses/gpl.html>`_ or later based on whatever `Stallman <https://stallman.org/>`_ says) and rewarding any contribution by letting it remain in git history of the project (not hidding or deleting useful contribution) and getting some dev fund depends on the amount of work is done.
+And this is another reason we insist to put everything on git repository.
 
 List of participants
 ####################
