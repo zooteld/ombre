@@ -1,5 +1,7 @@
-// Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2017-2018, The Masari Project (forked from The Monero Project)
+// Copyright (c) 2017-2018, The Masari Project
+// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2017, SUMOKOIN
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -118,12 +120,14 @@ namespace cryptonote {
     carry = cadc(high, top, carry);
     return !carry;
   }
- /*
+
+  /*
   # Tom Harold (Degnr8) WT
   # Modified by Zawy to be a weighted-Weighted Harmonic Mean (WWHM)
   # No limits in rise or fall rate should be employed.
   # MTP should not be used.
   k = (N+1)/2  * T
+
   # original algorithm
   d=0, t=0, j=0
   for i = height - N+1 to height  # (N most recent blocks)
@@ -145,29 +149,46 @@ namespace cryptonote {
       timestamps.resize(DIFFICULTY_WINDOW);
       cumulative_difficulties.resize(DIFFICULTY_WINDOW);
     }
+
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
     if (length <= 1) {
       return 1;
+		}
+
+		uint64_t weighted_timespans = 0;
+		uint64_t target;
+
+		for (size_t i = 1; i < length; i++) {
+			uint64_t timespan;
+			if (timestamps[i - 1] >= timestamps[i]) {
+				timespan = 1;
+			} else {
+				timespan = timestamps[i] - timestamps[i - 1];
+			}
+			if (timespan > 10 * target_seconds) {
+				timespan = 10 * target_seconds;
+			}
+			weighted_timespans += i * timespan;
+		}
+		target = ((length + 1) / 2) * target_seconds;
+
+    uint64_t minimum_timespan = target_seconds * length / 2;
+    if (weighted_timespans < minimum_timespan) {
+      weighted_timespans = minimum_timespan;
     }
-    uint64_t weighted_timespans = 0;
-    for (size_t i = 1; i < length; i++) {
-      uint64_t timespan = timestamps[i] - timestamps[i - 1];
-      if (timespan > 10 * target_seconds) {
-        timespan = 10 * target_seconds;
-      }
-      if (timespan == 0) {
-        timespan = 1;
-      }
-      weighted_timespans += i * timespan;
-    }
+
     difficulty_type total_work = cumulative_difficulties.back() - cumulative_difficulties.front();
     assert(total_work > 0);
+
     uint64_t low, high;
-    uint64_t target = ((length + 1) / 2) * target_seconds;
     mul(total_work, target, low, high);
     if (high != 0) {
       return 0;
+    }
+
+    if (!low / weighted_timespans) {
+      return 1;
     }
     return low / weighted_timespans;
   }
