@@ -1,5 +1,5 @@
+// Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2017-2018, The Masari Project
-// Copyright (c) 2014-2017, The Monero Project
 // Copyright (c) 2017, SUMOKOIN
 //
 // All rights reserved.
@@ -40,6 +40,7 @@
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
 #include "difficulty.h"
+#include "misc_log_ex.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
@@ -154,24 +155,24 @@ namespace cryptonote {
     assert(length == cumulative_difficulties.size());
     if (length <= 1) {
       return 1;
-		}
+    }
 
-		uint64_t weighted_timespans = 0;
-		uint64_t target;
+    uint64_t weighted_timespans = 0;
+    uint64_t target;
 
-		for (size_t i = 1; i < length; i++) {
-			uint64_t timespan;
-			if (timestamps[i - 1] >= timestamps[i]) {
-				timespan = 1;
-			} else {
-				timespan = timestamps[i] - timestamps[i - 1];
-			}
-			if (timespan > 10 * target_seconds) {
-				timespan = 10 * target_seconds;
-			}
-			weighted_timespans += i * timespan;
-		}
-		target = ((length + 1) / 2) * target_seconds;
+    for (size_t i = 1; i < length; i++) {
+      uint64_t timespan;
+      if (timestamps[i - 1] >= timestamps[i]) {
+        timespan = 1;
+      } else {
+        timespan = timestamps[i] - timestamps[i - 1];
+      }
+      if (timespan > 10 * target_seconds) {
+        timespan = 10 * target_seconds;
+      }
+      weighted_timespans += i * timespan;
+    }
+    target = ((length + 1) / 2) * target_seconds;
 
     uint64_t minimum_timespan = target_seconds * length / 2;
     if (weighted_timespans < minimum_timespan) {
@@ -184,13 +185,12 @@ namespace cryptonote {
     uint64_t low, high;
     mul(total_work, target, low, high);
     if (high != 0) {
+      LOG_ERROR("high != 0");
       return 0;
     }
 
-    if (!low / weighted_timespans) {
-      return 1;
-    }
-    return low / weighted_timespans;
+    int next_diff = low / weighted_timespans;
+    return next_diff != 0 ? next_diff : 1;
   }
+}  // namespace
 
-}
