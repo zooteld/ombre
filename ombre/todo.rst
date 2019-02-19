@@ -20,4 +20,7 @@ These are suggestions of `Niels <https://github.com/SadBatman>`_ from https://gi
 #. Implement the 60 seconds block time
 #. Implement the Ombre emission scheme
 #. Fix issues
+#. change seed nodes
+#. change hardforks of monero and replace it with ombre forks
+#. prepare for test on every step by setting up a testnet with different port
 
