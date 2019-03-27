@@ -2,7 +2,7 @@
 
 ## Development Resources
 
-- Web: [www.ombre.io](https://www.ombre.io)
+- Web: [www.ombre.ir](http://www.ombre.ir)
 - GitHub: [https://github.com/ombre-projects/ombre](https://github.com/ombre-projects/ombre)
 
 ## Introduction
