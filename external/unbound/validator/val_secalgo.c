@@ -634,7 +634,7 @@ verify_canonrrset(sldns_buffer* buf, int algo, unsigned char* sigblock,
 #ifdef HAVE_EVP_MD_CTX_NEW
 	ctx = EVP_MD_CTX_new();
 #else
-	ctx = (EVP_MD_CTX*)malloc(sizeof(*ctx));
+	ctx = (EVP_MD_CTX*)malloc(sizeof(*ctx)); /* yoosofan comment:: get compile error in windows by msys2 similar to https://github.com/monero-project/monero-gui/pull/1753 */
 	if(ctx) EVP_MD_CTX_init(ctx);
 #endif
 	if(!ctx) {
