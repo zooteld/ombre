@@ -2,7 +2,7 @@
 
 ## Development Resources
 
-- Web: [www.ombre.io](https://www.ombre.io)
+- Web: [www.ombre.ir](http://www.ombre.ir)
 - GitHub: [https://github.com/ombre-projects/ombre](https://github.com/ombre-projects/ombre)
 
 ## Introduction
@@ -56,7 +56,7 @@ We plan on doing a full security audit of the codebase and will setup fuzzing fo
 ### Q3. Web wallet (under consideration)
 For this roadmap item we would like to have community feedback first: we think a web wallet would be very convenient for our users but we'll be on the lookout for feedback before starting the implementation.
 
-### Q3. Global pool balancer ((under consideration)
+### Q3. Global pool balancer (under consideration)
 We will implement a lightweight and yet protocol aware loadbalancer to spread the mining load on our network across pools evenly. We will create an incentive for pool owners and miners to join the loadbalancer. A healthy spread of the mining across multiple pools is highly beneficial for the stability of the coin.
 
 

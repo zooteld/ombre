@@ -125,9 +125,10 @@ namespace nodetool
     virtual std::map<uint32_t, time_t> get_blocked_ips() { CRITICAL_REGION_LOCAL(m_blocked_ips_lock); return m_blocked_ips; }
   private:
     const std::vector<std::string> m_seed_nodes_list =
-    { "185.113.115.13",
-      "5.56.132.162",
-      "91.90.42.91"
+    { "seed1.ombre.ir",
+      "seed2.ombre.ir",
+      "seed3.ombre.ir",
+      "seed4.ombre.ir"
     };
 
     bool islimitup=false;
