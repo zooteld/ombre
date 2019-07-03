@@ -46,10 +46,10 @@ namespace tools
 
     // All four MoneroPulse domains have DNSSEC on and valid
     static const std::vector<std::string> dns_urls = {
-        "updates.sumopulse.stream",
-        "updates.sumopulse.download",
-        "updates.sumopulse.win",
-        "updates.sumopulse.bid"
+        "updates.ombrepulse.stream",
+        "updates.ombrepulse.download",
+        "updates.ombrepulse.win",
+        "updates.ombrepulse.bid"
     };
 
     if (!tools::dns_utils::load_txt_records_from_dns(records, dns_urls))
@@ -99,7 +99,7 @@ namespace tools
 
   std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
   {
-    const char *base = user ? "https://downloads.sumokoin.org/" : "https://updates.sumokoin.org/";
+    const char *base = user ? "https://downloads.ombre.org/" : "https://updates.ombre.org/";
 #ifdef _WIN32
     static const char *extension = strncmp(buildtag.c_str(), "install-", 8) ? ".zip" : ".exe";
 #else

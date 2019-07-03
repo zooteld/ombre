@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Ombre Project
 // Copyright (c) 2017-2019, Sumokoin Project
 // Copyright (c) 2014-2019, The Monero Project
 // 
@@ -928,13 +929,13 @@ namespace cryptonote
     switch (decimal_point)
     {
       case 9:
-        return "sumo";
+        return "ombre";
       case 6:
-        return "sumosan";
+        return "ombresan";
       case 3:
-        return "sumokun";
+        return "ombrekun";
       case 0:
-        return "sumoshi";
+        return "ombreshi";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
     }

@@ -181,7 +181,7 @@ namespace daemonizer
     }
     else // interactive
     {
-      //LOG_PRINT_L0("Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL);
+      //LOG_PRINT_L0("Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL);
       if (command_line::has_arg(vm, arg_non_interactive))
         return executor.run_non_interactive(vm);
       else

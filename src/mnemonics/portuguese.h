@@ -1342,7 +1342,7 @@ namespace Language
         "reorientar",
         "repuxo",
         "requisito",
-        "resumo",
+        "reombre",
         "returno",
         "reutilizar",
         "revolvido",

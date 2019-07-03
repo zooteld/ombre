@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Ombre Project
 // Copyright (c) 2017-2019, Sumokoin Project
 // Copyright (c) 2014-2019, The Monero Project
 // 
@@ -101,9 +102,9 @@ using namespace cryptonote;
 #define CHACHA8_KEY_TAIL 0x8c
 #define CACHE_KEY_TAIL 0x8d
 
-#define UNSIGNED_TX_PREFIX "Sumokoin unsigned tx set\004"
-#define SIGNED_TX_PREFIX "Sumokoin signed tx set\004"
-#define MULTISIG_UNSIGNED_TX_PREFIX "Sumokoin multisig unsigned tx set\001"
+#define UNSIGNED_TX_PREFIX "Ombre unsigned tx set\004"
+#define SIGNED_TX_PREFIX "Ombre signed tx set\004"
+#define MULTISIG_UNSIGNED_TX_PREFIX "Ombre multisig unsigned tx set\001"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_DAYS (1.8) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -117,11 +118,11 @@ using namespace cryptonote;
 #define SUBADDRESS_LOOKAHEAD_MAJOR 50
 #define SUBADDRESS_LOOKAHEAD_MINOR 200
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Sumokoin key image export\002"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Ombre key image export\002"
 
-#define MULTISIG_EXPORT_FILE_MAGIC "Sumokoin multisig export\001"
+#define MULTISIG_EXPORT_FILE_MAGIC "Ombre multisig export\001"
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Sumokoin output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Ombre output export\003"
 
 #define SEGREGATION_FORK_HEIGHT ((uint64_t)(-1))
 #define TESTNET_SEGREGATION_FORK_HEIGHT ((uint64_t)(-1))
@@ -1675,8 +1676,8 @@ void wallet2::scan_output(const cryptonote::transaction &tx, bool miner_tx, cons
     if (!m_encrypt_keys_after_refresh)
     {
       boost::optional<epee::wipeable_string> pwd = m_callback->on_get_password(pool ? "output found in pool" : "output received");
-      THROW_WALLET_EXCEPTION_IF(!pwd, error::password_needed, tr("Password is needed to compute key image for incoming SUMO"));
-      THROW_WALLET_EXCEPTION_IF(!verify_password(*pwd), error::password_needed, tr("Invalid password: password is needed to compute key image for incoming SUMO"));
+      THROW_WALLET_EXCEPTION_IF(!pwd, error::password_needed, tr("Password is needed to compute key image for incoming OMBRE"));
+      THROW_WALLET_EXCEPTION_IF(!verify_password(*pwd), error::password_needed, tr("Invalid password: password is needed to compute key image for incoming OMBRE"));
       decrypt_keys(*pwd);
       m_encrypt_keys_after_refresh = *pwd;
     }
@@ -12596,7 +12597,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "sumo:" + address;
+  std::string uri = "ombre:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
@@ -12625,9 +12626,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 //----------------------------------------------------------------------------------------------------
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
-  if (uri.substr(0, 5) != "sumo:")
+  if (uri.substr(0, 5) != "ombre:")
   {
-    error = std::string("URI has wrong scheme (expected \"sumo:\"): ") + uri;
+    error = std::string("URI has wrong scheme (expected \"ombre:\"): ") + uri;
     return false;
   }
 
@@ -12888,10 +12889,10 @@ uint64_t wallet2::get_segregation_fork_height() const
   {
     // All four SumoPulse domains have DNSSEC on and valid
     static const std::vector<std::string> dns_urls = {
-        "segheights.sumopulse.stream",
-        "segheights.sumopulse.download",
-        "segheights.sumopulse.win",
-        "segheights.sumopulse.bid"
+        "segheights.ombrepulse.stream",
+        "segheights.ombrepulse.download",
+        "segheights.ombrepulse.win",
+        "segheights.ombrepulse.bid"
     };
 
     const uint64_t current_height = get_blockchain_current_height();
@@ -12938,7 +12939,7 @@ mms::multisig_wallet_state wallet2::get_multisig_wallet_state() const
   state.num_transfer_details = m_transfers.size();
   if (state.multisig)
   {
-    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original Sumokoin address not available");
+    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original Ombre address not available");
     state.address = m_original_address;
     state.view_secret_key = m_original_view_secret_key;
   }

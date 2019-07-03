@@ -848,10 +848,10 @@ namespace rct {
             }
         }
 
-        key sumout = zero();
+        key ombreut = zero();
         for (i = 0; i < outSk.size(); ++i)
         {
-            sc_add(sumout.bytes, outSk[i].mask.bytes, sumout.bytes);
+            sc_add(ombreut.bytes, outSk[i].mask.bytes, ombreut.bytes);
 
             //mask amount and mask
             rv.ecdhInfo[i].mask = copy(outSk[i].mask);
@@ -874,7 +874,7 @@ namespace rct {
             sc_add(sumpouts.bytes, a[i].bytes, sumpouts.bytes);
             genC(pseudoOuts[i], a[i], inamounts[i]);
         }
-        sc_sub(a[i].bytes, sumout.bytes, sumpouts.bytes);
+        sc_sub(a[i].bytes, ombreut.bytes, sumpouts.bytes);
         genC(pseudoOuts[i], a[i], inamounts[i]);
         DP(pseudoOuts[i]);
 

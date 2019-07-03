@@ -1,7 +1,7 @@
-Sumokoin daemon internationalization
+Ombre daemon internationalization
 ==================================
 
-The Sumokoin command line tools can be translated in various languages.
+The Ombre command line tools can be translated in various languages.
 
 ### Tools for translators
 

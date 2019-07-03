@@ -1,4 +1,4 @@
-// Copyright (c) 2017, SUMOKOIN
+// Copyright (c) 2017, OMBRE
 //
 // All rights reserved.
 //
@@ -215,7 +215,7 @@ private:
 
 	inline bool check_override()
 	{
-		const char *env = getenv("SUMO_USE_SOFTWARE_AES");
+		const char *env = getenv("OMBRE_USE_SOFTWARE_AES");
 		if (!env) {
 			return false;
 		}

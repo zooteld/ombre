@@ -51,8 +51,8 @@
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
-// Hardcode Sumokoin's donation address
-constexpr const char SUMOKOIN_DONATION_ADDR[] = "Sumoo64zh7dRFyB8dgDWZMLmzKBgGXYWZCG4NBF2VcvzEuiSQpMjyyiYJ1Ra696pZu56PPFQNBDdB1r ZjyeX1RVKeWZgHg7pTxj";
+// Hardcode Ombre's donation address
+constexpr const char OMBRE_DONATION_ADDR[] = "Sumoo64zh7dRFyB8dgDWZMLmzKBgGXYWZCG4NBF2VcvzEuiSQpMjyyiYJ1Ra696pZu56PPFQNBDdB1r ZjyeX1RVKeWZgHg7pTxj";
 
 /*!
  * \namespace cryptonote
