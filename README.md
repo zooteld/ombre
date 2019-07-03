@@ -8,6 +8,7 @@ Ombre, therefore, is a new Monero without its legacy, a _truely fungible_ crypto
 
 ## Coin Supply & Emission
 
+<!--
 - **Total supply**: **88,888,888** coins in first 20 years, then **263,000** coins each year for inflation. 
 About 10% (~8.8 million) was premined to reserve for future development, i.e. **80 million coins available** for community mining.
 - **Coin symbol**: **OMBRE**
@@ -18,6 +19,7 @@ About 10% (~8.8 million) was premined to reserve for future development, i.e. **
 - **Hash algorithm**: CryptoNight (Proof-Of-Work)
 - **Emission scheme**: Ombre's block reward changes _every 6-months_ as the following "Camel" distribution* (inspired by _real-world mining production_ like of crude oil, coal etc. that is often slow at first, 
 accelerated in the next few years before declined and depleted). However, the emission path of Ombre is generally not far apart from what of Bitcoin (view charts below).
+-->
 
 \* The emulated algorithm of Ombre block-reward emission can be found in Python and C++ scripts at [scripts](scripts) directory.
 
