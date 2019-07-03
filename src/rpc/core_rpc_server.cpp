@@ -237,7 +237,7 @@ namespace cryptonote
     if (restricted)
       res.database_size = round_up(res.database_size, 5ull* 1024 * 1024 * 1024);
     res.update_available = restricted ? false : m_core.is_update_available();
-    res.version = restricted ? "" : SUMOKOIN_VERSION;
+    res.version = restricted ? "" : OMBRECOIN_VERSION;
 
     res.status = CORE_RPC_STATUS_OK;
     return true;
@@ -2077,7 +2077,7 @@ namespace cryptonote
       return true;
     }
 
-    static const char software[] = "sumokoin";
+    static const char software[] = "ombrecoin";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli";
@@ -2098,7 +2098,7 @@ namespace cryptonote
       res.status = "Error checking for updates";
       return true;
     }
-    if (tools::vercmp(version.c_str(), SUMOKOIN_VERSION) <= 0)
+    if (tools::vercmp(version.c_str(), OMBRECOIN_VERSION) <= 0)
     {
       res.update = false;
       res.status = CORE_RPC_STATUS_OK;

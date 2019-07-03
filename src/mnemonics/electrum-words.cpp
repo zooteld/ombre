@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Ombre Project
 // Copyright (c) 2017-2019, Sumokoin Project
 // Copyright (c) 2014-2019, The Monero Project
 // 
@@ -548,7 +549,7 @@ namespace crypto
      */
     bool get_is_old_style_seed(const epee::wipeable_string &seed)
     {
-      // Sumokoin not support old style seed
+      // Ombrecoin not support old style seed
       return false;
     }
 

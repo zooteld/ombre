@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Ombre Project
 // Copyright (c) 2017-2018, Sumokoin Project
 // Copyright (c) 2014-2018, The Monero Project
 // 
@@ -140,7 +141,7 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME                         "sumokoin"
+#define CRYPTONOTE_NAME                         "ombrecoin"
 #define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"

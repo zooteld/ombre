@@ -10,11 +10,11 @@ Ombre, therefore, is a new Monero without its legacy, a _truely fungible_ crypto
 
 - **Total supply**: **88,888,888** coins in first 20 years, then **263,000** coins each year for inflation. 
 About 10% (~8.8 million) was premined to reserve for future development, i.e. **80 million coins available** for community mining.
-- **Coin symbol**: **SUMO**
+- **Coin symbol**: **OMBRE**
 - **Coin Units**:
-  + 1 Sumoshi &nbsp;= 0.000000001 **SUMO** (10<sup>-9</sup> - _the smallest coin unit_)
-  + 1 Sumokun = 0.000001 **SUMO** (10<sup>-6</sup>)
-  + 1 Sumosan = 0.001 **SUMO** (10<sup>-3</sup>)
+  + 1 Sumoshi &nbsp;= 0.000000001 **OMBRE** (10<sup>-9</sup> - _the smallest coin unit_)
+  + 1 Sumokun = 0.000001 **OMBRE** (10<sup>-6</sup>)
+  + 1 Sumosan = 0.001 **OMBRE** (10<sup>-3</sup>)
 - **Hash algorithm**: CryptoNight (Proof-Of-Work)
 - **Emission scheme**: Ombre's block reward changes _every 6-months_ as the following "Camel" distribution* (inspired by _real-world mining production_ like of crude oil, coal etc. that is often slow at first, 
 accelerated in the next few years before declined and depleted). However, the emission path of Ombre is generally not far apart from what of Bitcoin (view charts below).
@@ -484,7 +484,7 @@ and its home is the data directory specified in the [example
 config](utils/conf/ombred.conf).
 
 If you're on Mac, you may need to add the `--max-concurrency 1` option to
-sumo-wallet-cli, and possibly ombred, if you get crashes refreshing.
+ombre-wallet-cli, and possibly ombred, if you get crashes refreshing.
 
 ## Using Tor
 

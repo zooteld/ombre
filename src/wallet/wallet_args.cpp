@@ -140,8 +140,8 @@ namespace wallet_args
 
       if (command_line::get_arg(vm, command_line::arg_help))
       {
-        Print(print) << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")" << ENDL;
-        Print(print) << wallet_args::tr("This is the command line sumokoin wallet. It needs to connect to a Sumokoin\n"
+        Print(print) << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")" << ENDL;
+        Print(print) << wallet_args::tr("This is the command line ombrecoin wallet. It needs to connect to a Ombrecoin\n"
 												  "daemon to work correctly.") << ENDL;
         Print(print) << wallet_args::tr("Usage:") << ENDL << "  " << usage;
         Print(print) << desc_all;
@@ -150,7 +150,7 @@ namespace wallet_args
       }
       else if (command_line::get_arg(vm, command_line::arg_version))
       {
-        Print(print) << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")";
+        Print(print) << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")";
         should_terminate = true;
         return true;
       }
@@ -201,12 +201,12 @@ namespace wallet_args
     if (!command_line::is_arg_defaulted(vm, arg_max_concurrency))
       tools::set_max_concurrency(command_line::get_arg(vm, arg_max_concurrency));
 
-    Print(print) << "Sumokoin '" << SUMOKOIN_RELEASE_NAME << "' (v" << SUMOKOIN_VERSION_FULL << ")";
+    Print(print) << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")";
 
     if (!command_line::is_arg_defaulted(vm, arg_log_level))
       MINFO("Setting log level = " << command_line::get_arg(vm, arg_log_level));
     else
-      MINFO("Setting log levels = " << getenv("SUMOKOIN_LOGS"));
+      MINFO("Setting log levels = " << getenv("OMBRECOIN_LOGS"));
     MINFO(wallet_args::tr("Logging to: ") << log_path);
 
     Print(print) << boost::format(wallet_args::tr("Logging to %s")) % log_path;

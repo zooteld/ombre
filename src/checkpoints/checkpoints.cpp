@@ -1,3 +1,4 @@
+// Copyright (c) 2018-2019, Ombre Project
 // Copyright (c) 2017-2018, Sumokoin Project
 // Copyright (c) 2014-2018, The Monero Project
 //
@@ -233,22 +234,22 @@ namespace cryptonote
     std::vector<std::string> records;
 
     // All four SumoPulse domains have DNSSEC on and valid
-    static const std::vector<std::string> dns_urls = { "checkpoints.sumopulse.stream"
-                   , "checkpoints.sumopulse.download"
-                   , "checkpoints.sumopulse.win"
-                   , "checkpoints.sumopulse.bid"
+    static const std::vector<std::string> dns_urls = { "checkpoints.ombrepulse.stream"
+                   , "checkpoints.ombrepulse.download"
+                   , "checkpoints.ombrepulse.win"
+                   , "checkpoints.ombrepulse.bid"
     };
 
-    static const std::vector<std::string> testnet_dns_urls = { "testpoints.sumopulse.stream"
-                   , "testpoints.sumopulse.download"
-                   , "testpoints.sumopulse.win"
-                   , "testpoints.sumopulse.bid"
+    static const std::vector<std::string> testnet_dns_urls = { "testpoints.ombrepulse.stream"
+                   , "testpoints.ombrepulse.download"
+                   , "testpoints.ombrepulse.win"
+                   , "testpoints.ombrepulse.bid"
     };
 
-    static const std::vector<std::string> stagenet_dns_urls = { "stagenetpoints.sumopulse.stream"
-                   , "stagenetpoints.sumopulse.download"
-                   , "stagenetpoints.sumopulse.win"
-                   , "stagenetpoints.sumopulse.bid"
+    static const std::vector<std::string> stagenet_dns_urls = { "stagenetpoints.ombrepulse.stream"
+                   , "stagenetpoints.ombrepulse.download"
+                   , "stagenetpoints.ombrepulse.win"
+                   , "stagenetpoints.ombrepulse.bid"
     };
 
     if (!tools::dns_utils::load_txt_records_from_dns(records, nettype == TESTNET ? testnet_dns_urls : nettype == STAGENET ? stagenet_dns_urls : dns_urls))

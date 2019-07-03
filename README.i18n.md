@@ -1,7 +1,7 @@
-Sumokoin daemon internationalization
+Ombrecoin daemon internationalization
 ==================================
 
-The Sumokoin command line tools can be translated in various languages.
+The Ombrecoin command line tools can be translated in various languages.
 
 ### Tools for translators
 
