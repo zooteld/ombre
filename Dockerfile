@@ -205,5 +205,5 @@ VOLUME /wallet
 EXPOSE 19733
 EXPOSE 19734
 
-ENTRYPOINT ["ombrecoind", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=19733", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=19734", "--non-interactive", "--confirm-external-bind"]
+ENTRYPOINT ["ombred", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=19733", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=19734", "--non-interactive", "--confirm-external-bind"]
 

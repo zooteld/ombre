@@ -622,7 +622,7 @@ Please view [LICENSE](LICENSE)
 
 Copyright (c) 2018-2019, Ombre Project
 
-Copyright (c) 2017-2019, Ombre Project
+Copyright (c) 2017-2019, Sumokoin Project
 
 Copyright (c) 2014-2017, The Monero Project
 

@@ -2157,7 +2157,7 @@ bool simple_wallet::welcome(const std::vector<std::string> &args)
   message_writer() << tr("Flaws in Ombrecoin may be discovered in the future, and attacks may be developed to peek under some");
   message_writer() << tr("of the layers of privacy Ombrecoin provides. Be safe and practice defense in depth.");
   message_writer() << "";
-  message_writer() << tr("Welcome to Ombrecoin and financial privacy. For more information, see https://www.ombrecoin.org/");
+  message_writer() << tr("Welcome to Ombre and financial privacy. For more information, see https://www.ombre.network/");
   return true;
 }
 
