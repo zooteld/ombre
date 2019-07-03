@@ -42,6 +42,7 @@
 #include "cryptonote_config.h"
 #include "difficulty.h"
 #include "misc_language.h"
+#include "misc_log_ex.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
@@ -356,13 +357,32 @@ namespace cryptonote {
       return check_hash_128(hash, difficulty);
   }
 
+  /*
+  # Tom Harold (Degnr8) WT
+  # Modified by Zawy to be a weighted-Weighted Harmonic Mean (WWHM)
+  # No limits in rise or fall rate should be employed.
+  # MTP should not be used.
+  k = (N+1)/2  * T
+   # original algorithm
+  d=0, t=0, j=0
+  for i = height - N+1 to height  # (N most recent blocks)
+      # TS = timestamp
+      solvetime = TS[i] - TS[i-1]
+      solvetime = 10*T if solvetime > 10*T
+      solvetime = -9*T if solvetime < -9*T
+      j++
+      t +=  solvetime * j
+      d +=D[i] # sum the difficulties
+  next i
+  t=T*N/2 if t < T*N/2  # in case of startup weirdness, keep t reasonable
+  next_D = d * k / t
+  */
   difficulty_type next_difficulty(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
     if (timestamps.size() > DIFFICULTY_WINDOW)
     {
       timestamps.resize(DIFFICULTY_WINDOW);
       cumulative_difficulties.resize(DIFFICULTY_WINDOW);
     }
-
 
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
