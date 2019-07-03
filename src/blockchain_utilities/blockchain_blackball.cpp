@@ -860,7 +860,7 @@ static void open_db(const std::string &filename, MDB_env **env, MDB_txn **txn, M
   dbr = mdb_env_set_maxdbs(*env, 1);
   CHECK_AND_ASSERT_THROW_MES(!dbr, "Failed to set max env dbs: " + std::string(mdb_strerror(dbr)));
   const std::string actual_filename = filename;
-  MINFO("Opening ombrecoin blockchain at " << actual_filename);
+  MINFO("Opening ombre blockchain at " << actual_filename);
   dbr = mdb_env_open(*env, actual_filename.c_str(), flags, 0664);
   CHECK_AND_ASSERT_THROW_MES(!dbr, "Failed to open rings database file '"
       + actual_filename + "': " + std::string(mdb_strerror(dbr)));
@@ -1086,7 +1086,7 @@ int main(int argc, char* argv[])
   const command_line::arg_descriptor<bool> arg_rct_only  = {"rct-only", "Only work on ringCT outputs", false};
   const command_line::arg_descriptor<bool> arg_check_subsets  = {"check-subsets", "Check ring subsets (very expensive)", false};
   const command_line::arg_descriptor<bool> arg_verbose  = {"verbose", "Verbose output)", false};
-  const command_line::arg_descriptor<std::vector<std::string> > arg_inputs = {"inputs", "Path to Ombrecoin DB, and path to any fork DBs"};
+  const command_line::arg_descriptor<std::vector<std::string> > arg_inputs = {"inputs", "Path to Ombre DB, and path to any fork DBs"};
   const command_line::arg_descriptor<std::string> arg_db_sync_mode = {
     "db-sync-mode"
   , "Specify sync option, using format [safe|fast|fastest]:[nrecords_per_sync]." 
@@ -1128,7 +1128,7 @@ int main(int argc, char* argv[])
 
   if (command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
     return 1;
   }

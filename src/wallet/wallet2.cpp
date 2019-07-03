@@ -102,9 +102,9 @@ using namespace cryptonote;
 #define CHACHA8_KEY_TAIL 0x8c
 #define CACHE_KEY_TAIL 0x8d
 
-#define UNSIGNED_TX_PREFIX "Ombrecoin unsigned tx set\004"
-#define SIGNED_TX_PREFIX "Ombrecoin signed tx set\004"
-#define MULTISIG_UNSIGNED_TX_PREFIX "Ombrecoin multisig unsigned tx set\001"
+#define UNSIGNED_TX_PREFIX "Ombre unsigned tx set\004"
+#define SIGNED_TX_PREFIX "Ombre signed tx set\004"
+#define MULTISIG_UNSIGNED_TX_PREFIX "Ombre multisig unsigned tx set\001"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_DAYS (1.8) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -118,11 +118,11 @@ using namespace cryptonote;
 #define SUBADDRESS_LOOKAHEAD_MAJOR 50
 #define SUBADDRESS_LOOKAHEAD_MINOR 200
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Ombrecoin key image export\002"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Ombre key image export\002"
 
-#define MULTISIG_EXPORT_FILE_MAGIC "Ombrecoin multisig export\001"
+#define MULTISIG_EXPORT_FILE_MAGIC "Ombre multisig export\001"
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Ombrecoin output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Ombre output export\003"
 
 #define SEGREGATION_FORK_HEIGHT ((uint64_t)(-1))
 #define TESTNET_SEGREGATION_FORK_HEIGHT ((uint64_t)(-1))
@@ -12939,7 +12939,7 @@ mms::multisig_wallet_state wallet2::get_multisig_wallet_state() const
   state.num_transfer_details = m_transfers.size();
   if (state.multisig)
   {
-    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original Ombrecoin address not available");
+    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original Ombre address not available");
     state.address = m_original_address;
     state.view_secret_key = m_original_view_secret_key;
   }

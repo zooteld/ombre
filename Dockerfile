@@ -190,12 +190,12 @@ COPY --from=builder /src/build/release/bin /usr/local/bin/
 
 # Create ombre user
 RUN adduser --system --group --disabled-password ombre && \
-	mkdir -p /wallet /home/ombre/.ombrecoin && \
-	chown -R ombre:ombre /home/ombre/.ombrecoin && \
+	mkdir -p /wallet /home/ombre/.ombre && \
+	chown -R ombre:ombre /home/ombre/.ombre && \
 	chown -R ombre:ombre /wallet
 
 # Contains the blockchain
-VOLUME /root/.ombrecoin
+VOLUME /root/.ombre
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet

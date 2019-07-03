@@ -67,7 +67,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 The key words "MUST", "MUST NOT", "REQUIRED", "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
-The "Ombrecoin Maintainer Team" is defined in this document as the following users:
+The "Ombre Maintainer Team" is defined in this document as the following users:
 - quangvu3
 
 ## Goals
@@ -124,7 +124,7 @@ C4 is meant to provide a reusable optimal collaboration model for open source so
 - To request changes, a user SHOULD log an issue on the project Platform issue tracker.
 - The user or Contributor SHOULD write the issue by describing the problem they face or observe.
 - The user or Contributor SHOULD seek consensus on the accuracy of their observation, and the value of solving the problem.
-- Users MUST NOT log feature requests, ideas, or suggestions unrelated to Ombrecoin code or Ombrecoin's dependency code or Ombrecoin's potential/future dependency code or research which successfully implements Ombrecoin.
+- Users MUST NOT log feature requests, ideas, or suggestions unrelated to Ombre code or Ombre's dependency code or Ombre's potential/future dependency code or research which successfully implements Ombre.
 - Users MUST NOT log any solutions to problems (verifiable or hypothetical) of which are not explicitly documented and/or not provable and/or cannot be reasonably proven.
 - Thus, the release history of the project MUST be a list of meaningful issues logged and solved.
 - To work on an issue, a Contributor MUST fork the project repository and then work on their forked repository.
@@ -132,9 +132,9 @@ C4 is meant to provide a reusable optimal collaboration model for open source so
 - A Contributor MUST NOT commit changes directly to the project.
 - To discuss a patch, people MAY comment on the Platform pull request, on the commit, or elsewhere.
 - To accept or reject a patch, a Maintainer MUST use the Platform interface.
-- Maintainers SHOULD NOT merge their own patches except in exceptional cases, such as non-responsiveness from other Maintainers for an extended period (more than 30 days) or unless urgent as defined by the Ombrecoin Maintainers Team.
+- Maintainers SHOULD NOT merge their own patches except in exceptional cases, such as non-responsiveness from other Maintainers for an extended period (more than 30 days) or unless urgent as defined by the Ombre Maintainers Team.
 - Maintainers MUST NOT make value judgments on correct patches unless the Maintainer (as may happen in rare circumstances) is a core code developer.
-- Maintainers MUST NOT merge pull requests in less than 168 hours (1 week) unless deemed urgent by at least 2 people from the Ombrecoin Maintainer Team.
+- Maintainers MUST NOT merge pull requests in less than 168 hours (1 week) unless deemed urgent by at least 2 people from the Ombre Maintainer Team.
 - The Contributor MAY tag an issue as "Ready" after making a pull request for the issue.
 - The user who created an issue SHOULD close the issue after checking the patch is successful.
 - Maintainers SHOULD ask for improvements to incorrect patches and SHOULD reject incorrect patches if the Contributor does not respond constructively.

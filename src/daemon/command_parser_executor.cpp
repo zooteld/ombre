@@ -758,7 +758,7 @@ bool t_command_parser_executor::pop_blocks(const std::vector<std::string>& args)
 
 bool t_command_parser_executor::version(const std::vector<std::string>& args)
 {
-  std::cout << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")" << std::endl;
+  std::cout << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")" << std::endl;
   return true;
 }
 

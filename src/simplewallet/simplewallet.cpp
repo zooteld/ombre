@@ -150,7 +150,7 @@ namespace
   const command_line::arg_descriptor<bool> arg_allow_mismatched_daemon_version = {"allow-mismatched-daemon-version", sw::tr("Allow communicating with a daemon that uses a different RPC version"), false};
   const command_line::arg_descriptor<uint64_t> arg_restore_height = {"restore-height", sw::tr("Restore from specific blockchain height"), 0};
   const command_line::arg_descriptor<std::string> arg_restore_date = {"restore-date", sw::tr("Restore from estimated blockchain height on specified date"), ""};
-  const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to Ombrecoin network"), false};
+  const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to Ombre network"), false};
   const command_line::arg_descriptor<bool> arg_create_address_file = {"create-address-file", sw::tr("Create an address file for new wallets"), false};
   const command_line::arg_descriptor<std::string> arg_subaddress_lookahead = {"subaddress-lookahead", tools::wallet2::tr("Set subaddress lookahead sizes to <major>:<minor>"), ""};
   const command_line::arg_descriptor<bool> arg_use_english_language_names = {"use-english-language-names", sw::tr("Display English language names"), false};
@@ -220,7 +220,7 @@ namespace
   const char* USAGE_MMS("mms [<subcommand> [<subcommand_parameters>]]");
   const char* USAGE_MMS_INIT("mms init <required_signers>/<authorized_signers> <own_label> <own_transport_address>");
   const char* USAGE_MMS_INFO("mms info");
-  const char* USAGE_MMS_SIGNER("mms signer [<number> <label> [<transport_address> [<ombrecoin_address>]]]");
+  const char* USAGE_MMS_SIGNER("mms signer [<number> <label> [<transport_address> [<ombre_address>]]]");
   const char* USAGE_MMS_LIST("mms list");
   const char* USAGE_MMS_NEXT("mms next [sync]");
   const char* USAGE_MMS_SYNC("mms sync");
@@ -447,7 +447,7 @@ namespace
     std::stringstream prompt;
     prompt << sw::tr("For URL: ") << url
            << ", " << dnssec_str << std::endl
-           << sw::tr(" Ombrecoin Address = ") << addresses[0]
+           << sw::tr(" Ombre Address = ") << addresses[0]
            << std::endl
            << sw::tr("Is this OK?")
     ;
@@ -2145,17 +2145,17 @@ bool simple_wallet::net_stats(const std::vector<std::string> &args)
 
 bool simple_wallet::welcome(const std::vector<std::string> &args)
 {
-  message_writer() << tr("Welcome to Ombrecoin, the private cryptocurrency.");
+  message_writer() << tr("Welcome to Ombre, the private cryptocurrency.");
   message_writer() << "";
-  message_writer() << tr("Ombrecoin, like Bitcoin, is a cryptocurrency. That is, it is digital money.");
-  message_writer() << tr("Unlike Bitcoin, your Ombrecoin transactions and balance stay private, and not visible to the world by default.");
+  message_writer() << tr("Ombre, like Bitcoin, is a cryptocurrency. That is, it is digital money.");
+  message_writer() << tr("Unlike Bitcoin, your Ombre transactions and balance stay private, and not visible to the world by default.");
   message_writer() << tr("However, you have the option of making those available to select parties, if you choose to.");
   message_writer() << "";
-  message_writer() << tr("Ombrecoin protects your privacy on the blockchain, and while Ombrecoin strives to improve all the time,");
-  message_writer() << tr("no privacy technology can be 100% perfect, Ombrecoin included.");
-  message_writer() << tr("Ombrecoin cannot protect you from malware, and it may not be as effective as we hope against powerful adversaries.");
-  message_writer() << tr("Flaws in Ombrecoin may be discovered in the future, and attacks may be developed to peek under some");
-  message_writer() << tr("of the layers of privacy Ombrecoin provides. Be safe and practice defense in depth.");
+  message_writer() << tr("Ombre protects your privacy on the blockchain, and while Ombre strives to improve all the time,");
+  message_writer() << tr("no privacy technology can be 100% perfect, Ombre included.");
+  message_writer() << tr("Ombre cannot protect you from malware, and it may not be as effective as we hope against powerful adversaries.");
+  message_writer() << tr("Flaws in Ombre may be discovered in the future, and attacks may be developed to peek under some");
+  message_writer() << tr("of the layers of privacy Ombre provides. Be safe and practice defense in depth.");
   message_writer() << "";
   message_writer() << tr("Welcome to Ombre and financial privacy. For more information, see https://www.ombre.network/");
   return true;
@@ -2163,7 +2163,7 @@ bool simple_wallet::welcome(const std::vector<std::string> &args)
 
 bool simple_wallet::version(const std::vector<std::string> &args)
 {
-  message_writer() << "Ombrecoin '" << OMBRECOIN_RELEASE_NAME << "' (v" << OMBRECOIN_VERSION_FULL << ")";
+  message_writer() << "Ombre '" << OMBRE_RELEASE_NAME << "' (v" << OMBRE_VERSION_FULL << ")";
   return true;
 }
 
@@ -2782,7 +2782,7 @@ simple_wallet::simple_wallet()
   m_cmd_binder.set_handler("donate",
                            boost::bind(&simple_wallet::donate, this, _1),
                            tr(USAGE_DONATE),
-                           tr("Donate <amount> to the development team (donate.ombrecoin.org)."));
+                           tr("Donate <amount> to the development team (donate.ombre.org)."));
   m_cmd_binder.set_handler("sign_transfer",
                            boost::bind(&simple_wallet::sign_transfer, this, _1),
                            tr(USAGE_SIGN_TRANSFER),
@@ -2856,7 +2856,7 @@ simple_wallet::simple_wallet()
                                   "  action: ask the password before many actions such as transfer, etc\n "
                                   "  decrypt: same as action, but keeps the spend key encrypted in memory when not needed\n "
                                    "unit <ombre|ombresan|ombrekun|ombreshi>\n "
-                                  "  Set the default ombrecoin (sub-)unit.\n "
+                                  "  Set the default ombre (sub-)unit.\n "
                                   "min-outputs-count [n]\n "
                                   "  Try to keep at least that many outputs of value at least min-outputs-value.\n "
                                   "min-outputs-value [n]\n "
@@ -2872,12 +2872,12 @@ simple_wallet::simple_wallet()
                                   "auto-low-priority <1|0>\n "
                                   "  Whether to automatically use the low priority fee level when it's safe to do so.\n "
                                   "segregate-pre-fork-outputs <1|0>\n "
-                                  "  Set this if you intend to spend outputs on both Ombrecoin AND a key reusing fork.\n "
+                                  "  Set this if you intend to spend outputs on both Ombre AND a key reusing fork.\n "
                                   "key-reuse-mitigation2 <1|0>\n "
-                                  "  Set this if you are not sure whether you will spend on a key reusing Ombrecoin fork later.\n"
+                                  "  Set this if you are not sure whether you will spend on a key reusing Ombre fork later.\n"
                                   "subaddress-lookahead <major>:<minor>\n "
                                   "  Set the lookahead sizes for the subaddress hash table.\n "
-                                  "  Set this if you are not sure whether you will spend on a key reusing Ombrecoin fork later.\n "
+                                  "  Set this if you are not sure whether you will spend on a key reusing Ombre fork later.\n "
                                   "segregation-height <n>\n "
                                   "  Set to the height of a key reusing fork you want to use, 0 to use default."));
   m_cmd_binder.set_handler("encrypted_seed",
@@ -3068,7 +3068,7 @@ simple_wallet::simple_wallet()
   m_cmd_binder.set_handler("mms signer",
                            boost::bind(&simple_wallet::mms, this, _1),
                            tr(USAGE_MMS_SIGNER),
-                           tr("Set or modify authorized signer info (single-word label, transport address, Ombrecoin address), or list all signers"));
+                           tr("Set or modify authorized signer info (single-word label, transport address, Ombre address), or list all signers"));
   m_cmd_binder.set_handler("mms list",
                            boost::bind(&simple_wallet::mms, this, _1),
                            tr(USAGE_MMS_LIST),
@@ -3181,7 +3181,7 @@ simple_wallet::simple_wallet()
   m_cmd_binder.set_handler("welcome",
                            boost::bind(&simple_wallet::welcome, this, _1),
                            tr(USAGE_WELCOME),
-                           tr("Prints basic info about Ombrecoin for first time users"));
+                           tr("Prints basic info about Ombre for first time users"));
   m_cmd_binder.set_handler("version",
                            boost::bind(&simple_wallet::version, this, _1),
                            tr(USAGE_VERSION),
@@ -4078,7 +4078,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
   check_background_mining(password);
 
   if (welcome)
-    message_writer(console_color_yellow, true) << tr("If you are new to Ombrecoin, type \"welcome\" for a brief overview.");
+    message_writer(console_color_yellow, true) << tr("If you are new to Ombre, type \"welcome\" for a brief overview.");
 
   if (m_long_payment_id_support)
   {
@@ -4668,7 +4668,7 @@ void simple_wallet::start_background_mining()
       return;
     }
   }
-  success_msg_writer() << tr("Background mining enabled. Thank you for supporting Ombrecoin network.");
+  success_msg_writer() << tr("Background mining enabled. Thank you for supporting Ombre network.");
 }
 //----------------------------------------------------------------------------------------------------
 void simple_wallet::stop_background_mining()
@@ -6803,23 +6803,23 @@ bool simple_wallet::donate(const std::vector<std::string> &args_)
   {
     // if not mainnet, convert donation address string to the relevant network type
     address_parse_info info;
-    if (!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, OMBRECOIN_DONATION_ADDR))
+    if (!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, OMBRE_DONATION_ADDR))
     {
-      fail_msg_writer() << tr("Failed to parse donation address: ") << OMBRECOIN_DONATION_ADDR;
+      fail_msg_writer() << tr("Failed to parse donation address: ") << OMBRE_DONATION_ADDR;
       return true;
     }
     address_str = cryptonote::get_account_address_as_str(m_wallet->nettype(), info.is_subaddress, info.address);
   }
   else
   {
-    address_str = OMBRECOIN_DONATION_ADDR;
+    address_str = OMBRE_DONATION_ADDR;
   }
   local_args.push_back(address_str);
   local_args.push_back(amount_str);
   if (!payment_id_str.empty())
     local_args.push_back(payment_id_str);
   if (m_wallet->nettype() == cryptonote::MAINNET)
-    message_writer() << (boost::format(tr("Donating %s %s to Ombrecoin Project (donate.ombrecoin.org or %s).")) % amount_str % cryptonote::get_unit(cryptonote::get_default_decimal_point()) % OMBRECOIN_DONATION_ADDR).str();
+    message_writer() << (boost::format(tr("Donating %s %s to Ombre Project (donate.ombre.org or %s).")) % amount_str % cryptonote::get_unit(cryptonote::get_default_decimal_point()) % OMBRE_DONATION_ADDR).str();
   else
     message_writer() << (boost::format(tr("Donating %s %s to %s.")) % amount_str % cryptonote::get_unit(cryptonote::get_default_decimal_point()) % address_str).str();
   transfer(local_args);
@@ -9392,7 +9392,7 @@ int main(int argc, char* argv[])
   std::tie(vm, should_terminate) = wallet_args::main(
    argc, argv,
    "ombre-wallet-cli [--wallet-file=<filename>|--generate-new-wallet=<filename>] [<COMMAND>]",
-    sw::tr("This is the command line ombrecoin wallet. It needs to connect to a ombrecoin\ndaemon to work correctly.\nWARNING: Do not reuse your Ombrecoin keys on an another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy."),
+    sw::tr("This is the command line ombre wallet. It needs to connect to a ombre\ndaemon to work correctly.\nWARNING: Do not reuse your Ombre keys on an another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy."),
     desc_params,
     positional_options,
     [](const std::string &s, bool emphasis){ tools::scoped_message_writer(emphasis ? epee::console_color_white : epee::console_color_default, true) << s; },
@@ -9575,7 +9575,7 @@ void simple_wallet::list_mms_messages(const std::vector<mms::message> &messages)
 void simple_wallet::list_signers(const std::vector<mms::authorized_signer> &signers)
 {
   message_writer() << boost::format("%2s %-20s %-s") % tr("#") % tr("Label") % tr("Transport Address");
-  message_writer() << boost::format("%2s %-20s %-s") % "" % tr("Auto-Config Token") % tr("Ombrecoin Address");
+  message_writer() << boost::format("%2s %-20s %-s") % "" % tr("Auto-Config Token") % tr("Ombre Address");
   for (size_t i = 0; i < signers.size(); ++i)
   {
     const mms::authorized_signer &signer = signers[i];
@@ -9781,7 +9781,7 @@ void simple_wallet::mms_signer(const std::vector<std::string> &args)
   }
   if ((args.size() < 2) || (args.size() > 4))
   {
-    fail_msg_writer() << tr("mms signer [<number> <label> [<transport_address> [<ombrecoin_address>]]]");
+    fail_msg_writer() << tr("mms signer [<number> <label> [<transport_address> [<ombre_address>]]]");
     return;
   }
 
@@ -9800,14 +9800,14 @@ void simple_wallet::mms_signer(const std::vector<std::string> &args)
     bool ok = cryptonote::get_account_address_from_str_or_url(info, m_wallet->nettype(), args[3], oa_prompter);
     if (!ok)
     {
-      fail_msg_writer() << tr("Invalid Ombrecoin address");
+      fail_msg_writer() << tr("Invalid Ombre address");
       return;
     }
     monero_address = info.address;
     const std::vector<mms::message> &messages = ms.get_all_messages();
     if ((messages.size() > 0) || state.multisig)
     {
-      fail_msg_writer() << tr("Wallet state does not allow changing Ombrecoin addresses anymore");
+      fail_msg_writer() << tr("Wallet state does not allow changing Ombre addresses anymore");
       return;
     }
   }

@@ -549,7 +549,7 @@ namespace crypto
      */
     bool get_is_old_style_seed(const epee::wipeable_string &seed)
     {
-      // Ombrecoin not support old style seed
+      // Ombre not support old style seed
       return false;
     }
 
