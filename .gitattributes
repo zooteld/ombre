@@ -1,0 +1,2 @@
+.git* export-ignore
+src/version.cpp.in export-subst
