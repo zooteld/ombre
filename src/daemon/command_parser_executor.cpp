@@ -296,12 +296,6 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string> &arg
 		return true;
 	}
 
-	if(args.front() == cryptonote::common_config::DEV_FUND_ADDRESS) 
-	{ 
-		tools::fail_msg_writer() << "Dev fund address is not mineable. If you would like to support the dev team please mine to " << cryptonote::common_config::RYO_DONATION_ADDR << std::endl;
-		return true; 
-	}
-
 	if(nettype != cryptonote::MAINNET)
 		std::cout << "Mining to a " << (nettype == cryptonote::TESTNET ? "testnet" : "stagenet") << "address, make sure this is intentional!" << std::endl;
 	uint64_t threads_count = 1;

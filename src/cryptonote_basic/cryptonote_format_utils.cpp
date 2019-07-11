@@ -112,10 +112,6 @@ namespace cryptonote
 void get_transaction_prefix_hash(const transaction_prefix &tx, crypto::hash &h)
 {
 	std::ostringstream s;
-
-	if(tx.version >= 3)
-		s << TX_FORK_ID_STR;
-
 	binary_archive<true> a(s);
 	::serialization::serialize(a, const_cast<transaction_prefix &>(tx));
 	crypto::cn_fast_hash(s.str().data(), s.str().size(), h);
@@ -807,13 +803,6 @@ bool get_transaction_hash(const transaction &t, crypto::hash &res)
 //---------------------------------------------------------------
 bool calculate_transaction_hash(const transaction &t, crypto::hash &res, size_t *blob_size)
 {
-	// v1 transactions hash the entire blob
-	if(t.version == 1)
-	{
-		size_t ignored_blob_size, &blob_size_ref = blob_size ? *blob_size : ignored_blob_size;
-		return get_object_hash(t, res, blob_size_ref);
-	}
-
 	// v2 transactions hash different parts together, than hash the set of those hashes
 	crypto::hash hashes[3];
 
@@ -948,19 +937,20 @@ bool get_block_longhash(network_type nettype, const block &b, cn_pow_hash_v2 &ct
 	blobdata bd = get_block_hashing_blob(b);
 	
 	uint8_t cn_heavy_v = get_fork_v(nettype, FORK_POW_CN_HEAVY);
-	uint8_t cn_gpu_v = get_fork_v(nettype, FORK_POW_CN_GPU);
+	//uint8_t cn_gpu_v = get_fork_v(nettype, FORK_POW_CN_GPU);
 
-	if(cn_gpu_v != hardfork_conf::FORK_ID_DISABLED && b_local.major_version >= cn_gpu_v)
+	/*if(cn_gpu_v != hardfork_conf::FORK_ID_DISABLED && b_local.major_version >= cn_gpu_v)
 	{
 		cn_pow_hash_v3 ctx_v3 = cn_pow_hash_v3::make_borrowed_v3(ctx);
 		ctx_v3.hash(bd.data(), bd.size(), res.data);
 	}
-	else if(cn_heavy_v != hardfork_conf::FORK_ID_DISABLED && b_local.major_version >= cn_heavy_v)
+	else*/ if(cn_heavy_v != hardfork_conf::FORK_ID_DISABLED && b_local.major_version >= cn_heavy_v)
 	{
 		ctx.hash(bd.data(), bd.size(), res.data);
 	}
 	else
 	{
+		std::cout << "v1 hash" << std::endl;
 		cn_pow_hash_v1 ctx_v1 = cn_pow_hash_v1::make_borrowed(ctx);
 		ctx_v1.hash(bd.data(), bd.size(), res.data);
 	}

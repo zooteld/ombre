@@ -82,28 +82,21 @@ size_t get_max_tx_size()
 	return common_config::TRANSACTION_SIZE_LIMIT;
 }
 //-----------------------------------------------------------------------------------------------
-template <network_type NETTYPE>
-bool get_dev_fund_amount(uint64_t height, uint64_t& amount)
+uint64_t get_dev_fund_amount_v0(uint64_t tx_total, uint64_t already_generated_coins)
 {
-	amount = 0;
-	if(height < config<NETTYPE>::DEV_FUND_START)
-		return false; // No dev fund output needed because the dev fund didn't start yet
-
-	height -= config<NETTYPE>::DEV_FUND_START;
-
-	if(height / config<NETTYPE>::DEV_FUND_PERIOD >= config<NETTYPE>::DEV_FUND_LENGTH)
-		return false; // No dev fund output needed because the dev fund has ended
-
-	if(height % config<NETTYPE>::DEV_FUND_PERIOD != 0)
-		return false;  // No dev fund output needed because it isn't on the period
-
-	amount = config<NETTYPE>::DEV_FUND_AMOUNT / config<NETTYPE>::DEV_FUND_LENGTH;
-	return true;
+	float mult;
+	mult =  CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER * (1 - std::sqrt((float)already_generated_coins / (float)MONEY_SUPPLY));
+	mult = std::round(mult * 100000) / 100000; // 32bit float rounded to 5 decimal places for consistency (this ensures functional determinism)
+	
+	return tx_total * mult;
 }
 
-template bool get_dev_fund_amount<MAINNET>(uint64_t height, uint64_t& amount);
-template bool get_dev_fund_amount<TESTNET>(uint64_t height, uint64_t& amount);
-template bool get_dev_fund_amount<STAGENET>(uint64_t height, uint64_t& amount);
+uint64_t get_dev_fund_amount_v1(uint64_t tx_total, uint64_t already_generated_coins)
+{
+	float mult;
+	mult = CRYPTONOTE_PROJECT_BLOCK_REWARD;
+	return tx_total * mult;
+}
 
 //-----------------------------------------------------------------------------------------------
 bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height)
@@ -282,7 +275,6 @@ bool get_account_address_from_str(address_parse_info &info, std::string const &s
 		info.has_payment_id = true;
 		break;
 	case config<NETTYPE>::RYO_LONG_SUBADDRESS_BASE58_PREFIX:
-	case config<NETTYPE>::LEGACY_LONG_SUBADDRESS_BASE58_PREFIX:
 		info.is_subaddress = true;
 		break;
 	case config<NETTYPE>::RYO_KURZ_ADDRESS_BASE58_PREFIX:
