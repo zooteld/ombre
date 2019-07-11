@@ -985,10 +985,6 @@ class wallet2
 	{
 		using namespace cryptonote;
 		uint64_t fee = ((bytes + 1023) / 1024) * common_config::FEE_PER_KB;
-	
-		if(use_fork_rules(FORK_FEE_V2, 10))
-			fee += ring_size * common_config::FEE_PER_RING_MEMBER;
-
 		return fee * fee_multiplier;
 	}
 

@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 		cerr << "Wrong arguments" << endl;
 		return 1;
 	}
-	vector<uint64_t> timestamps, cumulative_difficulties;
+	/*vector<uint64_t> timestamps, cumulative_difficulties;
 	fstream data(argv[1], fstream::in);
 	data.exceptions(fstream::badbit);
 	data.clear(data.rdstate());
@@ -86,6 +86,6 @@ int main(int argc, char *argv[])
 	if(!data.eof())
 	{
 		data.clear(fstream::badbit);
-	}
+	}*/
 	return 0;
 }

@@ -240,12 +240,6 @@ bool miner::init(const boost::program_options::variables_map &vm, network_type n
 			return false;
 		}
 
-		if(command_line::get_arg(vm, arg_start_mining) == common_config::DEV_FUND_ADDRESS) 
-		{ 
-			LOG_ERROR("Dev fund address is not mineable. If you would like to support the dev team please mine to " << common_config::RYO_DONATION_ADDR);
-			return false; 
-		}
-
 		m_mine_address = info.address;
 		m_threads_total = 1;
 		m_do_mining = true;

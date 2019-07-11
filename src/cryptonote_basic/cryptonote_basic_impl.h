@@ -79,29 +79,8 @@ struct address_parse_info
 size_t get_min_block_size();
 size_t get_max_tx_size();
 
-template <network_type NETTYPE>
-bool get_dev_fund_amount(uint64_t height, uint64_t& amount);
-
-extern template bool get_dev_fund_amount<MAINNET>(uint64_t height, uint64_t& amount);
-extern template bool get_dev_fund_amount<TESTNET>(uint64_t height, uint64_t& amount);
-extern template bool get_dev_fund_amount<STAGENET>(uint64_t height, uint64_t& amount);
-
-inline bool get_dev_fund_amount(network_type nettype, uint64_t height, uint64_t& amount)
-{
-	switch(nettype)
-	{
-	case MAINNET:
-		return get_dev_fund_amount<MAINNET>(height, amount);
-	case TESTNET:
-		return get_dev_fund_amount<TESTNET>(height, amount);
-	case STAGENET:
-		return get_dev_fund_amount<STAGENET>(height, amount);
-	default:
-		assert(false);
-		amount = 0;
-		return false;
-	}
-}
+uint64_t get_dev_fund_amount_v0(uint64_t tx_total, uint64_t already_generated_coins);
+uint64_t get_dev_fund_amount_v1(uint64_t tx_total, uint64_t already_generated_coins);
 
 bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height);
 uint8_t get_account_address_checksum(const public_address_outer_blob &bl);

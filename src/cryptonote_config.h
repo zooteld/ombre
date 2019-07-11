@@ -35,10 +35,15 @@
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE 10
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY ((uint64_t)88888888000000000)
-#define EMISSION_SPEED_FACTOR 19
-#define FINAL_SUBSIDY ((uint64_t)4000000000)			  // 4 * pow(10, 9)
-#define GENESIS_BLOCK_REWARD ((uint64_t)8800000000000000) // ~10% dev premine, now  mostly burned
+#define MONEY_SUPPLY                                    ((uint64_t)1000000000000000000) //   1 billion.
+#define MONEY_SUPPLY_V4                                 ((uint64_t)500000000000000000)  // 0.5 billion.
+#define EMISSION_SPEED_FACTOR                           21
+#define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
+#define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
+
+#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.01 // Percentage of the total block reward.
+// Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
+#define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define EMISSION_SPEED_FACTOR_PER_MINUTE (20)
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW 60
@@ -83,9 +88,9 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME "ryo"
+#define CRYPTONOTE_NAME "ombre2"
 #define CRYPTONOTE_POOLDATA_FILENAME "poolstate.bin"
-#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME "data.mdb"
+#define CRYPTONOTE_BLOCKCHAINDATA_FILENAME "blockchain.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
 #define P2P_NET_DATA_FILENAME "p2pstate.bin"
 #define MINER_CONFIG_FILE_NAME "miner_conf.json"
@@ -99,12 +104,10 @@
 #define DEFAULT_TXPOOL_MAX_SIZE 648000000ull // 3 days at 300000, in bytes
 
 // coin emission change interval/speed configs
-#define COIN_EMISSION_MONTH_INTERVAL 6																										// months to change emission speed
-#define COIN_EMISSION_HEIGHT_INTERVAL ((uint64_t)(COIN_EMISSION_MONTH_INTERVAL * (30.4375 * 24 * 3600) / common_config::DIFFICULTY_TARGET)) // calculated to # of heights to change emission speed
-#define PEAK_COIN_EMISSION_YEAR 4
-#define PEAK_COIN_EMISSION_HEIGHT ((uint64_t)(((12 * 30.4375 * 24 * 3600) / common_config::DIFFICULTY_TARGET) * PEAK_COIN_EMISSION_YEAR)) // = (# of heights emmitted per year) * PEAK_COIN_EMISSION_YEAR
-
-#define TX_FORK_ID_STR "ryo-currency"
+#define COIN_EMISSION_MONTH_INTERVAL                    6  // months to change emission speed
+#define COIN_EMISSION_HEIGHT_INTERVAL                   ((uint64_t) (COIN_EMISSION_MONTH_INTERVAL * (30.4375 * 24 * 3600) / cryptonote::common_config::DIFFICULTY_TARGET)) // calculated to # of heights to change emission speed
+#define PEAK_COIN_EMISSION_YEAR                         4
+#define PEAK_COIN_EMISSION_HEIGHT                       ((uint64_t) (((12 * 30.4375 * 24 * 3600)/cryptonote::common_config::DIFFICULTY_TARGET) * PEAK_COIN_EMISSION_YEAR))// = (# of heights emmitted per year) * PEAK_COIN_EMISSION_YEAR
 
 template <typename T, std::size_t N>
 constexpr std::size_t countof(T const (&)[N]) noexcept
@@ -128,18 +131,15 @@ enum hard_fork_feature
 {
 	FORK_POW_CN_HEAVY,
 	FORK_POW_CN_GPU,
-	FORK_V2_DIFFICULTY,
-	FORK_V3_DIFFICULTY,
-	FORK_V4_DIFFICULTY,
+	FORK_DEV_FUND_V2,
+	FORK_DEV_FUND_V3,
 	FORK_FIXED_FEE,
-	FORK_NEED_V3_TXES,
+	FORK_DIFF_V2,
 	FORK_RINGSIZE_INC,
 	FORK_RINGSIZE_INC_REQ,
 	FORK_BULLETPROOFS,
 	FORK_BULLETPROOFS_REQ,
 	FORK_STRICT_TX_SEMANTICS,
-	FORK_DEV_FUND,
-	FORK_FEE_V2,
 	FORK_UNIFORM_IDS,
 	FORK_UNIFORM_IDS_REQ
 };
@@ -155,22 +155,19 @@ struct hardfork_conf
 };
 
 static constexpr hardfork_conf FORK_CONFIG[] = {
-	{FORK_POW_CN_HEAVY, 3, 3, 1},
-	{FORK_POW_CN_GPU, 6, 9, 1},
-	{FORK_V2_DIFFICULTY, 2, 2, 1},
-	{FORK_V3_DIFFICULTY, 4, 4, 1},
-	{FORK_V4_DIFFICULTY, 6, 9, 1},
-	{FORK_FIXED_FEE, 4, 4, 1},
-	{FORK_NEED_V3_TXES, 4, 4, 1},
-	{FORK_STRICT_TX_SEMANTICS, 5, 5, 1},
-	{FORK_DEV_FUND, 5, 5, 1},
-	{FORK_FEE_V2, 5, 6, 1},
-	{FORK_RINGSIZE_INC, 6, 8, 1},
-	{FORK_RINGSIZE_INC_REQ, 7, 9, 1},
-	{FORK_BULLETPROOFS, 6, 8, 1},
-	{FORK_BULLETPROOFS_REQ, 7, 9, 1},
-	{FORK_UNIFORM_IDS, 6, 7, 1},
-	{FORK_UNIFORM_IDS_REQ, 7, 8, 1}
+	{FORK_DIFF_V2, 2, 2, 1},
+	{FORK_POW_CN_HEAVY,3, 3, 1},
+	{FORK_POW_CN_GPU, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_DEV_FUND_V2, 4, 4, 1},
+	{FORK_DEV_FUND_V3, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_FIXED_FEE, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_STRICT_TX_SEMANTICS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_RINGSIZE_INC, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_RINGSIZE_INC_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_BULLETPROOFS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_BULLETPROOFS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_UNIFORM_IDS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_UNIFORM_IDS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1}
 };
 
 // COIN - number of smallest units in one coin
@@ -178,15 +175,13 @@ inline constexpr uint64_t MK_COINS(uint64_t coins) { return coins * 1000000000ul
 
 struct common_config
 {
-	static constexpr size_t MIN_MIXIN_V1 = 12; // default & minimum mixin allowed
-	static constexpr size_t MIN_MIXIN_V2 = 24;
+	static constexpr size_t MIN_MIXIN_V1 = 10; // default & minimum mixin allowed
+	static constexpr size_t MIN_MIXIN_V2 = 10;
 	static constexpr size_t MAX_MIXIN = 240;
 
 	static constexpr uint64_t POISSON_CHECK_TRIGGER = 10;  // Reorg size that triggers poisson timestamp check
 	static constexpr uint64_t POISSON_CHECK_DEPTH = 60;   // Main-chain depth of the poisson check. The attacker will have to tamper 50% of those blocks
 	static constexpr double POISSON_LOG_P_REJECT = -75.0; // Reject reorg if the probablity that the timestamps are genuine is below e^x, -75 = 10^-33
-
-	static constexpr uint64_t DIFFICULTY_TARGET = 240; // 4 minutes
 
 	/////////////// V1 difficulty constants
 	static constexpr uint64_t DIFFICULTY_WINDOW_V1 = 720; // blocks
@@ -194,25 +189,17 @@ struct common_config
 	static constexpr uint64_t DIFFICULTY_CUT_V1 = 60;	 // timestamps to cut after sorting
 	static constexpr uint64_t DIFFICULTY_BLOCKS_COUNT_V1 = DIFFICULTY_WINDOW_V1 + DIFFICULTY_LAG_V1;
 	static constexpr uint64_t BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V1 = 60;
+	static constexpr uint64_t DIFFICULTY_TARGET = 60;
 
 	/////////////// V2 difficulty constants
-	static constexpr uint64_t DIFFICULTY_WINDOW_V2 = 17;
-	static constexpr uint64_t DIFFICULTY_CUT_V2 = 6;
-	static constexpr uint64_t DIFFICULTY_BLOCKS_COUNT_V2 = DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2 * 2;
-	static constexpr uint64_t BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2 = 12;
-	static constexpr uint64_t BLOCK_FUTURE_TIME_LIMIT_V2 = 60 * 24;
+	static constexpr uint64_t DIFFICULTY_WINDOW_V2 = 93;
+	static constexpr uint64_t DIFFICULTY_CUT_V2 = 60;
+	static constexpr uint64_t DIFFICULTY_BLOCKS_COUNT_V2 = DIFFICULTY_WINDOW_V2;
+	static constexpr uint64_t BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2 = 60;
 
-	/////////////// V3 difficulty constants
-	static constexpr uint64_t DIFFICULTY_WINDOW_V3 = 60;
-	static constexpr uint64_t DIFFICULTY_BLOCKS_COUNT_V3 = DIFFICULTY_WINDOW_V3 + 1;
-	static constexpr uint64_t BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3 = 11;
-	static constexpr uint64_t BLOCK_FUTURE_TIME_LIMIT_V3 = DIFFICULTY_TARGET * 3;
+	static constexpr uint64_t BLOCK_FUTURE_TIME_LIMIT = 60 * 24;
 
-	/////////////// V4 difficulty constants
-	static constexpr uint64_t DIFFICULTY_WINDOW_V4 = 45;
-	static constexpr uint64_t DIFFICULTY_BLOCKS_COUNT_V4 = DIFFICULTY_WINDOW_V4 + 1;
-
-	static constexpr uint64_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE = 240 * 1024; // 240 kB
+	static constexpr uint64_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE = 300 * 1024; // 240 kB
 	static constexpr uint64_t BLOCK_SIZE_GROWTH_FAVORED_ZONE = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 4;
 	static constexpr uint64_t TRANSACTION_SIZE_LIMIT = 300 * 1024;			// 300 kB
 	static constexpr uint64_t BLOCK_SIZE_LIMIT_ABSOLUTE = 16 * 1024 * 1024; // 16 MB
@@ -226,14 +213,11 @@ struct common_config
 	static constexpr uint64_t BULLETPROOF_MAX_OUTPUTS = 16;
 
 	///////////////// Dev fund constants
-	// 2 out of 3 multisig address held by fireice, mosu, and psychocrypt
-	static constexpr const char* DEV_FUND_ADDRESS = "RYoLshTYzNEaizPi9jWtRtNPtan5fAqc3TVbyzZDWghLY99eXivKD1XQMseVyJQ1kD5FXDvk4nHqpUXBTMCm5aqmQU8tHaN51Wc";
-	// 34d6b7155d99da44c3a73424c60ecb0da53d228ed8da026df00ed275ea54e803
-	static constexpr const char* DEV_FUND_VIEWKEY = "\x34\xd6\xb7\x15\x5d\x99\xda\x44\xc3\xa7\x34\x24\xc6\x0e\xcb\x0d\xa5\x3d\x22\x8e\xd8\xda\x02\x6d\xf0\x0e\xd2\x75\xea\x54\xe8\x03";
-	// Exact number of coins burned in the premine burn, in atomic units
-	static constexpr uint64_t PREMINE_BURN_AMOUNT = 8700051446427001;
-	// Ryo donation address
-	static constexpr const char* RYO_DONATION_ADDR = "RYoLshssqU9WvHMwAmt4j6dtpgRERDqwzSiHF4V9nEb5YWmQ5pLSkJC9QudNseKrxBacKtQuLWhpSQ6GLXgyDWjKAGjNXH72VDJ";
+	static constexpr const char* DEV_FUND_ADDRESS_V1 = "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt";
+	static constexpr const char* DEV_FUND_VIEWKEY_V1 = "\xbf\xfa\x80\x3b\xb4\x06\x1d\x93\xa8\x3a\x36\x13\xff\x47\x8c\x5b\x5e\x5c\xb0\xb0\x33\x7a\x73\x5e\x1a\x13\x04\xca\x9f\xab\x18\x07";
+	static constexpr const char* DEV_FUND_ADDRESS_V2 = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
+	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\x1b\xc6\x6c\x1b\x5e\x0e\x7f\x32\x7d\x2f\x03\xac\xde\x9e\x73\xf6\xe6\xf9\x66\xb7\x6b\x61\xc9\x54\xf3\x9a\xed\x2f\xee\x8a\xe9\x0e";
+	static constexpr const char* RYO_DONATION_ADDR = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
 };
 
 template <network_type type>
@@ -244,25 +228,22 @@ struct config : public common_config
 template <>
 struct config<MAINNET>
 {
-	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0x2bb39a;			   // Sumo
-	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x29339a; //Sumi
-	static constexpr uint64_t LEGACY_LONG_SUBADDRESS_BASE58_PREFIX = 0x8319a;		   // Subo
+	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xe1f54;            // cash
+	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0xcd18fd299;			// ShaDoW
+	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x11cfd299;			// ShaDoe
+	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x8a20fd299;			// ShaDowS
+	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xf11afd299; // ShaDoeS
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299;			// ShaDos
 
-	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x3fe192;			// RYo
-	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x2c6192;			// RYoK
-	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x2ce192;			// RYoL
-	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x2de192; // RYoN
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x2fe192;			// RYoS
+	static constexpr uint16_t P2P_DEFAULT_PORT = 19743;
+	static constexpr uint16_t RPC_DEFAULT_PORT = 19744;
+	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 19745;
 
-	static constexpr uint16_t P2P_DEFAULT_PORT = 12210;
-	static constexpr uint16_t RPC_DEFAULT_PORT = 12211;
-	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 12212;
-
-	//Random UUID generated from radioactive cs-137 ( http://www.fourmilab.ch/hotbits/how3.html ) it gives me a nice warm feeling =) 
-	static constexpr boost::uuids::uuid NETWORK_ID = { { 0xcd, 0xac, 0x50, 0x2e, 0xb3, 0x74, 0x8f, 0xf2, 0x0f, 0xb7, 0x72, 0x18, 0x0f, 0x73, 0x24, 0x13 } }; 
+	static constexpr boost::uuids::uuid NETWORK_ID = { { 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x8d, 0x41, 0x42, 0x43, 0x41  } }; 
 
 	static constexpr const char *GENESIS_TX =
-		"023c01ff0001808098d0daf1d00f028be379aa57a70fa19c0ee5765fdc3d2aae0b1034158f4963e157d9042c24fbec21013402fc7071230f1f86f33099119105a7b1f64a898526060ab871e685059c223100";
+		"013c01ff00018094ebdc0302bc7ae26c871f8f18415e0fbd4776f9d4dbd5297c126bd99e26cf218ea0d6ec4a2101450a7665ca17a5ef3c691898068994569bb033012598c43068161b1194592327";
 	static constexpr uint32_t GENESIS_NONCE = 10000;
 
 	////////////////////// Dev fund constants
@@ -278,22 +259,20 @@ struct config<TESTNET>
 {
 	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0x37751a;			   // Suto
 	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x34f51a; // Suti
-	static constexpr uint64_t LEGACY_LONG_SUBADDRESS_BASE58_PREFIX = 0x1d351a;		   // Susu
+	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x3fa0;			  // Tr
+	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x7420;			  // Tu
+	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x7d1f;			  // Tk
+	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x9f; // Tb
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x1a1;		  // Tw
 
-	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x2ae192;			// RYoG
-	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x2b6192;			// RYoH
-	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x306192;			// RYoT
-	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x29e192; // RYoE
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x30e192;			// RYoU
-
-	static constexpr uint16_t P2P_DEFAULT_PORT = 13310; 
-	static constexpr uint16_t RPC_DEFAULT_PORT = 13311; 
-	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 13312; 
+	static constexpr uint16_t P2P_DEFAULT_PORT = 29743; 
+	static constexpr uint16_t RPC_DEFAULT_PORT = 29744; 
+	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 29745; 
  
-	static constexpr boost::uuids::uuid NETWORK_ID = { { 0x6f, 0x81, 0x7d, 0x7e, 0xa2, 0x0b, 0x71, 0x77, 0x22, 0xc8, 0xd2, 0xff, 0x02, 0x5d, 0xe9, 0x92 } }; 
+	static constexpr boost::uuids::uuid NETWORK_ID = { {  0x12, 0x04, 0x06, 0xdf, 0xce, 0xfc, 0x7c, 0x27, 0x4a, 0x24, 0xd4, 0xf3, 0x41, 0x44, 0x44, 0x43 } }; 
 
 	static constexpr const char *GENESIS_TX =
-		"023c01ff0001808098d0daf1d00f028be379aa57a70fa19c0ee5765fdc3d2aae0b1034158f4963e157d9042c24fbec21013402fc7071230f1f86f33099119105a7b1f64a898526060ab871e685059c223100";
+		"013c01ff0001bbbad6adf00d029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101b20e782a04028cf9326ccd66e0d683f50dd1b261f4e81fac4bfa0c73d0601102";
 	static constexpr uint32_t GENESIS_NONCE = 10001;
 	
 	////////////////////// Dev fund constants

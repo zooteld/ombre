@@ -974,8 +974,10 @@ class Blockchain
 	std::vector<crypto::hash> m_blocks_hash_check;
 	std::vector<crypto::hash> m_blocks_txs_check;
 
-	crypto::secret_key m_dev_view_key;
-	crypto::public_key m_dev_spend_key;
+	crypto::secret_key m_dev_view_key_v1;
+	crypto::public_key m_dev_spend_key_v1;
+	crypto::secret_key m_dev_view_key_v2;
+	crypto::public_key m_dev_spend_key_v2;
 
 	blockchain_db_sync_mode m_db_sync_mode;
 	bool m_fast_sync;
