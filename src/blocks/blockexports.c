@@ -1,3 +1,4 @@
+// Copyright (c) 2018, Ombre Cryptocurrency Project
 #include <stddef.h>
 
 #if defined(__APPLE__)
