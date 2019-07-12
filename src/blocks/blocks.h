@@ -1,3 +1,4 @@
+// Copyright (c) 2018, Ombre Cryptocurrency Project
 #ifndef SRC_BLOCKS_BLOCKS_H_
 #define SRC_BLOCKS_BLOCKS_H_
 
