@@ -1,5 +1,5 @@
 # Ombre
-Copyright (c) 2019, The Ombre Project
+Copyright (c) 2018, The Ombre Cryptocurrency Project
 
 Copyright (c) 2018, Ryo Currency Project
 
@@ -8,6 +8,7 @@ Copyright (c) 2017, Sumokoin.org
 Copyright (c) 2014-2017, The Monero Project
 
 Copyright (c) 2012-2013, The Cryptonote developers
+
 ## Development Resources
 
 - Web: [www.ombre.network](http://www.ombre.network)
@@ -26,17 +27,13 @@ Some main differences compared to other cryptonote coins are:
 
 ## Development funding
 
-We do not have a premine. Instead we have a project development reward that causes coins to unlock with every block that is found. The algorithm (see below) will start with unlocking 6% of the block reward but gradually reduces to 0% in the next 10 years.  In total a maximum of 2% of the total coin supply will be unlocked for development.
-
-```
-f(x) = 0.06 * (1 - sqrt(x)) where x = current_supply / max_supply S.T. current_supply <= max_supply
-```
+We do not have a premine. Instead we have a project development reward that causes coins to unlock 0.01% with every block that is found. 
 
 The development fee will be used to pay for development, exchanges and marketing.
 
 ## Coin Supply & Emission
 
-- **Total supply**: **1,000,000,000** coins in first 20 years which is followed by a tail emission each year for inflation.
+- **Total supply**: **500,000,000** coins in first 20 years which is followed by a tail emission each year for inflation.
 - **Coin symbol**: **OMB**
 - **Coin Units**:
   + 1 Nano-Ombre &nbsp;= 0.000000001 **OMB** (10<sup>-9</sup> - _the smallest coin unit_)
@@ -48,23 +45,23 @@ accelerated in the next few years before declined and depleted). This great emis
 
 ## Roadmap 2019
 
-### Q2: Android wallet
+### Q3: Android wallet
 We will release an Android wallet which will use remote wallet nodes to scan the blockchain for transactions.
 
 One problem with existing Android wallets for cryptonote coins is that they use close to 1GB of data (Sumokoin) to scan the blockchain. we will solve this by allowing the Android wallet to send the wallet's viewkey to the remote wallet node. With this approach the transaction scanning can be done server side and this will significantly increase the performance of the wallet.
 
 All wallet connections will be SSL encrypted and official wallet nodes will be provided.
 
-### Q2. Blockchain protocol optimisations
+### Q3. Blockchain protocol optimisations
 The blockchain network communication is not optimized and, for example, doesn't even use compression on large data exchanges. We will add compression and will look into modernizing the RPC protocols.
 
-### Q3. Security audit
+### Q4. Security audit
 We plan on doing a full security audit of the codebase and will setup fuzzing for all exposed network logic. Additionally security enhancements are planned for the ombred daemon, the GUI wallet and the communication channel between both.
 
-### Q3. Web wallet (under consideration)
+### Q3. Web wallet
 For this roadmap item we would like to have community feedback first: we think a web wallet would be very convenient for our users but we'll be on the lookout for feedback before starting the implementation.
 
-### Q3. Global pool balancer ((under consideration)
+### Q4. Global pool balancer ((under consideration)
 We will implement a lightweight and yet protocol aware loadbalancer to spread the mining load on our network across pools evenly. We will create an incentive for pool owners and miners to join the loadbalancer. A healthy spread of the mining across multiple pools is highly beneficial for the stability of the coin.
 
 
