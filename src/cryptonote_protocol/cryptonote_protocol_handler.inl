@@ -2,14 +2,13 @@
 /// @author rfree (current maintainer/user in monero.cc project - most of code is from CryptoNote)
 /// @brief This is the original cryptonote protocol network-events handler, modified by us
 
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
 // Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -1533,7 +1532,61 @@ bool t_cryptonote_protocol_handler<t_core>::on_connection_synchronized()
 	if(m_synchronized.compare_exchange_strong(val_expected, true))
 	{
 		MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
-						   << "You are now synchronized with the network. You may now start ombre-wallet-cli." << ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNo``oNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMy.    `sMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMd-        -dMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN+            +NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMh.              .hMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN+                  +NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMd-         ::         -dMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMy`        `sNMy`        `yMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMo`        :dMMMMm:         oMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN/         +NMMMMMMNo         /NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN:        `yMMMMMMMMMMy`        :NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN:        .hMMMMMMMMMMMMd.        :NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN:        .dMMMMMMMMMMMMMMm.        :NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM/        .mMMMMMMMMMMMMMMMMm.        /NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMo        .mMMMMMMMMMMMMMMMMMMm.        +MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMy        `dMMMMMMMMMMMMMMMMMMMMd`        sMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMMm`        hMMMMMMMMMMMMMMMMMMMMMMh`       `dMMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMM-        oMMMMMMMMMMMMMMMMMMMMMMMMs        -MMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMMs        :MMMMMMMMMMMMMMMMMMMMMMMMMM:        yMMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMMm`       `mMMMMMMMMMMMMMMMMMMMMMMMMMMm`       -MMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMM/        sMMMMMMMMMMMMMMMMMMMMMMMMMMMM+        mMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMMm        .MMMMMMMMMMMMMMMMMMMMMMMMMMMMMs        sMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMM+        yMMMMMMMMMMMMMMMMMMMMMMMMMMMMM+        +MMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMN`        NMMMMMMMMMMMMMMMMMMMMMMMMMMMMN.        +MMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMMs         `oNMMMMMMMMMMMMMMMMMMMMMMMMMM/         oMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMMMMy.           `sNMMMMMMMMMMMMMMMMMMMMMMN:          hMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMMMNo`               `sNMMMMMMMMMMMMMMMMMMNs`          `MMMMMMMMMMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMMMm+`                   `+dMMMMMMMMMMMMMMd+`            oMMMMMMy+mMMMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMMMm+`            --          `:oyOMBRE-1.5`              -NMMMMMo  `+mMMMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMMNo`             `m`                ``                   `mMMMMm:     `+NMMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMMMs.               sN                                     `dMMMMy`        .sMMMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMMMd-                .Mm                                    -mMMMd:            -hMMMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMMN+`                 yMm                                   +NMMd/`              `+NMMMMMMMMM"<< ENDL
+						   <<"MMMMMMMMh-                  `NMN                                 :dMNh:`                  .hMMMMMMMM"<< ENDL
+						   <<"MMMMMMNo`                   +MMM.                              -yNms-                      `oNMMMMMM"<< ENDL
+						   <<"MMMMMm:                     yMMM/                           `:hdy:`                          :mMMMMM"<< ENDL
+						   <<"MMMMh.                      hMMMh                         -/so-`                              .hMMMM"<< ENDL
+						   <<"MMMy`                       dMMMM-                      .--.                                   `sMMM"<< ENDL
+						   <<"MMs                         hMMMMd`                                                              oMM"<< ENDL
+						   <<"Mo                          oMMMMMs                                                               +M"<< ENDL
+						   <<"o                           .MMMMMM+                                                               +"<< ENDL
+						   <<"                             yMMMMMMo`                                                              "<< ENDL
+						   <<"                             `NMMMMMMh.                                                             "<< ENDL
+						   <<"                              :NMMMMMMm+`                                                           "<< ENDL
+						   <<"                               /NMMMMMMMd:`                                                         "<< ENDL
+						   <<"                                :NMMMMMMMMh/`                                                       "<< ENDL
+						   <<"                                 -dMMMMMMMMMms-`                                                    "<< ENDL
+						   <<"                                  `oNMMMMMMMMMMms:`                                                 "<< ENDL
+						   <<"                                    .yMMMMMMMMMMMMMds+-`                                            "<< ENDL
+						   <<"                                     .+NMMMMMMMMMMMMMMMMmhyo/-.                                     "<< ENDL
+						   <<"RichardMiner``        ``..-://+oyhdmMMMMMMMMMMMMMMMMMMMMMMMMMMMMmdhyso+/:-..```       ``..--:/+o2019"<< ENDL
+						   <<""<< ENDL
+						   <<"A Special Thanks To FireIce_UK and The Ryo Crew!"<< ENDL
+						   <<""<< ENDL
+						   << "You are now synchronized with the network. You may now start Ombre-wallet-cli." << ENDL
 						   << ENDL
 						   << "Use the \"help\" command to see the list of available commands." << ENDL
 						   << "**********************************************************************");

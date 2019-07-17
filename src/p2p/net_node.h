@@ -1,11 +1,10 @@
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
 // Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -130,16 +129,12 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
 
   private:
 	const std::vector<std::string> m_seed_nodes_list =
-		{"seed1.ombre.ir",
-		 "seed2.ombre.ir",
-		 "seed3.ombre.ir",
-		 "seed4.ombre.ir",
-		 "seed1.ombre.network",
-		 "seed2.ombre.network",
-		 "seed3.ombre.network",
-		 "seed4.ombre.network",
-		 "testnet-seed.ombre.ir",
-		 "testnet-seed.ombre.newtork"};
+		{  "178.128.181.80"
+	 , "185.181.61.14"
+	 , "5.56.132.162"
+	 , "185.113.115.13"
+     , "173.212.213.63"
+    };
 
 	bool islimitup = false;
 	bool islimitdown = false;

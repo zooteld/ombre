@@ -1,11 +1,10 @@
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
 // Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -1268,7 +1267,7 @@ bool core::on_idle()
 	{
 		std::string main_message;
 		if(m_offline)
-			main_message = "The daemon is running offline and will not attempt to sync to the Ombre network.";
+			main_message = "The daemon is running offline and will not attempt to sync to the ombre network.";
 		else
 			main_message = "The daemon will start synchronizing with the network. This may take a long time to complete.";
 		MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
@@ -1333,7 +1332,7 @@ uint8_t core::get_hard_fork_version(uint64_t height) const
 bool core::check_updates()
 {
 #if 0
-    static const char software[] = "ryo";
+    static const char software[] = "ombre";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli"; // because it can never be simple

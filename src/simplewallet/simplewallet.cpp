@@ -1,11 +1,10 @@
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
 // Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -21,7 +20,7 @@
 
 /*!
  * \file simplewallet.cpp
- *
+ * 
  * \brief Source file that defines simple_wallet class.
  */
 #include "simplewallet.h"
@@ -74,6 +73,9 @@ using boost::lexical_cast;
 namespace po = boost::program_options;
 typedef cryptonote::simple_wallet sw;
 
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
+
 #define EXTENDED_LOGS_FILE "wallet_details.log"
 
 #define OUTPUT_EXPORT_FILE_MAGIC_LEGACY "Sumokoin output export\002"
@@ -119,7 +121,7 @@ const command_line::arg_descriptor<bool> arg_restore_multisig_wallet = {"restore
 const command_line::arg_descriptor<bool> arg_trusted_daemon = {"trusted-daemon", sw::tr("Enable commands which rely on a trusted daemon"), false};
 const command_line::arg_descriptor<bool> arg_allow_mismatched_daemon_version = {"allow-mismatched-daemon-version", sw::tr("Allow communicating with a daemon that uses a different RPC version"), false};
 const command_line::arg_descriptor<uint64_t> arg_restore_height = {"restore-height", sw::tr("Restore from specific blockchain height"), 0};
-const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to the ryo network"), false};
+const command_line::arg_descriptor<bool> arg_do_not_relay = {"do-not-relay", sw::tr("The newly created transaction will not be relayed to the ombre network"), false};
 const command_line::arg_descriptor<bool> arg_create_address_file = {"create-address-file", sw::tr("Create an address file for new wallets"), false};
 const command_line::arg_descriptor<std::string> arg_subaddress_lookahead = {"subaddress-lookahead", tools::wallet2::tr("Set subaddress lookahead sizes to <major>:<minor>"), ""};
 const command_line::arg_descriptor<bool> arg_use_english_language_names = {"use-english-language-names", sw::tr("Display English language names"), false};
@@ -149,7 +151,7 @@ std::string input_line(const std::string &prompt)
 
 	SetConsoleMode(hConIn, oldMode);
 	CloseHandle(hConIn);
-
+ 
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
 	std::string buf(size_needed, '\0');
 	WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &buf[0], size_needed, NULL, NULL);
@@ -720,7 +722,7 @@ bool simple_wallet::print_fee_info(const std::vector<std::string> &args /* = std
 
 	using namespace cryptonote;
 	constexpr uint64_t typical_size_kb = 15;
-	message_writer() << (boost::format(tr("Current fee is %s %s per kB and %s %s per ring member.")) %
+	message_writer() << (boost::format(tr("Current fee is %s %s per kB and %s %s per ring member.")) % 
 		print_money(common_config::FEE_PER_KB) % get_unit(get_default_decimal_point()) %
 		print_money(common_config::FEE_PER_RING_MEMBER) % get_unit(get_default_decimal_point()));
 
@@ -1575,7 +1577,7 @@ bool simple_wallet::save_known_rings(const std::vector<std::string> &args)
 
 bool simple_wallet::version(const std::vector<std::string> &args)
 {
-	message_writer() << "Ombre '" << RYO_RELEASE_NAME << "' (" << RYO_VERSION_FULL << ")";
+	message_writer() << "ombre '" << RYO_RELEASE_NAME << "' (" << RYO_VERSION_FULL << ")";
 	return true;
 }
 
@@ -1779,13 +1781,13 @@ bool simple_wallet::set_unit(const std::vector<std::string> &args /* = std::vect
 	const std::string &unit = args[1];
 	unsigned int decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT;
 
-	if(unit == "ryo")
+	if(unit == "ombre")
 		decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT;
-	else if(unit == "milliryo")
+	else if(unit == "milliombre")
 		decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 3;
-	else if(unit == "microryo")
+	else if(unit == "microombre")
 		decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 6;
-	else if(unit == "nanoryo")
+	else if(unit == "nanoombre")
 		decimal_point = 0;
 	else
 	{
@@ -2053,7 +2055,7 @@ simple_wallet::simple_wallet()
 	m_cmd_binder.set_handler("donate",
 							 boost::bind(&simple_wallet::donate, this, _1),
 							 tr("donate [index=<N1>[,<N2>,...]] [<priority>] [<ring_size>] <amount> [<payment_id>]"),
-							 tr("Donate <amount> to the Ryo development team"));
+							 tr("Donate <amount> to the ombre development team"));
 	m_cmd_binder.set_handler("sign_transfer",
 							 boost::bind(&simple_wallet::sign_transfer, this, _1),
 							 tr("sign_transfer [export]"),
@@ -2130,8 +2132,8 @@ simple_wallet::simple_wallet()
 								"  Set the fee too default/unimportant/normal/elevated/priority.\n "
 								"confirm-missing-payment-id <1|0>\n "
 								"ask-password <1|0>\n "
-								"unit <ryo|milliryo|microryo|nanoryo>\n "
-								"  Set the default ryo (sub-)unit.\n "
+								"unit <ombre|milliombre|microombre|nanoombre>\n "
+								"  Set the default ombre (sub-)unit.\n "
 								"min-outputs-count [n]\n "
 								"  Try to keep at least that many outputs of value at least min-outputs-value.\n "
 								"min-outputs-value [n]\n "
@@ -2147,9 +2149,9 @@ simple_wallet::simple_wallet()
 								"auto-low-priority <1|0>\n "
 								"  Whether to automatically use the low priority fee level when it's safe to do so.\n "
 								"segregate-pre-fork-outputs <1|0>\n "
-								"  Set this if you intend to spend outputs on both Ryo AND a key reusing fork.\n "
+								"  Set this if you intend to spend outputs on both ombre AND a key reusing fork.\n "
 								"key-reuse-mitigation2 <1|0>\n "
-								"  Set this if you are not sure whether you will spend on a key reusing Ryo fork later.\n"
+								"  Set this if you are not sure whether you will spend on a key reusing ombre fork later.\n"
 								"subaddress-lookahead <major>:<minor>\n "
 								"  Set the lookahead sizes for the subaddress hash table.\n "
 								"segregation-height <n>\n "
@@ -2400,7 +2402,7 @@ bool simple_wallet::set_variable(const std::vector<std::string> &args)
 		CHECK_SIMPLE_VARIABLE("priority", set_default_priority, tr("0, 1, 2, 3, or 4"));
 		CHECK_SIMPLE_VARIABLE("confirm-missing-payment-id", set_confirm_missing_payment_id, tr("0 or 1"));
 		CHECK_SIMPLE_VARIABLE("ask-password", set_ask_password, tr("0 or 1"));
-		CHECK_SIMPLE_VARIABLE("unit", set_unit, tr("ryo, milliryo, microryo, nanoryo"));
+		CHECK_SIMPLE_VARIABLE("unit", set_unit, tr("ombre, milliombre, microombre, nanoombre"));
 		CHECK_SIMPLE_VARIABLE("min-outputs-count", set_min_output_count, tr("unsigned integer"));
 		CHECK_SIMPLE_VARIABLE("min-outputs-value", set_min_output_value, tr("amount"));
 		CHECK_SIMPLE_VARIABLE("merge-destinations", set_merge_destinations, tr("0 or 1"));
@@ -3189,9 +3191,9 @@ bool simple_wallet::try_connect_to_daemon(bool silent, uint32_t *version)
 
 /*!
  * \brief Gets the word seed language from the user.
- *
+ * 
  * User is asked to choose from a list of supported languages.
- *
+ * 
  * \return The chosen language.
  */
 std::string simple_wallet::get_mnemonic_language(bool ignore_cmd_arg)
@@ -3207,7 +3209,7 @@ std::string simple_wallet::get_mnemonic_language(bool ignore_cmd_arg)
 
 		//Don't return smelly user input here
 		if(!ret.empty())
-			return ret;
+			return ret; 
 
 		fail_msg_writer() << boost::format(tr("Language '%s' is not in the language list. Please specify the language manually.\n")) % m_mnemonic_language.c_str();
 	}
@@ -3306,7 +3308,7 @@ bool simple_wallet::new_wallet_from_seed(const boost::program_options::variables
 		return restore_legacy_wallet(vm, language, seed_25);
 }
 
-std::pair<std::unique_ptr<tools::wallet2>, tools::password_container> simple_wallet::make_new_wrapped(const boost::program_options::variables_map &vm,
+std::pair<std::unique_ptr<tools::wallet2>, tools::password_container> simple_wallet::make_new_wrapped(const boost::program_options::variables_map &vm, 
 																			const std::function<boost::optional<tools::password_container>(const char *, bool)> &password_prompter)
 {
 	try
@@ -3368,7 +3370,7 @@ bool simple_wallet::new_wallet(const boost::program_options::variables_map &vm, 
 							   "To start synchronizing with the daemon, use the \"refresh\" command.\n"
 							   "Use the \"help\" command to see the list of available commands.\n"
 							   "Use \"help <command>\" to see a command's documentation.\n"
-							   "Always use the \"exit\" command when closing ryo-wallet-cli to save \n"
+							   "Always use the \"exit\" command when closing ombre-wallet-cli to save \n"
 							   "your current session's state. Otherwise, you might need to synchronize \n"
 							   "your wallet again (your wallet keys are NOT at risk in any case).\n");
 
@@ -3420,7 +3422,7 @@ bool simple_wallet::restore_legacy_wallet(const boost::program_options::variable
 							   "To start synchronizing with the daemon, use the \"refresh\" command.\n"
 							   "Use the \"help\" command to see the list of available commands.\n"
 							   "Use \"help <command>\" to see a command's documentation.\n"
-							   "Always use the \"exit\" command when closing ryo-wallet-cli to save \n"
+							   "Always use the \"exit\" command when closing ombre-wallet-cli to save \n"
 							   "your current session's state. Otherwise, you might need to synchronize \n"
 							   "your wallet again (your wallet keys are NOT at risk in any case).\n");
 
@@ -4429,7 +4431,7 @@ bool simple_wallet::transfer_main(int transfer_type, const std::vector<std::stri
 		fail_msg_writer() << tr("wrong number of arguments");
 		return true;
 	}
-
+	
 	crypto::uniform_payment_id payment_id;
 	bool expect_even = (transfer_type == TransferLocked);
 	if((expect_even ? 0 : 1) == local_args.size() % 2)
@@ -4444,7 +4446,7 @@ bool simple_wallet::transfer_main(int transfer_type, const std::vector<std::stri
 		}
 
 		if(m_wallet->confirm_missing_payment_id())
-			message_writer() << tr("You included a PID. Normally this would be a privacy problem, however Ryo Uniform PID's fixed this.");
+			message_writer() << tr("You included a PID. Normally this would be a privacy problem, however ombre Uniform PID's fixed this.");
 	}
 
 	uint64_t locked_blocks = 0;
@@ -4531,11 +4533,11 @@ bool simple_wallet::transfer_main(int transfer_type, const std::vector<std::stri
 				return true;
 			}
 			unlock_block = bc_height + locked_blocks;
-			ptx_vector = m_wallet->create_transactions_2(dsts, fake_outs_count, unlock_block, priority, payment_id.zero == 0 ? &payment_id : nullptr,
+			ptx_vector = m_wallet->create_transactions_2(dsts, fake_outs_count, unlock_block, priority, payment_id.zero == 0 ? &payment_id : nullptr, 
 														 m_current_subaddress_account, subaddr_indices, m_trusted_daemon);
 			break;
 		case TransferNew:
-			ptx_vector = m_wallet->create_transactions_2(dsts, fake_outs_count, 0, priority, payment_id.zero == 0 ? &payment_id : nullptr,
+			ptx_vector = m_wallet->create_transactions_2(dsts, fake_outs_count, 0, priority, payment_id.zero == 0 ? &payment_id : nullptr, 
 														 m_current_subaddress_account, subaddr_indices, m_trusted_daemon);
 			break;
 		default:
@@ -4846,7 +4848,7 @@ bool simple_wallet::sweep_main(uint64_t below, const std::vector<std::string> &a
 	try
 	{
 		// figure out what tx will be necessary
-		auto ptx_vector = m_wallet->create_transactions_all(below, info.address, info.is_subaddress, fake_outs_count, 0,
+		auto ptx_vector = m_wallet->create_transactions_all(below, info.address, info.is_subaddress, fake_outs_count, 0, 
 					priority, pid.zero == 0 ? &pid : nullptr, m_current_subaddress_account, subaddr_indices, m_trusted_daemon);
 
 		if(ptx_vector.empty())
@@ -5039,7 +5041,7 @@ bool simple_wallet::sweep_single(const std::vector<std::string> &args_)
 	try
 	{
 		// figure out what tx will be necessary
-		auto ptx_vector = m_wallet->create_transactions_single(ki, info.address, info.is_subaddress, fake_outs_count, 0,
+		auto ptx_vector = m_wallet->create_transactions_single(ki, info.address, info.is_subaddress, fake_outs_count, 0, 
 					priority, pid.zero == 0 ? &pid : nullptr, m_trusted_daemon);
 
 		if(ptx_vector.empty())
@@ -5172,7 +5174,7 @@ bool simple_wallet::donate(const std::vector<std::string> &args_)
 	local_args.push_back(amount_str);
 	if(!payment_id_str.empty())
 		local_args.push_back(payment_id_str);
-	message_writer() << tr("Donating ") << amount_str << " to The Ryo Currency Project (" << common_config::RYO_DONATION_ADDR << ").";
+	message_writer() << tr("Donating ") << amount_str << " to The ombre Currency Project (" << common_config::RYO_DONATION_ADDR << ").";
 	transfer_new(local_args);
 	return true;
 }
@@ -7177,7 +7179,7 @@ bool simple_wallet::import_outputs(const std::vector<std::string> &args)
 
 	size_t magiclen = strlen(OUTPUT_EXPORT_FILE_MAGIC);
 	bool is_legacy = false;
-	// first check if this outputs are Ombre
+	// first check if this outputs are ombre
 	if(data.size() < magiclen || memcmp(data.data(), OUTPUT_EXPORT_FILE_MAGIC, magiclen))
 	{
 		magiclen = strlen(OUTPUT_EXPORT_FILE_MAGIC_LEGACY);
@@ -7476,12 +7478,12 @@ int main(int argc, char *argv[])
 	int vm_error_code = 1;
 	const auto vm = wallet_args::main(
 		argc, argv,
-		"ryo-wallet-cli [--wallet-file=<file>|--generate-new-wallet=<file>] [<COMMAND>]",
-		sw::tr("This is the command line ryo wallet. It needs to connect to a ryo daemon to work correctly."),
+		"ombre-wallet-cli [--wallet-file=<file>|--generate-new-wallet=<file>] [<COMMAND>]",
+		sw::tr("This is the command line ombre wallet. It needs to connect to a ombre daemon to work correctly."),
 		desc_params,
 		positional_options,
 		[](const std::string &s, bool emphasis) { tools::scoped_message_writer(emphasis ? epee::console_color_white : epee::console_color_default, true) << s; },
-		"ryo-wallet-cli.log",
+		"ombre-wallet-cli.log",
 		vm_error_code);
 
 	if(!vm)
