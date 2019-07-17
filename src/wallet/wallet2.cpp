@@ -4,7 +4,7 @@
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ryo changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -117,7 +117,7 @@ namespace
 std::string get_default_ringdb_path()
 {
 	boost::filesystem::path dir = tools::get_default_data_dir();
-	// remove .ryo, replace with .shared-ringdb
+	// remove .ombre, replace with .shared-ringdb
 	dir = dir.remove_filename();
 	dir /= ".shared-ringdb";
 	return dir.string();
@@ -2566,9 +2566,8 @@ bool wallet2::store_keys(const std::string &keys_file_name, const epee::wipeable
 	json.AddMember("refresh_type", value2, json.GetAllocator());
 
 	value2.SetUint64(m_refresh_from_block_height);
-	/* refresh_height was used until ryo version 0.2.0.2.
-	 * The new entry refresh_height2 avoids an refresh bug in older ryo versions
-	 * https://github.com/ryo-currency/ryo-currency/pull/48
+	/* refresh_height was used until ombre version 1.4.0.
+	 * The new entry refresh_height2 avoids an refresh bug in older ombre versions
 	 */
 	json.AddMember("refresh_height2", value2, json.GetAllocator());
 
@@ -4688,7 +4687,7 @@ bool wallet2::load_unsigned_tx(const std::string &unsigned_filename, unsigned_tx
 	}
 	size_t magiclen = strlen(UNSIGNED_TX_PREFIX) - 1;
 	bool is_legacy = false;
-	// search first for ryo
+	// search first for ombre
 	if(strncmp(s.c_str(), UNSIGNED_TX_PREFIX, magiclen))
 	{
 		magiclen = strlen(UNSIGNED_TX_PREFIX_LEGACY) - 1;
@@ -4892,7 +4891,7 @@ bool wallet2::load_tx(const std::string &signed_filename, std::vector<tools::wal
 
 	size_t magiclen = strlen(SIGNED_TX_PREFIX) - 1;
 	bool is_legacy = false;
-	//parse first ryo
+	//parse first ombre
 	if(strncmp(s.c_str(), SIGNED_TX_PREFIX, magiclen))
 	{
 		magiclen = strlen(SIGNED_TX_PREFIX_LEGACY) - 1;
@@ -9321,7 +9320,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 		}
 	}
 
-	std::string uri = "ryo:" + address;
+	std::string uri = "ombre:" + address;
 	unsigned int n_fields = 0;
 
 	if(!payment_id.empty())
@@ -9351,9 +9350,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
 	const size_t separator_pos = uri.find(':');
-	if(separator_pos == std::string::npos || uri.substr(0, separator_pos) != "ryo")
+	if(separator_pos == std::string::npos || uri.substr(0, separator_pos) != "ombre")
 	{
-		error = std::string("URI has wrong scheme (expected \"ryo:\"): ") + uri;
+		error = std::string("URI has wrong scheme (expected \"ombre:\"): ") + uri;
 		return false;
 	}
 	// exclude separator
@@ -9590,7 +9589,7 @@ std::vector<std::pair<uint64_t, uint64_t>> wallet2::estimate_backlog(const std::
 		uint64_t nblocks_min = priority_size_min / full_reward_zone;
 		uint64_t nblocks_max = priority_size_max / full_reward_zone;
 		MDEBUG("estimate_backlog: priority_size " << priority_size_min << " - " << priority_size_max << " for "
-												  << our_fee_byte_min << " - " << our_fee_byte_max << " nanoRyo byte fee, "
+												  << our_fee_byte_min << " - " << our_fee_byte_max << " nanoombre byte fee, "
 												  << nblocks_min << " - " << nblocks_max << " blocks at block size " << full_reward_zone);
 		blocks.push_back(std::make_pair(nblocks_min, nblocks_max));
 	}

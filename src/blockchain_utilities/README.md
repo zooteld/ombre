@@ -1,4 +1,4 @@
-# Ombre Blockchain Utilities
+# ombre Blockchain Utilities
 
 Copyright (c) 2014-2018, The Monero Project
 
@@ -14,13 +14,13 @@ See also each utility's "--help" option.
 
 `$ ombre-blockchain-export`
 
-This loads the existing blockchain and exports it to `$OMBRE_DATA_DIR/export/blockchain.raw`
+This loads the existing blockchain and exports it to `$ombre_DATA_DIR/export/blockchain.raw`
 
 ### Import the exported file
 
 `$ ombre-blockchain-import`
 
-This imports blocks from `$OMBRE_DATA_DIR/export/blockchain.raw` (exported using the
+This imports blocks from `$ombre_DATA_DIR/export/blockchain.raw` (exported using the
 `ombre-blockchain-export` tool as described above) into the current database.
 
 Defaults: `--batch on`, `--batch size 20000`, `--verify on`

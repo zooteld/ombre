@@ -1,11 +1,10 @@
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
 // Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -30,6 +29,9 @@
 #include <boost/format.hpp>
 #include <ctime>
 #include <string>
+
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize
 {
@@ -1094,8 +1096,8 @@ bool t_rpc_command_executor::stop_daemon()
 	//# ifdef WIN32
 	//    // Stop via service API
 	//    // TODO - this is only temporary!  Get rid of hard-coded constants!
-	//    bool ok = windows::stop_service("Ombre Daemon");
-	//    ok = windows::uninstall_service("Ombre Daemon");
+	//    bool ok = windows::stop_service("ombre Daemon");
+	//    ok = windows::uninstall_service("ombre Daemon");
 	//    //bool ok = windows::stop_service(SERVICE_NAME);
 	//    //ok = windows::uninstall_service(SERVICE_NAME);
 	//    if (ok)

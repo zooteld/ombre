@@ -41,7 +41,7 @@
 #define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
-#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.01 // Percentage of the total block reward.
+#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
 // Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
 #define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define EMISSION_SPEED_FACTOR_PER_MINUTE (20)
@@ -296,9 +296,9 @@ struct config<STAGENET>
 	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x1fbbe192; // RYosE
 	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0xe3c2192;		  // RYosU
 
-	static constexpr uint16_t P2P_DEFAULT_PORT = 14410; 
-	static constexpr uint16_t RPC_DEFAULT_PORT = 14411; 
-	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 14412; 
+	static constexpr uint16_t P2P_DEFAULT_PORT = 39743; 
+	static constexpr uint16_t RPC_DEFAULT_PORT = 39744; 
+	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 39745; 
  
 	static constexpr boost::uuids::uuid NETWORK_ID = { { 0x15, 0x77, 0x3a, 0x26, 0x42, 0xa0, 0x3f, 0xf3, 0xe5, 0x79, 0x72, 0x8d, 0x4e, 0x5a, 0xf2, 0x98 } }; 
 

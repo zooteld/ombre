@@ -1,10 +1,10 @@
-// Copyright (c) 2018, Ombre Cryptocurrency Project
 // Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Ombre changes to this code are in public domain. Please note, other licences may apply to the file.
+// ombre changes to this code are in public domain. Please note, other licences may apply to the file.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 		desc_params,
 		boost::program_options::positional_options_description(),
 		[](const std::string &s, bool emphasis) { tools::scoped_message_writer(emphasis ? epee::console_color_white : epee::console_color_default, true) << s; },
-		"ryo-gen-multisig.log",
+		"ombre-gen-multisig.log",
 		vm_error_code);
 	if(!vm)
 		return vm_error_code;

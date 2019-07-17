@@ -1,4 +1,3 @@
-# Copyright (c) 2018, Ombre Cryptocurrency Project
 # Copyright (c) 2018, Ryo Currency Project
 # Portions copyright (c) 2014-2018, The Monero Project
 #
@@ -63,7 +62,7 @@ target_link_libraries(cn_deserialize
 
 set_property(TARGET cn_deserialize
 	PROPERTY
-	OUTPUT_NAME "ryo-utils-deserialize")
+	OUTPUT_NAME "ombre-utils-deserialize")
 
 
 set(object_sizes_sources
@@ -84,5 +83,5 @@ target_link_libraries(object_sizes
 
 set_property(TARGET object_sizes
 	PROPERTY
-	OUTPUT_NAME "ryo-utils-object-sizes")
+	OUTPUT_NAME "ombre-utils-object-sizes")
 
