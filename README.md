@@ -27,7 +27,7 @@ Some main differences compared to other cryptonote coins are:
 
 ## Development funding
 
-We do not have a premine. Instead we have a project development reward that causes coins to unlock 0.01% with every block that is found. 
+We do not have a premine. Instead we have a project development reward that causes coins to unlock 0.02% with every block that is found. 
 
 The development fee will be used to pay for development, exchanges and marketing.
 
