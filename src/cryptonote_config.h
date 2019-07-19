@@ -215,9 +215,9 @@ struct common_config
 	///////////////// Dev fund constants
 	static constexpr const char* DEV_FUND_ADDRESS_V1 = "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt";
 	static constexpr const char* DEV_FUND_VIEWKEY_V1 = "\xbf\xfa\x80\x3b\xb4\x06\x1d\x93\xa8\x3a\x36\x13\xff\x47\x8c\x5b\x5e\x5c\xb0\xb0\x33\x7a\x73\x5e\x1a\x13\x04\xca\x9f\xab\x18\x07";
-	static constexpr const char* DEV_FUND_ADDRESS_V2 = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
-	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\x1b\xc6\x6c\x1b\x5e\x0e\x7f\x32\x7d\x2f\x03\xac\xde\x9e\x73\xf6\xe6\xf9\x66\xb7\x6b\x61\xc9\x54\xf3\x9a\xed\x2f\xee\x8a\xe9\x0e";
-	static constexpr const char* RYO_DONATION_ADDR = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
+	static constexpr const char* DEV_FUND_ADDRESS_V2 = "ShaDowSig6F7oJipFK46NDhkqfkmmRFQq1vt3ZwSfpTuKQBMf9enee3fJrSqRtTsyG9xTizeRTUrc9F9fErtSfWPK55eGnNpQbbAZ7";
+	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\x5f\x70\xe5\x07\x02\x94\x2f\x26\x9c\x87\x35\x8b\xb5\xaa\x12\x47\x52\x79\x31\x49\x91\x8c\x5f\x52\x39\xf8\x6c\x09\x18\xfd\x71\xd6";
+	static constexpr const char* RYO_DONATION_ADDR = "ShaDowSibcWgnL2sqXmxfTRMdZnx56acz8V2RCWSPmpyKbBT1xDg4A95pwQok9SE9pHRAVe53aFHyW733YaykzjXHtb7fy5a5uzFo3";
 };
 
 template <network_type type>
