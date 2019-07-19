@@ -215,9 +215,9 @@ struct common_config
 	///////////////// Dev fund constants
 	static constexpr const char* DEV_FUND_ADDRESS_V1 = "cashCdYTudG44DDXfmWFxv9mFBbZ4rmaB2HcB5uCWQRXfdnjSBf8CDT3d8KtR4vAos8U3YrJKqu3CGacg6iQSqDR1PTekywzyt";
 	static constexpr const char* DEV_FUND_VIEWKEY_V1 = "\xbf\xfa\x80\x3b\xb4\x06\x1d\x93\xa8\x3a\x36\x13\xff\x47\x8c\x5b\x5e\x5c\xb0\xb0\x33\x7a\x73\x5e\x1a\x13\x04\xca\x9f\xab\x18\x07";
-	static constexpr const char* DEV_FUND_ADDRESS_V2 = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
-	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\x1b\xc6\x6c\x1b\x5e\x0e\x7f\x32\x7d\x2f\x03\xac\xde\x9e\x73\xf6\xe6\xf9\x66\xb7\x6b\x61\xc9\x54\xf3\x9a\xed\x2f\xee\x8a\xe9\x0e";
-	static constexpr const char* RYO_DONATION_ADDR = "ShaDowSiNCj5sDzTFeFBea8AehPmcns37jgm7T9sttAiLFFdKppWT8p14Ge7dgAeHGWG4RJLE6wtZJppPLCVVNmcUTGWxA4sgjbHUU";
+	static constexpr const char* DEV_FUND_ADDRESS_V2 = "ShaDowSig6F7oJipFK46NDhkqfkmmRFQq1vt3ZwSfpTuKQBMf9enee3fJrSqRtTsyG9xTizeRTUrc9F9fErtSfWPK55eGnNpQbbAZ7";
+	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\xc6\x86\x25\x5a\x48\x4d\x80\x2c\x14\x58\xd5\xf0\xf4\xe4\xd3\x7f\x9e\xe1\x60\x4c\x84\x4c\x58\xbb\xbe\x25\xf6\x43\x51\x54\x55\x01";
+	static constexpr const char* RYO_DONATION_ADDR = "ShaDowSibcWgnL2sqXmxfTRMdZnx56acz8V2RCWSPmpyKbBT1xDg4A95pwQok9SE9pHRAVe53aFHyW733YaykzjXHtb7fy5a5uzFo3";
 };
 
 template <network_type type>
@@ -228,13 +228,13 @@ struct config : public common_config
 template <>
 struct config<MAINNET>
 {
-	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xe1f54;            // cash
-	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
-	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0xcd18fd299;			// ShaDoW
-	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x11cfd299;			// ShaDoe
-	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x8a20fd299;			// ShaDowS
+	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xcd18fd299; // ShaDow
+	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x8a20fd299; // ShaDowS
+	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0xe1f54; // cash
+	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x11cfd299; // ShaDoe
 	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xf11afd299; // ShaDoeS
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299;			// ShaDos
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299; // ShaDos
 
 	static constexpr uint16_t P2P_DEFAULT_PORT = 19743;
 	static constexpr uint16_t RPC_DEFAULT_PORT = 19744;

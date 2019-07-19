@@ -117,7 +117,7 @@ namespace
 std::string get_default_ringdb_path()
 {
 	boost::filesystem::path dir = tools::get_default_data_dir();
-	// remove .ombre, replace with .shared-ringdb
+	// remove .ryo, replace with .shared-ringdb
 	dir = dir.remove_filename();
 	dir /= ".shared-ringdb";
 	return dir.string();
@@ -9320,7 +9320,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 		}
 	}
 
-	std::string uri = "ombre:" + address;
+	std::string uri = "ryo:" + address;
 	unsigned int n_fields = 0;
 
 	if(!payment_id.empty())
@@ -9350,9 +9350,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
 	const size_t separator_pos = uri.find(':');
-	if(separator_pos == std::string::npos || uri.substr(0, separator_pos) != "ombre")
+	if(separator_pos == std::string::npos || uri.substr(0, separator_pos) != "ryo")
 	{
-		error = std::string("URI has wrong scheme (expected \"ombre:\"): ") + uri;
+		error = std::string("URI has wrong scheme (expected \"ryo:\"): ") + uri;
 		return false;
 	}
 	// exclude separator
