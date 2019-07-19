@@ -88,7 +88,7 @@
 
 #define ALLOW_DEBUG_COMMANDS
 
-#define CRYPTONOTE_NAME "ombre2"
+#define CRYPTONOTE_NAME "ombre"
 #define CRYPTONOTE_POOLDATA_FILENAME "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME "blockchain.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
