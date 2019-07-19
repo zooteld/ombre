@@ -228,13 +228,13 @@ struct config : public common_config
 template <>
 struct config<MAINNET>
 {
-	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xe1f54;            // cash
-	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
-	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0xcd18fd299;			// ShaDoW
-	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x11cfd299;			// ShaDoe
-	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x8a20fd299;			// ShaDowS
+	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xcd18fd299; // ShaDow
+	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x8a20fd299; // ShaDowS
+	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0xe1f54; // cash
+	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x11cfd299; // ShaDoe
 	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xf11afd299; // ShaDoeS
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299;			// ShaDos
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299; // ShaDos
 
 	static constexpr uint16_t P2P_DEFAULT_PORT = 19743;
 	static constexpr uint16_t RPC_DEFAULT_PORT = 19744;
