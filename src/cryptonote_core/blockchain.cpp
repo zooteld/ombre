@@ -3076,7 +3076,7 @@ bool Blockchain::check_fee(const transaction &tx, size_t blob_size, uint64_t fee
 
 	//WHO THOUGHT THAT FLOATS IN CONSENSUS CODE ARE A GOOD IDEA?????
 	float kB = (blob_size - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE) * 1.0f / 1024;
-	needed_fee = ((uint64_t)(kB * fee_per_kb)) / 1000 * 100;
+	needed_fee = ((uint64_t)(kB * fee_per_kb)) / 100 * 100;
 
 	if(fee < needed_fee)
 	{
