@@ -29,9 +29,9 @@
 #define CRYPTONOTE_GETBLOCKTEMPLATE_MAX_BLOCK_SIZE 196608 //size of block (bytes) that is the maximum that miners will produce
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER 0
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW 60
-#define CURRENT_TRANSACTION_VERSION 3
+#define CURRENT_TRANSACTION_VERSION 2
 #define MIN_TRANSACTION_VERSION 2
-#define MAX_TRANSACTION_VERSION 3
+#define MAX_TRANSACTION_VERSION 2
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE 10
 
 // MONEY_SUPPLY - total number coins to be generated
@@ -159,15 +159,15 @@ static constexpr hardfork_conf FORK_CONFIG[] = {
 	{FORK_POW_CN_HEAVY,3, 3, 1},
 	{FORK_POW_CN_GPU, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 	{FORK_DEV_FUND_V2, 4, 4, 1},
-	{FORK_DEV_FUND_V3, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_FIXED_FEE, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_STRICT_TX_SEMANTICS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_RINGSIZE_INC, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_RINGSIZE_INC_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_BULLETPROOFS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_BULLETPROOFS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_UNIFORM_IDS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_UNIFORM_IDS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1}
+	{FORK_DEV_FUND_V3, 5, 6, 4},
+	{FORK_FIXED_FEE, 5, 6, 4},
+	{FORK_STRICT_TX_5, 6, 4},
+	{FORK_RINGSIZE_INC, 5, 6, 4},
+	{FORK_RINGSIZE_INC_REQ, 5, 6, 4},
+	{FORK_BULLETPROOFS, 5, 6, 4},
+	{FORK_BULLETPROOFS_REQ, 5, 6, 4},
+	{FORK_UNIFORM_IDS, 5, 6, 4},
+	{FORK_UNIFORM_IDS_REQ, 5, 6, 4},
 };
 
 // COIN - number of smallest units in one coin
