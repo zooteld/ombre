@@ -161,7 +161,7 @@ static constexpr hardfork_conf FORK_CONFIG[] = {
 	{FORK_DEV_FUND_V2, 4, 4, 1},
 	{FORK_DEV_FUND_V3, 5, 6, 4},
 	{FORK_FIXED_FEE, 5, 6, 4},
-	{FORK_STRICT_TX_5, 6, 4},
+	{FORK_STRICT_TX_SEMANTICS, 5, 6, 4},
 	{FORK_RINGSIZE_INC, 5, 6, 4},
 	{FORK_RINGSIZE_INC_REQ, 5, 6, 4},
 	{FORK_BULLETPROOFS, 5, 6, 4},
