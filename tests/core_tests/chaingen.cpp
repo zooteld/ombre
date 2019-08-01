@@ -132,9 +132,13 @@ bool test_generator::construct_block(cryptonote::block &blk, uint64_t height, co
 
 	blk.miner_tx = AUTO_VAL_INIT(blk.miner_tx);
 	size_t target_block_size = txs_size + get_object_blobsize(blk.miner_tx);
+  bool dev_fee_v3 = false;
+  if( height>796430)  /// This number should be changed based on what hieght the fork will be happened. yoosofan
+    dev_fee_v3=true;
 	while(true)
 	{
-		if(!construct_miner_tx(MAINNET, height, misc_utils::median(block_sizes), already_generated_coins, target_block_size, total_fee, miner_acc.get_keys().m_account_address, blk.miner_tx, blobdata()))
+
+		if(!construct_miner_tx(MAINNET, dev_fee_v3, height, misc_utils::median(block_sizes), already_generated_coins, target_block_size, total_fee, miner_acc.get_keys().m_account_address, blk.miner_tx, blobdata()))
 			return false;
 
 		size_t actual_block_size = txs_size + get_object_blobsize(blk.miner_tx);
@@ -237,7 +241,10 @@ bool test_generator::construct_block_manually(block &blk, const block &prev_bloc
 	{
 		size_t current_block_size = txs_sizes + get_object_blobsize(blk.miner_tx);
 		// TODO: This will work, until size of constructed block is less then CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE
-		if(!construct_miner_tx(MAINNET, height, misc_utils::median(block_sizes), already_generated_coins, current_block_size, 0, miner_acc.get_keys().m_account_address, blk.miner_tx, blobdata()))
+    bool dev_fee_v3 = false;
+    if( height>796430)  /// This number should be changed based on what hieght the fork will be happened. yoosofan
+      dev_fee_v3=true;
+		if(!construct_miner_tx(MAINNET, dev_fee_v3, height, misc_utils::median(block_sizes), already_generated_coins, current_block_size, 0, miner_acc.get_keys().m_account_address, blk.miner_tx, blobdata()))
 			return false;
 	}
 
