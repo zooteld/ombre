@@ -1157,7 +1157,7 @@ bool Blockchain::validate_miner_transaction_v2(const block &b, uint64_t height, 
 	crypto::key_derivation deriv;
 
 	const crypto::secret_key& dev_view_key = check_hard_fork_feature(FORK_DEV_FUND_V3) ? m_dev_view_key_v1 : m_dev_view_key_v2;
-	const crypto::public_key& dev_spend_key = check_hard_fork_feature(FORK_DEV_FUND_V3) ?  m_dev_spend_key_v1 : m_dev_spend_key_v1;
+	const crypto::public_key& dev_spend_key = check_hard_fork_feature(FORK_DEV_FUND_V3) ?  m_dev_spend_key_v1 : m_dev_spend_key_v2;
 	
 	if(tx_pub == null_pkey || !generate_key_derivation(tx_pub, dev_view_key, deriv))
 	{

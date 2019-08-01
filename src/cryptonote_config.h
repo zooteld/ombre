@@ -160,14 +160,14 @@ static constexpr hardfork_conf FORK_CONFIG[] = {
 	{FORK_POW_CN_GPU, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 	{FORK_DEV_FUND_V2, 4, 4, 1},
 	{FORK_DEV_FUND_V3, 5, 6, 4},
-	{FORK_FIXED_FEE, 5, 6, 4},
-	{FORK_STRICT_TX_SEMANTICS, 5, 6, 4},
+	{FORK_FIXED_FEE, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_STRICT_TX_SEMANTICS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 	{FORK_RINGSIZE_INC, 5, 6, 4},
-	{FORK_RINGSIZE_INC_REQ, 5, 6, 4},
+	{FORK_RINGSIZE_INC_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 	{FORK_BULLETPROOFS, 5, 6, 4},
-	{FORK_BULLETPROOFS_REQ, 5, 6, 4},
+	{FORK_BULLETPROOFS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 	{FORK_UNIFORM_IDS, 5, 6, 4},
-	{FORK_UNIFORM_IDS_REQ, 5, 6, 4},
+	{FORK_UNIFORM_IDS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
 };
 
 // COIN - number of smallest units in one coin
