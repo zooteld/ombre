@@ -249,10 +249,10 @@ struct config<MAINNET>
 
 	////////////////////// Dev fund constants
 	// How ofen do we add the dev reward
-	static constexpr uint64_t DEV_FUND_PERIOD = 10; // testing
+	static constexpr uint64_t DEV_FUND_PERIOD = 10; // 10 min
 	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(2000000);
 	static constexpr uint64_t DEV_FUND_LENGTH = 52 * 6; // 6 years
-	static constexpr uint64_t DEV_FUND_START  = 770630;
+	static constexpr uint64_t DEV_FUND_START  = 797770;
 };
 
 template <>
