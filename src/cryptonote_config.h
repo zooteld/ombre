@@ -230,14 +230,13 @@ struct config : public common_config
 template <>
 struct config<MAINNET>
 {
-	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xcd18fd299; // ShaDoW
-	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x8a20fd299; // ShaDowS
-	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x11cfd299; // ShaDoe
-	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+	static constexpr uint64_t LEGACY_LONG_ADDRESS_BASE58_PREFIX = 0xd7bd299; // Shade
+	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xb285bd299; // Shadow
+	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x3c9299; // Shae
+	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x6bb9299; // Shad3
 	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0xe1f54; // cash
-	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xf11afd299; // ShaDoeS
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x120fd299; // ShaDos
-
+	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xe9f54; // casi
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x1b19a;         // Suba
 	static constexpr uint16_t P2P_DEFAULT_PORT = 19743;
 	static constexpr uint16_t RPC_DEFAULT_PORT = 19744;
 	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 19745;
@@ -263,10 +262,9 @@ struct config<TESTNET>
 	static constexpr uint64_t LEGACY_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x34f51a; // Suti
 	static constexpr uint64_t RYO_KURZ_SUBADDRESS_BASE58_PREFIX = 0x3fa0;			  // Tr
 	static constexpr uint64_t RYO_KURZ_ADDRESS_BASE58_PREFIX = 0x7420;			  // Tu
-	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x7d1f;			  // Tk
-	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x9f; // Tb
-	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x1a1;		  // Tw
-
+	static constexpr uint64_t RYO_LONG_ADDRESS_BASE58_PREFIX = 0x211f;            // Te
+	static constexpr uint64_t RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x629f; // Ti
+	static constexpr uint64_t RYO_LONG_SUBADDRESS_BASE58_PREFIX = 0x59a0;         // Ts
 	static constexpr uint16_t P2P_DEFAULT_PORT = 29743; 
 	static constexpr uint16_t RPC_DEFAULT_PORT = 29744; 
 	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 29745; 
