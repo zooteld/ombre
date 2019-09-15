@@ -31,7 +31,7 @@
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW 60
 #define CURRENT_TRANSACTION_VERSION 2
 #define MIN_TRANSACTION_VERSION 2
-#define MAX_TRANSACTION_VERSION 2
+#define MAX_TRANSACTION_VERSION 3
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE 10
 
 // MONEY_SUPPLY - total number coins to be generated
@@ -41,7 +41,7 @@
 #define FINAL_SUBSIDY                                   ((uint64_t)10000000000) // 1 * pow(10, 9)
 #define GENESIS_BLOCK_REWARD                            ((uint64_t)1000000000)
 
-#define CRYPTONOTE_PROJECT_BLOCK_REWARD                 0.02 // Percentage of the total block reward.
+#define CRYPTONOTE_PROJECT_BLOCK_REWARD                  0.02 // Percentage of the total block reward.
 // Initial dev fee - drops down rapidly and averages to CRYPTONOTE_PROJECT_BLOCK_REWARD over time
 #define CRYPTONOTE_PROJECT_INITIAL_MULTIPLIER           0.06
 #define EMISSION_SPEED_FACTOR_PER_MINUTE (20)
@@ -157,17 +157,17 @@ struct hardfork_conf
 static constexpr hardfork_conf FORK_CONFIG[] = {
 	{FORK_DIFF_V2, 2, 2, 1},
 	{FORK_POW_CN_HEAVY,3, 3, 1},
-	{FORK_POW_CN_GPU, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_POW_CN_GPU, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
 	{FORK_DEV_FUND_V2, 4, 4, 1},
-	{FORK_DEV_FUND_V3, 5, 6, 4},
-	{FORK_FIXED_FEE, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_STRICT_TX_SEMANTICS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_RINGSIZE_INC, 5, 6, 4},
-	{FORK_RINGSIZE_INC_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_BULLETPROOFS, 5, 6, 4},
-	{FORK_BULLETPROOFS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
-	{FORK_UNIFORM_IDS, 5, 6, 4},
-	{FORK_UNIFORM_IDS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, 1},
+	{FORK_DEV_FUND_V3, 5, 4, 1},
+	{FORK_FIXED_FEE, 5, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_STRICT_TX_SEMANTICS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_RINGSIZE_INC, 5, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_RINGSIZE_INC_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_BULLETPROOFS, 5, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_BULLETPROOFS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_UNIFORM_IDS, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED},
+	{FORK_UNIFORM_IDS_REQ, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED, hardfork_conf::FORK_ID_DISABLED}
 };
 
 // COIN - number of smallest units in one coin
@@ -199,7 +199,7 @@ struct common_config
 
 	static constexpr uint64_t BLOCK_FUTURE_TIME_LIMIT = 60 * 24;
 
-	static constexpr uint64_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE = 300 * 1024; // 240 kB
+	static constexpr uint64_t CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE = 240 * 1024; // 240 kB
 	static constexpr uint64_t BLOCK_SIZE_GROWTH_FAVORED_ZONE = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 4;
 	static constexpr uint64_t TRANSACTION_SIZE_LIMIT = 300 * 1024;			// 300 kB
 	static constexpr uint64_t BLOCK_SIZE_LIMIT_ABSOLUTE = 16 * 1024 * 1024; // 16 MB
@@ -217,6 +217,8 @@ struct common_config
 	static constexpr const char* DEV_FUND_VIEWKEY_V1 = "\xbf\xfa\x80\x3b\xb4\x06\x1d\x93\xa8\x3a\x36\x13\xff\x47\x8c\x5b\x5e\x5c\xb0\xb0\x33\x7a\x73\x5e\x1a\x13\x04\xca\x9f\xab\x18\x07";
 	static constexpr const char* DEV_FUND_ADDRESS_V2 = "cashCcaFrjhH1hNgK7TSXW4imEJA81zd2fwUzPvNKmzcLkG3US2YnQo8xiLze5RRZJMKkV15YpqgqZUu4Vxht7bK9zLRN2UCNM";
 	static constexpr const char* DEV_FUND_VIEWKEY_V2 = "\xee\xe5\xc6\xcd\x5d\xed\xff\xbd\x21\xc1\x57\x6c\xd7\x0e\xbf\x33\x25\x3d\xc5\xee\x52\xc6\xf7\xb0\x73\xc9\xcd\x0e\xd8\x2b\x95\x00";
+	//secret eee5c6cd5dedffbd21c1576cd70ebf33253dc5ee52c6f7b073c9cd0ed82b9500
+	//public af9af800002f97d66e7bbcd191798140ec546d4d8ec230f071b763fcf6ed3145
 	static constexpr const char* RYO_DONATION_ADDR = "cashL7NzHYoHrGvWRJvMygcqwb2pKKC6DCsCKuvoeiRBbPYBkUNF7Fh7F3qFY9WAnKUWCiS99PFXQfmuUJHcfF7X5LYbMYDP4P";
 };
 
@@ -248,10 +250,10 @@ struct config<MAINNET>
 
 	////////////////////// Dev fund constants
 	// How ofen do we add the dev reward
-	static constexpr uint64_t DEV_FUND_PERIOD = 15 * 24 * 7; // 1 week
-	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(8000000);
+	static constexpr uint64_t DEV_FUND_PERIOD = 10; // testing
+	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(2000000);
 	static constexpr uint64_t DEV_FUND_LENGTH = 52 * 6; // 6 years
-	static constexpr uint64_t DEV_FUND_START  = 161500;
+	static constexpr uint64_t DEV_FUND_START  = 770630;
 };
 
 template <>

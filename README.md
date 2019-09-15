@@ -143,7 +143,6 @@ invokes cmake commands as needed.
 * Change to the root of the source code directory, change to the most recent release branch, and build:
 
         cd ombre
-        git checkout tags/0.2.0
         make
 
     *Optional*: If your machine has several cores and enough memory, enable
