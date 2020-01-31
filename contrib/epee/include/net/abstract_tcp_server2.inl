@@ -58,6 +58,12 @@
 #define DEFAULT_TIMEOUT_MS_REMOTE boost::posix_time::milliseconds(10000) // 10 seconds
 #define TIMEOUT_EXTRA_MS_PER_BYTE 0.2
 
+#if BOOST_VERSION >= 107000
+#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())
+#else
+#define GET_IO_SERVICE(s) ((s).get_io_service())
+#endif
+
 PRAGMA_WARNING_PUSH
 namespace epee
 {
@@ -80,7 +86,7 @@ connection<t_protocol_handler>::connection(boost::asio::io_service &io_service,
 	  m_connection_type(connection_type),
 	  m_throttle_speed_in("speed_in", "throttle_speed_in"),
 	  m_throttle_speed_out("speed_out", "throttle_speed_out"),
-	  m_timer(io_service),
+	  m_timer(get_io_service()),
 	  m_local(false)
 {
 	MDEBUG("test, connection constructor set m_connection_type=" << m_connection_type);
@@ -204,7 +210,7 @@ bool connection<t_protocol_handler>::request_callback()
 template <class t_protocol_handler>
 boost::asio::io_service &connection<t_protocol_handler>::get_io_service()
 {
-	return socket_.get_io_service();
+	return GET_IO_SERVICE(socket());
 }
 //---------------------------------------------------------------------------------
 template <class t_protocol_handler>
@@ -367,7 +373,7 @@ bool connection<t_protocol_handler>::call_run_once_service_io()
 	if(!m_is_multithreaded)
 	{
 		//single thread model, we can wait in blocked call
-		size_t cnt = socket_.get_io_service().run_one();
+		size_t cnt = GET_IO_SERVICE(socket()).run_one();
 		if(!cnt) //service is going to quit
 			return false;
 	}
@@ -378,7 +384,7 @@ bool connection<t_protocol_handler>::call_run_once_service_io()
 		//if no handlers were called
 		//TODO: Maybe we need to have have critical section + event + callback to upper protocol to
 		//ask it inside(!) critical region if we still able to go in event wait...
-		size_t cnt = socket_.get_io_service().poll_one();
+		size_t cnt = GET_IO_SERVICE(socket()).poll_one();
 		if(!cnt)
 			misc_utils::sleep_no_w(0);
 	}
